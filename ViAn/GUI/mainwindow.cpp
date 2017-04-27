@@ -2,9 +2,12 @@
 #include "ui_mainwindow.h"
 #include <QMessageBox>
 #include <iostream>
+#include <algorithm>
 #include <sstream>
 #include <QCloseEvent>
 #include <QColorDialog>
+#include <QLabel>
+#include <QSpacerItem>
 #include <chrono>
 #include <thread>
 #include "icononbuttonhandler.h"
@@ -23,7 +26,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow){
     ui->setupUi(this);
     video_slider = ui->video_slider;
-
 
     icon_on_button_handler = new IconOnButtonHandler();
     icon_on_button_handler->set_pictures_to_buttons(ui);
@@ -218,6 +220,58 @@ void MainWindow::on_previous_frame_button_clicked() {
  */
 void MainWindow::update_video(QImage frame) {
     ui->video_frame->setPixmap(QPixmap::fromImage(frame));
+    set_total_time();
+    set_current_time();
+}
+
+/**
+ * @brief MainWindow::set_total_time
+ * Sets the total video length in the totalTimeLabel
+ */
+void MainWindow::set_total_time() {
+    int total_time = mvideo_player->get_num_frames()/mvideo_player->get_frame_rate();
+    int sec_int = total_time%60;
+    int min_int = total_time/60;
+    int hour_int = min_int/60;
+    std::string sec_str, min_str, hour_str, time_str = "";
+
+    if (min_int <= 9) {
+        min_str = "0"+to_string(min_int);
+    } else {
+        min_str = to_string(min_int);
+    }
+
+    if (sec_int <= 9) {
+        sec_str = "0"+to_string(sec_int);
+    } else {
+        sec_str = to_string(sec_int);
+    }
+
+    hour_str = to_string(hour_int);
+    if (hour_int >= 1) {
+        time_str = hour_str+":"+min_str+":"+sec_str;
+    } else {
+        time_str = min_str+":"+sec_str;
+    }
+    ui->totalTimeLabel->setText(QString::fromStdString(time_str));
+}
+
+/**
+ * @brief MainWindow::set_current_time
+ * Set the current time in the video in the currentTimeLabel
+ */
+void MainWindow::set_current_time() {
+    int current_time = mvideo_player->get_current_frame_num()/mvideo_player->get_frame_rate();
+    std::string min = to_string(current_time/60);
+    std::string hour = to_string(current_time/3600);
+    std::string sec = to_string(current_time%60);
+    std::string time = "";
+    if (current_time/3600 >= 1) {
+        time = hour+":"+min+":"+sec;
+    } else {
+        time = min+":"+sec;
+    }
+    ui->currentTimeLabel->setText(QString::fromStdString(time));
 }
 
 /**
@@ -632,7 +686,7 @@ void MainWindow::on_actionAddVideo_triggered() {
         MyQTreeWidgetItem *my_project = (MyQTreeWidgetItem*) project;
         if (my_project->type == TYPE::PROJECT){
             QString dir = QFileDialog::getOpenFileName(this, tr("Choose video"), this->fileHandler->get_work_space().absolutePath().toStdString().c_str(),
-                                                       tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
+                                                       tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v *.wmv)"));
             if(!dir.isEmpty()) { // Check if you have selected something.
                 ID id = fileHandler->add_video(fileHandler->get_project(my_project->id), dir.toStdString());
                 add_video_to_tree(dir.toStdString(), id);
@@ -999,3 +1053,63 @@ void MainWindow::on_actionInvert_analysis_area_triggered() {
     }
 }
 
+void MainWindow::on_jump_button_clicked() {
+    total = mvideo_player->get_num_frames();
+
+    if (!clicked) {
+        set_status_bar("First point chosen");
+        time1 = mvideo_player->get_current_frame_num();
+        ui->jump_button->setText("2nd");
+        clicked = true;
+
+        /*ui->analysis_layout->setStretch(0, time1);
+        ui->analysis_layout->setStretch(2, (total-time1));
+        ui->analysis_layout->setStretch(4, (0));*/
+    } else {
+        set_status_bar("Second point chosen");
+        time2 = mvideo_player->get_current_frame_num();
+        ui->jump_button->setText("1st");
+        clicked = false;
+
+        if (time1 > time2) {
+            int temp = time2;
+            time2 = time1;
+            time1 = temp;
+        }
+
+        std::pair <int,int> pair;
+        pair = make_pair(time1, time2);
+        detection_areas.push_back(pair);
+    }
+}
+
+void MainWindow::on_show_button_clicked() {
+    while (auto item = ui->analysis_layout->takeAt(1)){
+        delete item->widget();
+    }
+    ui->analysis_layout->setStretch(0, detection_areas.at(0).first);
+    for (std::size_t i = 0; i != detection_areas.size(); ++i){
+        add_areas(detection_areas.at(i), i);
+    }
+
+    detection_areas.clear();
+}
+
+void MainWindow::add_areas(std::pair<int,int> pair, int i) {
+    QSpacerItem *spacer = new QSpacerItem(0, 20);
+    QLabel *first_label = new QLabel(">");
+    QLabel *second_label = new QLabel("<");
+    ui->analysis_layout->addWidget(first_label);
+    ui->analysis_layout->addSpacerItem(spacer);
+    ui->analysis_layout->addWidget(second_label);
+    ui->analysis_layout->addSpacerItem(spacer);
+    ui->analysis_layout->setStretch(2+4*i, pair.second-pair.first);
+    if (detection_areas.size()!=(i+1)) {
+        ui->analysis_layout->setStretch(4+4*i, detection_areas.at(i+1).first-pair.second);
+    } else {
+        ui->analysis_layout->setStretch(4+4*i, total-pair.second);
+    }
+
+    //- >-<- >-<- >-<-
+    //0 1234 5678 9ABC
+}

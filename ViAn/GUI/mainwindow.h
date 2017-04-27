@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QBasicTimer>
 #include <string>
+#include <vector>
 #include <QCloseEvent>
 #include <QSlider>
 #include <QFileDialog>
@@ -148,6 +149,12 @@ private slots:
 
     void on_actionInvert_analysis_area_triggered();
 
+    void on_jump_button_clicked();
+
+    void on_show_button_clicked();
+
+    void add_areas(std::pair<int,int> pair, int i);
+
 private:
 
     Ui::MainWindow *ui;
@@ -159,6 +166,12 @@ private:
     bool slider_blocked = false;
     bool slider_paused_video = false;
     int prev_slider_pos = 0;
+
+    vector<std::pair<int, int>> detection_areas;
+    bool clicked = false;
+    int time1 = 0;
+    int time2 = 0;
+    int total = 0;
 
     std::chrono::milliseconds slider_timer = std::chrono::duration_cast< std::chrono::milliseconds >(
                 std::chrono::system_clock::now().time_since_epoch()
@@ -174,6 +187,9 @@ private:
 
     void toggle_toolbar();
     void enable_video_buttons();
+
+    void set_total_time();
+    void set_current_time();
 
     void on_slider_moving();
     void on_slider_click(int new_pos, QPoint local_mouse_pos);

@@ -31,6 +31,7 @@ public:
     std::string export_current_frame(std::string path_to_folder, std::string file_name);
     bool video_open();
 
+    double get_frame_rate();
     int get_num_frames();    
     int get_current_frame_num();
     void set_frame_width(int new_value);
