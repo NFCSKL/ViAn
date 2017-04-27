@@ -8,10 +8,12 @@
 #include <QColorDialog>
 #include <QLabel>
 #include <QSpacerItem>
+#include <QTime>
 #include <chrono>
 #include <thread>
 #include "icononbuttonhandler.h"
 #include "Video/shapes/shape.h"
+#include "myslider.h"
 
 using namespace std;
 using namespace cv;
@@ -26,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow){
     ui->setupUi(this);
     video_slider = ui->video_slider;
+    ui->video_slider = new MySlider();
 
     icon_on_button_handler = new IconOnButtonHandler();
     icon_on_button_handler->set_pictures_to_buttons(ui);
@@ -1012,12 +1015,12 @@ void MainWindow::on_action_original_size_triggered() {
             on_action_fill_screen_triggered();
             set_status_bar("Filling the screen with the video.");
         }
-
     } else {
         set_status_bar("No video loaded.");
         ui->action_original_size->toggle(); // unchecks it again
     }
 }
+
 /**
  * @brief MainWindow::on_actionInvert_analysis_area_triggered
  * Switches between choosing area for analysing and area for not analysing.
@@ -1039,22 +1042,16 @@ void MainWindow::on_jump_button_clicked() {
         time1 = mvideo_player->get_current_frame_num();
         ui->jump_button->setText("2nd");
         clicked = true;
-
-        /*ui->analysis_layout->setStretch(0, time1);
-        ui->analysis_layout->setStretch(2, (total-time1));
-        ui->analysis_layout->setStretch(4, (0));*/
     } else {
         set_status_bar("Second point chosen");
         time2 = mvideo_player->get_current_frame_num();
         ui->jump_button->setText("1st");
         clicked = false;
-
         if (time1 > time2) {
             int temp = time2;
             time2 = time1;
             time1 = temp;
         }
-
         std::pair <int,int> pair;
         pair = make_pair(time1, time2);
         detection_areas.push_back(pair);
@@ -1069,11 +1066,10 @@ void MainWindow::on_show_button_clicked() {
     for (std::size_t i = 0; i != detection_areas.size(); ++i){
         add_areas(detection_areas.at(i), i);
     }
-
     detection_areas.clear();
 }
 
-void MainWindow::add_areas(std::pair<int,int> pair, int i) {
+void MainWindow::add_areas(std::pair<int,int> pair, size_t i) {
     QSpacerItem *spacer = new QSpacerItem(0, 20);
     QLabel *first_label = new QLabel(">");
     QLabel *second_label = new QLabel("<");

@@ -153,7 +153,7 @@ private slots:
 
     void on_show_button_clicked();
 
-    void add_areas(std::pair<int,int> pair, int i);
+    void add_areas(std::pair<int,int> pair, size_t i);
 
 private:
 
