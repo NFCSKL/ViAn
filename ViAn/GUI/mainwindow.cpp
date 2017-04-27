@@ -229,49 +229,27 @@ void MainWindow::update_video(QImage frame) {
  * Sets the total video length in the totalTimeLabel
  */
 void MainWindow::set_total_time() {
-    int total_time = mvideo_player->get_num_frames()/mvideo_player->get_frame_rate();
-    int sec_int = total_time%60;
-    int min_int = total_time/60;
-    int hour_int = min_int/60;
-    std::string sec_str, min_str, hour_str, time_str = "";
-
-    if (min_int <= 9) {
-        min_str = "0"+to_string(min_int);
-    } else {
-        min_str = to_string(min_int);
-    }
-
-    if (sec_int <= 9) {
-        sec_str = "0"+to_string(sec_int);
-    } else {
-        sec_str = to_string(sec_int);
-    }
-
-    hour_str = to_string(hour_int);
-    if (hour_int >= 1) {
-        time_str = hour_str+":"+min_str+":"+sec_str;
-    } else {
-        time_str = min_str+":"+sec_str;
-    }
-    ui->totalTimeLabel->setText(QString::fromStdString(time_str));
+    qint64 duration = mvideo_player->get_num_frames()/mvideo_player->get_frame_rate();
+    QTime total((duration/3600)%60, (duration/60)%60, duration%60);
+    QString format = "mm:ss";
+    if (duration > 3600)
+        format = "hh:mm:ss";
+    QString total_time_string = total.toString(format);
+    ui->totalTimeLabel->setText(total_time_string);
 }
 
 /**
  * @brief MainWindow::set_current_time
- * Set the current time in the video in the currentTimeLabel
  */
 void MainWindow::set_current_time() {
-    int current_time = mvideo_player->get_current_frame_num()/mvideo_player->get_frame_rate();
-    std::string min = to_string(current_time/60);
-    std::string hour = to_string(current_time/3600);
-    std::string sec = to_string(current_time%60);
-    std::string time = "";
-    if (current_time/3600 >= 1) {
-        time = hour+":"+min+":"+sec;
-    } else {
-        time = min+":"+sec;
-    }
-    ui->currentTimeLabel->setText(QString::fromStdString(time));
+    qint64 duration = mvideo_player->get_num_frames()/mvideo_player->get_frame_rate();
+    qint64 current_time = mvideo_player->get_current_frame_num()/mvideo_player->get_frame_rate();
+    QTime current((current_time/3600)%60, (current_time/60)%60, current_time%60);
+    QString format = "mm:ss";
+    if (duration > 3600)
+        format = "hh:mm:ss";
+    QString current_time_string = current.toString(format);
+    ui->currentTimeLabel->setText(current_time_string);
 }
 
 /**
