@@ -27,8 +27,12 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow){
     ui->setupUi(this);
-    video_slider = ui->video_slider;
-    ui->video_slider = new MySlider();
+
+    //ui->video_slider = new MySlider();
+    my_slider = new MySlider(ui->video_slider);
+    //my_slider->set_background();
+    //my_slider->update();
+    //video_slider = ui->video_slider;
 
     icon_on_button_handler = new IconOnButtonHandler();
     icon_on_button_handler->set_pictures_to_buttons(ui);
@@ -76,6 +80,8 @@ MainWindow::~MainWindow() {
 
     delete ui;
     delete bookmark_view;
+
+    delete my_slider;
 }
 /**
  * @brief MainWindow::setup_filehandler
@@ -308,6 +314,7 @@ void MainWindow::on_slider_click(int new_pos, QPoint local_mouse_pos){
     int slider_pos = slider_pos_under_mouse(local_mouse_pos);
     if (slider_pos != new_pos) {
         ui->video_slider->setValue(slider_pos);
+        my_slider->setValue(slider_pos);
         emit set_playback_frame(slider_pos, true);
     }
 }
@@ -1036,7 +1043,8 @@ void MainWindow::on_actionInvert_analysis_area_triggered() {
 
 void MainWindow::on_jump_button_clicked() {
     total = mvideo_player->get_num_frames();
-
+    my_slider->set_background();
+    //my_slider->setStyleSheet("background: red");
     if (!clicked) {
         set_status_bar("First point chosen");
         time1 = mvideo_player->get_current_frame_num();
@@ -1070,7 +1078,10 @@ void MainWindow::on_show_button_clicked() {
 }
 
 void MainWindow::add_areas(std::pair<int,int> pair, size_t i) {
-    QSpacerItem *spacer = new QSpacerItem(0, 20);
+    //video_slider->setStyleSheet("QSlider::add-page:horizontal {background: red;}");
+    //video_slider->setStyleSheet("background: red");
+
+    /*QSpacerItem *spacer = new QSpacerItem(0, 20);
     QLabel *first_label = new QLabel(">");
     QLabel *second_label = new QLabel("<");
     ui->analysis_layout->addWidget(first_label);
@@ -1082,7 +1093,7 @@ void MainWindow::add_areas(std::pair<int,int> pair, size_t i) {
         ui->analysis_layout->setStretch(4+4*i, detection_areas.at(i+1).first-pair.second);
     } else {
         ui->analysis_layout->setStretch(4+4*i, total-pair.second);
-    }
+    }*/
 
     //- >-<- >-<- >-<-
     //0 1234 5678 9ABC

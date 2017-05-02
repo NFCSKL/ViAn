@@ -19,6 +19,7 @@
 #include "ui_mainwindow.h"
 #include "Filehandler/filehandler.h"
 #include "bookmarkview.h"
+#include "myslider.h"
 #include "action.h"
 #include "qtreeitems.h"
 #include <QMutex>
@@ -161,6 +162,7 @@ private:
     video_player* mvideo_player;
     IconOnButtonHandler *icon_on_button_handler;
     BookmarkView* bookmark_view;
+    MySlider* my_slider;
     QSlider *video_slider;
 
     bool slider_blocked = false;
