@@ -26,14 +26,10 @@ using namespace cv;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow){
+
     ui->setupUi(this);
 
-    //ui->video_slider = new MySlider();
-    my_slider = new MySlider(ui->video_slider);
-    //my_slider->set_background();
-    //my_slider->update();
-    //video_slider = ui->video_slider;
-
+    video_slider = ui->video_slider;
     icon_on_button_handler = new IconOnButtonHandler();
     icon_on_button_handler->set_pictures_to_buttons(ui);
 
@@ -80,8 +76,6 @@ MainWindow::~MainWindow() {
 
     delete ui;
     delete bookmark_view;
-
-    delete my_slider;
 }
 /**
  * @brief MainWindow::setup_filehandler
@@ -297,7 +291,7 @@ void MainWindow::on_slider_moving(){
     );
     std::chrono::milliseconds time_since_last_slider_frame_update = current_time-slider_timer;
     if (time_since_last_slider_frame_update.count() >= SLIDER_UPDATE_TIMER) {
-        QPoint local_mouse_pos = ui->video_slider->mapFromGlobal(QCursor::pos());
+        QPoint local_mouse_pos = video_slider->mapFromGlobal(QCursor::pos());
         emit set_playback_frame(slider_pos_under_mouse(local_mouse_pos));
         slider_timer = current_time;
     }
@@ -313,8 +307,7 @@ void MainWindow::on_slider_moving(){
 void MainWindow::on_slider_click(int new_pos, QPoint local_mouse_pos){
     int slider_pos = slider_pos_under_mouse(local_mouse_pos);
     if (slider_pos != new_pos) {
-        ui->video_slider->setValue(slider_pos);
-        my_slider->setValue(slider_pos);
+        video_slider->setValue(slider_pos);
         emit set_playback_frame(slider_pos, true);
     }
 }
@@ -327,9 +320,9 @@ void MainWindow::on_slider_click(int new_pos, QPoint local_mouse_pos){
  * @return The current position of the mouse pointer on the slider
  */
 int MainWindow::slider_pos_under_mouse(QPoint local_mouse_pos) {
-    float pos_ratio = local_mouse_pos.x() / (float )ui->video_slider->size().width();
-    int slider_range = ui->video_slider->maximum() - ui->video_slider->minimum();
-    return ui->video_slider->minimum() + slider_range * pos_ratio;
+    float pos_ratio = local_mouse_pos.x() / (float )video_slider->size().width();
+    int slider_range = video_slider->maximum() - video_slider->minimum();
+    return video_slider->minimum() + slider_range * pos_ratio;
 }
 
 /**
@@ -340,15 +333,13 @@ int MainWindow::slider_pos_under_mouse(QPoint local_mouse_pos) {
  */
 
 void MainWindow::on_video_slider_valueChanged(int new_pos) {
-    slider_blocked = true;
     Qt::MouseButtons btns = QApplication::mouseButtons();
-    QPoint local_mouse_pos = ui->video_slider->mapFromGlobal(QCursor::pos());
+    QPoint local_mouse_pos = video_slider->mapFromGlobal(QCursor::pos());
     bool click_on_slider = (btns & Qt::LeftButton) &&
                          (local_mouse_pos.x() >= 0 && local_mouse_pos.y() >= 0 &&
-                          local_mouse_pos.x() < ui->video_slider->size().width() &&
-                          local_mouse_pos.y() < ui->video_slider->size().height());
+                          local_mouse_pos.x() < video_slider->size().width() &&
+                          local_mouse_pos.y() < video_slider->size().height());
     if (click_on_slider) on_slider_click(new_pos, local_mouse_pos);
-    slider_blocked = false;
 }
 
 /**
@@ -1043,9 +1034,9 @@ void MainWindow::on_actionInvert_analysis_area_triggered() {
 
 void MainWindow::on_jump_button_clicked() {
     total = mvideo_player->get_num_frames();
-    my_slider->set_background();
-    //my_slider->setStyleSheet("background: red");
+    double start, end;
     if (!clicked) {
+        //ui->video_slider->clear_rects();
         set_status_bar("First point chosen");
         time1 = mvideo_player->get_current_frame_num();
         ui->jump_button->setText("2nd");
@@ -1060,41 +1051,14 @@ void MainWindow::on_jump_button_clicked() {
             time2 = time1;
             time1 = temp;
         }
-        std::pair <int,int> pair;
-        pair = make_pair(time1, time2);
-        detection_areas.push_back(pair);
+        start = (double)time1/total;
+        end = (double)time2/total;
+        std::cout << "start " << start << std::endl;
+        std::cout << "end " << end << std::endl;
+        std::cout << "total " << total << std::endl;
+        ui->video_slider->add_slider_rect(start, end);
     }
 }
 
 void MainWindow::on_show_button_clicked() {
-    while (auto item = ui->analysis_layout->takeAt(1)){
-        delete item->widget();
-    }
-    ui->analysis_layout->setStretch(0, detection_areas.at(0).first);
-    for (std::size_t i = 0; i != detection_areas.size(); ++i){
-        add_areas(detection_areas.at(i), i);
-    }
-    detection_areas.clear();
-}
-
-void MainWindow::add_areas(std::pair<int,int> pair, size_t i) {
-    //video_slider->setStyleSheet("QSlider::add-page:horizontal {background: red;}");
-    //video_slider->setStyleSheet("background: red");
-
-    /*QSpacerItem *spacer = new QSpacerItem(0, 20);
-    QLabel *first_label = new QLabel(">");
-    QLabel *second_label = new QLabel("<");
-    ui->analysis_layout->addWidget(first_label);
-    ui->analysis_layout->addSpacerItem(spacer);
-    ui->analysis_layout->addWidget(second_label);
-    ui->analysis_layout->addSpacerItem(spacer);
-    ui->analysis_layout->setStretch(2+4*i, pair.second-pair.first);
-    if (detection_areas.size()!=(i+1)) {
-        ui->analysis_layout->setStretch(4+4*i, detection_areas.at(i+1).first-pair.second);
-    } else {
-        ui->analysis_layout->setStretch(4+4*i, total-pair.second);
-    }*/
-
-    //- >-<- >-<- >-<-
-    //0 1234 5678 9ABC
 }

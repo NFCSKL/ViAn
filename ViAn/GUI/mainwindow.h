@@ -154,22 +154,18 @@ private slots:
 
     void on_show_button_clicked();
 
-    void add_areas(std::pair<int,int> pair, size_t i);
-
 private:
 
     Ui::MainWindow *ui;
     video_player* mvideo_player;
     IconOnButtonHandler *icon_on_button_handler;
     BookmarkView* bookmark_view;
-    MySlider* my_slider;
     QSlider *video_slider;
 
     bool slider_blocked = false;
     bool slider_paused_video = false;
     int prev_slider_pos = 0;
 
-    vector<std::pair<int, int>> detection_areas;
     bool clicked = false;
     int time1 = 0;
     int time2 = 0;

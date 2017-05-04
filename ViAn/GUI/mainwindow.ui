@@ -73,7 +73,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>304</width>
-                <height>256</height>
+                <height>253</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_2">
@@ -340,7 +340,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QSlider" name="video_slider">
+           <widget class="MySlider" name="video_slider">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -929,6 +929,13 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>MySlider</class>
+   <extends>QSlider</extends>
+   <header>myslider.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../resources.qrc"/>
  </resources>
