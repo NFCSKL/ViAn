@@ -152,8 +152,6 @@ private slots:
 
     void on_jump_button_clicked();
 
-    void on_show_button_clicked();
-
 private:
 
     Ui::MainWindow *ui;

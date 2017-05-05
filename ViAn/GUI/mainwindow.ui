@@ -72,8 +72,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>304</width>
-                <height>253</height>
+                <width>268</width>
+                <height>284</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_2">
@@ -297,25 +297,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="show_button">
-            <property name="minimumSize">
-             <size>
-              <width>30</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>30</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Show</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <spacer name="horizontalSpacer">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -357,10 +338,10 @@
              <number>1</number>
             </property>
             <property name="value">
-             <number>20</number>
+             <number>0</number>
             </property>
             <property name="sliderPosition">
-             <number>20</number>
+             <number>0</number>
             </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -373,29 +354,6 @@
              <string/>
             </property>
            </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="analysis_layout" stretch="0">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <item>
-           <spacer name="spacer1">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Expanding</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>0</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
           </item>
          </layout>
         </item>
@@ -933,7 +891,7 @@
   <customwidget>
    <class>MySlider</class>
    <extends>QSlider</extends>
-   <header>myslider.h</header>
+   <header>GUI/myslider.h</header>
   </customwidget>
  </customwidgets>
  <resources>

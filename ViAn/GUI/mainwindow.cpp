@@ -1032,6 +1032,12 @@ void MainWindow::on_actionInvert_analysis_area_triggered() {
     }
 }
 
+/**
+ * @brief MainWindow::on_jump_button_clicked
+ * Temporary button to add two point to test drawing rects on the slider.
+ * Click once to add the sliders current position as a point
+ * and click again to add the second point.
+ */
 void MainWindow::on_jump_button_clicked() {
     total = mvideo_player->get_num_frames();
     double start, end;
@@ -1053,12 +1059,6 @@ void MainWindow::on_jump_button_clicked() {
         }
         start = (double)time1/total;
         end = (double)time2/total;
-        std::cout << "start " << start << std::endl;
-        std::cout << "end " << end << std::endl;
-        std::cout << "total " << total << std::endl;
         ui->video_slider->add_slider_rect(start, end);
     }
-}
-
-void MainWindow::on_show_button_clicked() {
 }
