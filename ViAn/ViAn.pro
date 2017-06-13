@@ -6,6 +6,7 @@
 
 QT       += core gui
 QT       += testlib
+QT       += axcontainer
 
 CONFIG += c++11
 
@@ -15,17 +16,21 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp \
+SOURCES += main.cpp
 
 #
 # TEST
 #
 SOURCES += Test/test_video_player.cpp\
     Test/filehandlertest.cpp\
-    Test/test_mainwindow.cpp
+    Test/test_mainwindow.cpp \
+    Test/test_report_generator.cpp \
+    Test/overlayintegrationtest.cpp
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
     Test/test_mainwindow.h \
+    Test/test_report_generator.h \
+    Test/overlayintegrationtest.h
 
 #
 # LIBRARY
@@ -40,19 +45,22 @@ SOURCES += GUI/mainwindow.cpp \
     GUI/icononbuttonhandler.cpp \
     GUI/qtreeitems.cpp \
     GUI/bookmarkview.cpp \
-    GUI/makeproject.cpp \
     GUI/bookmarkitem.cpp \
-    GUI/myslider.cpp
-
+    GUI/reportgenerator.cpp \
+    GUI/makeproject.cpp \
+    GUI/myslider.cpp \
+    GUI/fpsdialog.cpp
 
 HEADERS  += GUI/mainwindow.h \
     GUI/icononbuttonhandler.h \
     GUI/action.h \
     GUI/qtreeitems.h \
+    GUI/reportgenerator.h \
     GUI/bookmarkview.h \
     GUI/makeproject.h \
     GUI/bookmarkitem.h \
-    GUI/myslider.h
+    GUI/myslider.h \
+    GUI/fpsdialog.h
 
 FORMS    += GUI/mainwindow.ui \
     GUI/makeproject.ui
@@ -65,6 +73,7 @@ RESOURCES += resources.qrc
 #
 SOURCES += Video/video_player.cpp \
     Video/overlay.cpp \
+    Video/analysisoverlay.cpp \
     Video/shapes/arrow.cpp \
     Video/shapes/circle.cpp \
     Video/shapes/line.cpp \
@@ -74,8 +83,10 @@ SOURCES += Video/video_player.cpp \
     Video/shapes/text.cpp \
     Video/shapes/zoomrectangle.cpp \
     Video/shapes/analysarea.cpp
+
 HEADERS += Video/video_player.h \
     Video/overlay.h \
+    Video/analysisoverlay.h \
     Video/shapes/arrow.h \
     Video/shapes/circle.h \
     Video/shapes/line.h \
@@ -85,6 +96,7 @@ HEADERS += Video/video_player.h \
     Video/shapes/text.h \
     Video/shapes/zoomrectangle.h \
     Video/shapes/analysarea.h
+
 win32 {
     INCLUDEPATH += C:\opencv\release\install\include
     LIBS += C:\opencv\release\bin\libopencv_core320.dll
@@ -113,8 +125,9 @@ SOURCES += Filehandler/filehandler.cpp \
     Filehandler/video.cpp \
     Filehandler/videoproject.cpp \
     Filehandler/bookmark.cpp \
-    Filehandler/saveable.cpp
-
+    Filehandler/saveable.cpp \
+    Filehandler/analysis.cpp \
+    Filehandler/report.cpp
 
 HEADERS  += Filehandler/filehandler.h \
     Filehandler/project.h \
@@ -122,13 +135,14 @@ HEADERS  += Filehandler/filehandler.h \
     Filehandler/video.h \
     Filehandler/videoproject.h \
     Filehandler/bookmark.h  \
-    Filehandler/saveable.h
+    Filehandler/saveable.h \
+    Filehandler/analysis.h \
+    Filehandler/report.h
 
 win32{
 
     SOURCES += Filehandler/stringhelper.cpp\
       Filehandler/win32dir.cpp
-
 
     HEADERS += Filehandler/stringhelper.h
 }
@@ -147,3 +161,14 @@ unix {
 #
 # END: FILEHANDLER
 #
+
+#
+# ANALYSIS
+#
+SOURCES += Analysis/AnalysisMethod.cpp\
+    Analysis/MotionDetection.cpp \
+    Analysis/AnalysisController.cpp
+
+HEADERS +=Analysis/AnalysisMethod.h\
+    Analysis/MotionDetection.h \
+    Analysis/AnalysisController.h

@@ -1,4 +1,4 @@
-#ifndef VIDEO_PLAYER_H
+﻿#ifndef VIDEO_PLAYER_H
 #define VIDEO_PLAYER_H
 #include "opencv2/opencv.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -10,9 +10,9 @@
 #include <QMutex>
 #include <QWaitCondition>
 #include <QImage>
-#include <QImageWriter>
-#include <QWaitCondition>
 #include "overlay.h"
+#include "analysisoverlay.h"
+#include "Filehandler/analysis.h"
 
 #include <chrono>
 
@@ -20,24 +20,32 @@ using namespace std;
 
 class video_player : public QThread {
     Q_OBJECT
+
+    friend class OverlayIntegrationTest;
+
 public:
     video_player(QMutex* mutex, QWaitCondition* paused_wait, QLabel* label, QObject* parent = 0);
     ~video_player();
-    bool load_video(string filename);
+    bool load_video(string filename, Overlay* o);
     bool is_paused();
     bool is_stopped();
+    bool is_playing();
+    void set_showing_overlay(bool value);
     bool is_showing_overlay();
+    bool is_showing_analysis_overlay();
     bool is_showing_analysis_tool();
-    std::string export_current_frame(std::string path_to_folder, std::string file_name);
+    QImage get_current_frame_unscaled();
     bool video_open();
 
     double get_frame_rate();
     int get_num_frames();    
     int get_current_frame_num();
+    int get_current_time();
     void set_frame_width(int new_value);
     void set_frame_height(int new_value);
     void set_speed_multiplier(double mult);
     double get_speed_multiplier();
+    std::string get_file_name();
 
     void inc_playback_speed();
     void dec_playback_speed();
@@ -50,6 +58,7 @@ public:
     double get_contrast();
     int get_brightness();
     void toggle_overlay();
+    void toggle_analysis_overlay();
     void set_overlay_tool(SHAPES shape);
     void set_overlay_colour(QColor colour);
     void undo_overlay();
@@ -89,6 +98,7 @@ private slots:
     void next_frame();
     void previous_frame();
     void on_set_playback_frame(int frame_num);
+    void on_set_analysis_results(Analysis analysis);
 
 public slots:
     void on_play_video();
@@ -131,9 +141,10 @@ private:
 
     double frame_rate;
     double speed_multiplier = DEFAULT_SPEED_MULT;
+    std::string file_path;
 
     bool video_stopped = false;
-    bool video_paused;
+    bool video_paused = false;
     bool choosing_zoom_area = false;
     bool set_new_frame = false;
     bool slider_moving = false;
@@ -145,6 +156,7 @@ private:
 
     ZoomRectangle* zoom_area = new ZoomRectangle();
     AnalysArea* analysis_area = new AnalysArea();
+    Analysis m_analysis;
 
     // Constants for the directions of the rotation.
     int const ROTATE_90 = 0, ROTATE_180 = 1, ROTATE_270 = 2, ROTATE_NONE = 3;
@@ -159,7 +171,8 @@ private:
     // Brightness, value in range BRIGHTNESS_MIN to BRIGHTNESS_MAX.
     int beta = 0;
 
-    Overlay* video_overlay = new Overlay();
+    Overlay* video_overlay;
+    AnalysisOverlay* analysis_overlay = new AnalysisOverlay();
 };
 
 #endif // VIDEO_PLAYER_H
