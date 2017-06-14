@@ -1489,23 +1489,31 @@ void MainWindow::on_action_set_analysis_area_to_video_triggered() {
                 ID p_id = ((MyQTreeWidgetItem*)video_in_tree->parent())->id;
                 Analysis analysis = file_handler->get_project(p_id)->get_video(video_in_tree->id)->get_analysis(analysis_in_tree->id);
                 emit set_analysis_results(analysis);
-
-                ui->video_slider->clear_rects();
-                total = mvideo_player->get_num_frames();
-                double start, end;
-
-                for (POI p : analysis.POIs) {
-                    start = (double)p.start_frame/total;
-                    end = (double)p.end_frame/total;
-                    ui->video_slider->add_slider_rect(start, end);
-                }
-                ui->video_slider->repaint();
+                show_pois_on_slider(analysis);
             }
         }
     }
 }
 
-/*
+/**
+ * @brief MainWindow::show_pois_on_slider
+ * Colors an area on the slider for each POI in analysis
+ * @param analysis
+ */
+void MainWindow::show_pois_on_slider(Analysis analysis) {
+    ui->video_slider->clear_rects();
+    total = mvideo_player->get_num_frames();
+    double start, end;
+
+    for (POI p : analysis.POIs) {
+        start = (double)p.start_frame/total;
+        end = (double)p.end_frame/total;
+        ui->video_slider->add_slider_rect(start, end);
+    }
+    ui->video_slider->repaint();
+}
+
+/**
  * @brief MainWindow::on_action_change_bookmark_triggered
  * Lets the user change the bookmark description.
  */

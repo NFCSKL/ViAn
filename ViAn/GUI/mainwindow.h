@@ -203,9 +203,6 @@ private:
     bool slider_paused_video = false;
     int prev_slider_pos = 0;
 
-    bool clicked = false;
-    int time1 = 0;
-    int time2 = 0;
     int total = 0;
 
     std::chrono::milliseconds slider_timer = std::chrono::duration_cast< std::chrono::milliseconds >(
@@ -256,6 +253,8 @@ private:
     void remove_analysis_from_file_handler(MyQTreeWidgetItem *analysis_in_tree);
     void abort_current_analysis();
     void start_next_analysis();
+
+    void show_pois_on_slider(Analysis analysis);
 };
 
 #endif // MAINWINDOW_H
