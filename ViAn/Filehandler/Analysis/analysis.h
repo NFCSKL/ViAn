@@ -28,11 +28,7 @@ public:
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
     std::vector<cv::Rect> get_detections_on_frame(int frame_num);
-    std::vector<std::pair<int, int>> get_poi_interval();
     std::vector<POI> POIs;
-    std::vector<std::pair<int, int>> pair_list;
-
-private:
 
 };
 Q_DECLARE_METATYPE(Analysis)

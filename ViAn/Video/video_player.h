@@ -77,7 +77,6 @@ public:
     int get_video_height();
     std::vector<cv::Point>* get_analysis_area_polygon();
     void clear_analysis_overlay();
-    std::vector<std::pair<int, int>> get_pair_list();
 
     friend class test_video_player;
 
@@ -153,7 +152,6 @@ private:
     bool slider_moving = false;
     bool choosing_analysis_area = false;
 
-    std::vector<std::pair<int, int>> pair_list;
 
     QImage img;
     QMutex* m_mutex;

@@ -1493,11 +1493,10 @@ void MainWindow::on_action_set_analysis_area_to_video_triggered() {
                 ui->video_slider->clear_rects();
                 total = mvideo_player->get_num_frames();
                 double start, end;
-                for (std::pair<int, int> pair : mvideo_player->get_pair_list()) {
-                //for (std::pair<int, int> pair : analysis.get_poi_interval()) {
-                    start = (double)pair.first/total;
-                    end = (double)pair.second/total;
 
+                for (POI p : analysis.POIs) {
+                    start = (double)p.start_frame/total;
+                    end = (double)p.end_frame/total;
                     ui->video_slider->add_slider_rect(start, end);
                 }
                 ui->video_slider->repaint();

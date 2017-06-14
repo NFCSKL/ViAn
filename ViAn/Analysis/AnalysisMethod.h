@@ -23,7 +23,6 @@ public:
     bool load_video();
 
     Analysis run_analysis();
-    std::vector<std::pair<int, int>> get_poi_interval(Analysis m_analysis);
     int get_progress();
 
 private:

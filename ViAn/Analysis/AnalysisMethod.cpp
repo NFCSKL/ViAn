@@ -99,17 +99,7 @@ Analysis AnalysisMethod::run_analysis() {
         ++current_frame_index;
     }
     capture.release();
-    //m_analysis.pair_list = get_poi_interval(m_analysis);
     return m_analysis;
-}
-
-std::vector<std::pair<int, int>> AnalysisMethod::get_poi_interval(Analysis m_analysis) {
-    std::vector<std::pair<int, int>> pair_list;
-    for (POI p : m_analysis.POIs) {
-        std::pair<int, int> pair = std::make_pair(p.start_frame, p.end_frame);
-        pair_list.push_back(pair);
-    }
-    return pair_list;
 }
 
 /**

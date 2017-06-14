@@ -935,11 +935,6 @@ void video_player::on_set_analysis_results(Analysis analysis) {
             analysis_overlay->add_area(frame_num,rect);
         }
     }
-    pair_list = analysis.get_poi_interval();
-}
-
-std::vector<std::pair<int, int>> video_player::get_pair_list() {
-    return pair_list;
 }
 
 /**

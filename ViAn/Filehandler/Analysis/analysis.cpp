@@ -94,12 +94,3 @@ std::vector<cv::Rect> Analysis::get_detections_on_frame(int frame_num) {
     }
     return rects;
 }
-
-std::vector<std::pair<int, int>> Analysis::get_poi_interval() {
-    std::vector<std::pair<int, int>> pair_list;
-    for (POI p : POIs) {
-        std::pair<int, int> pair = std::make_pair(p.start_frame, p.end_frame);
-        pair_list.push_back(pair);
-    }
-    return pair_list;
-}
