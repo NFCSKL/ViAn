@@ -1479,8 +1479,7 @@ void MainWindow::on_action_clear_analysis_overlay_triggered() {
 /**
  * @brief MainWindow::on_action_set_analysis_area_to_video_triggered
  */
-void MainWindow::on_action_set_analysis_area_to_video_triggered()
-{
+void MainWindow::on_action_set_analysis_area_to_video_triggered() {
     MyQTreeWidgetItem *analysis_in_tree;
     if(ui->project_tree->selectedItems().size() == 1) {
         analysis_in_tree =(MyQTreeWidgetItem*)ui->project_tree->selectedItems().first();
