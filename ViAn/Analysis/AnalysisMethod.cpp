@@ -30,8 +30,6 @@ void AnalysisMethod::set_include_exclude_area(std::vector<cv::Point> points, boo
     exclude_frame = img;
 }
 
-
-
 /**
  * @brief AnalysisMethod::sample_current_frame
  * Checks if the current frame is to be analysed.
@@ -101,7 +99,17 @@ Analysis AnalysisMethod::run_analysis() {
         ++current_frame_index;
     }
     capture.release();
+    //m_analysis.pair_list = get_poi_interval(m_analysis);
     return m_analysis;
+}
+
+std::vector<std::pair<int, int>> AnalysisMethod::get_poi_interval(Analysis m_analysis) {
+    std::vector<std::pair<int, int>> pair_list;
+    for (POI p : m_analysis.POIs) {
+        std::pair<int, int> pair = std::make_pair(p.start_frame, p.end_frame);
+        pair_list.push_back(pair);
+    }
+    return pair_list;
 }
 
 /**
@@ -110,6 +118,7 @@ Analysis AnalysisMethod::run_analysis() {
  */
 int AnalysisMethod::get_progress() {
     return current_frame_index*100/num_frames;
+
 }
 
 /**

@@ -12,7 +12,7 @@
 #include <QImage>
 #include "overlay.h"
 #include "analysisoverlay.h"
-#include "Filehandler/analysis.h"
+#include "Filehandler/Analysis//analysis.h"
 
 #include <chrono>
 
@@ -75,6 +75,9 @@ public:
     void video_mouse_moved(QPoint pos);
     int get_video_width();
     int get_video_height();
+    std::vector<cv::Point>* get_analysis_area_polygon();
+    void clear_analysis_overlay();
+    std::vector<std::pair<int, int>> get_pair_list();
 
     friend class test_video_player;
 
@@ -149,6 +152,8 @@ private:
     bool set_new_frame = false;
     bool slider_moving = false;
     bool choosing_analysis_area = false;
+
+    std::vector<std::pair<int, int>> pair_list;
 
     QImage img;
     QMutex* m_mutex;

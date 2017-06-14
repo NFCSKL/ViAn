@@ -18,6 +18,7 @@ TEMPLATE = app
 #
 SOURCES += main.cpp
 
+
 #
 # TEST
 #
@@ -30,7 +31,7 @@ HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
     Test/test_mainwindow.h \
     Test/test_report_generator.h \
-    Test/overlayintegrationtest.h
+    Test/overlayintegrationtest.h \
 
 #
 # LIBRARY
@@ -49,7 +50,8 @@ SOURCES += GUI/mainwindow.cpp \
     GUI/reportgenerator.cpp \
     GUI/makeproject.cpp \
     GUI/myslider.cpp \
-    GUI/fpsdialog.cpp
+    GUI/fpsdialog.cpp \
+    GUI/analysiswindow.cpp \
 
 HEADERS  += GUI/mainwindow.h \
     GUI/icononbuttonhandler.h \
@@ -60,10 +62,12 @@ HEADERS  += GUI/mainwindow.h \
     GUI/makeproject.h \
     GUI/bookmarkitem.h \
     GUI/myslider.h \
-    GUI/fpsdialog.h
+    GUI/fpsdialog.h \
+    GUI/analysiswindow.h \
 
 FORMS    += GUI/mainwindow.ui \
-    GUI/makeproject.ui
+    GUI/makeproject.ui \
+    GUI/analysiswindow.ui
 
 RESOURCES += resources.qrc
 #
@@ -121,23 +125,27 @@ unix {
 # START: FILEHANDLER
 #
 SOURCES += Filehandler/filehandler.cpp \
-    Filehandler/project.cpp \
-    Filehandler/video.cpp \
-    Filehandler/videoproject.cpp \
-    Filehandler/bookmark.cpp \
+    Filehandler/Project/project.cpp \
+    Filehandler/Project/video.cpp \
+    Filehandler/Project/videoproject.cpp \
+    Filehandler/Project/bookmark.cpp \
     Filehandler/saveable.cpp \
-    Filehandler/analysis.cpp \
-    Filehandler/report.cpp
+    Filehandler/Analysis/analysis.cpp \
+    Filehandler/report.cpp \
+    Filehandler/Analysis/ooi.cpp \
+    Filehandler/Analysis/poi.cpp
 
 HEADERS  += Filehandler/filehandler.h \
-    Filehandler/project.h \
+    Filehandler/Project/project.h \
     Filehandler/dir.h \
-    Filehandler/video.h \
-    Filehandler/videoproject.h \
-    Filehandler/bookmark.h  \
+    Filehandler/Project/video.h \
+    Filehandler/Project/videoproject.h \
+    Filehandler/Project/bookmark.h  \
     Filehandler/saveable.h \
-    Filehandler/analysis.h \
-    Filehandler/report.h
+    Filehandler/Analysis/analysis.h \
+    Filehandler/report.h    \
+    Filehandler/Analysis/ooi.h \
+    Filehandler/Analysis/poi.h
 
 win32{
 
