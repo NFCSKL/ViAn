@@ -189,7 +189,6 @@ cv::Mat video_player::process_frame(cv::Mat &src, bool scale) {
     return processed_frame;
 }
 
-
 /**
  * @brief video_player::scale_frame
  * Scales the video frame to match the resolution of the video window.
@@ -304,7 +303,6 @@ bool video_player::is_showing_analysis_overlay() {
 bool video_player::is_showing_analysis_tool() {
     return choosing_analysis_area;
 }
-
 /**
  * @brief video_player::get_frame_rate
  * @return the frame rate

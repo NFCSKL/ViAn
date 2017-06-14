@@ -29,6 +29,7 @@ public:
     void write(QJsonObject& json);
     std::vector<cv::Rect> get_detections_on_frame(int frame_num);
     std::vector<POI> POIs;
+
 };
 Q_DECLARE_METATYPE(Analysis)
 

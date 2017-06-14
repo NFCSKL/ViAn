@@ -30,7 +30,7 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QComboBox" name="analysis_choise_list"/>
+         <widget class="QComboBox" name="analysis_choice_list"/>
         </item>
         <item>
          <widget class="QLabel" name="current_video_lable">
