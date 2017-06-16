@@ -1,5 +1,6 @@
 #include "analysiswindow.h"
 #include "ui_analysiswindow.h"
+#include "GUI/qtreeitems.h"
 #include <iostream>
 
 /**
@@ -8,12 +9,12 @@
  * @param file_handler
  * @param parent
  */
-AnalysisWindow::AnalysisWindow(MainWindow *mainwindow, FileHandler *file_handler, QWidget *parent) :
+AnalysisWindow::AnalysisWindow(MainWindow *mainwindow, ProjectManager *project_manager, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::AnalysisWindow) {
     ui->setupUi(this);
     this->mainwindow = mainwindow;
-    this->file_handler = file_handler;
+    this->project_manager = project_manager;
     for(auto it = ANALYSIS_NAMES.begin(); it!=ANALYSIS_NAMES.end(); it++) {
         ui->analysis_choise_list->addItem(QString::fromStdString(*it)); //ads all the types of analyses to the rolldown list.
     }
@@ -32,9 +33,13 @@ AnalysisWindow::~AnalysisWindow() {
  * Adds the selected analysis type to the analysis list.
  */
 void AnalysisWindow::on_add_button_clicked() {
+    ID proj_id = ((MyQTreeWidgetItem*)mainwindow->get_project_from_object(current_video))->id;
+    Project* proj = project_manager->get_project(proj_id);
+
     if(!ui->name_input->text().isEmpty()) {
         ANALYSIS_TYPE type = ANALYSIS_NAMES_TYPE_MAP.at(ui->analysis_choise_list->currentText().toStdString());
-        mainwindow->add_analysis_to_queue(type, ui->name_input->text(), current_video, ui->use_analysis_area->isChecked());
+        QString save_path = QString::fromStdString(proj->dir) + "/" + ui->name_input->text() + QString::fromStdString(std::to_string(type));
+        mainwindow->add_analysis_to_queue(save_path,type, ui->name_input->text(), current_video, ui->use_analysis_area->isChecked());
         QString text = QString::fromStdString(current_video->get_name() + "/") + ui->name_input->text();
         ui->analysis_list->insertItem(ui->analysis_list->count(), text);
     } else set_status_bar("No name given.");

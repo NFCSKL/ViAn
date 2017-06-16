@@ -5,35 +5,26 @@
  * @param id
  * @param name
  */
-Project::Project(FileHandler* file_handler, ID id, std::string name){
-    this->file_handler = file_handler;
+Project::Project(ProjectManager *project_manager, ID id, std::string name){
+    this->project_manager = project_manager;
     this->name = name;
-    this->save_name = name;
+    this->m_full_path = name;
     this->id = id;
     this->video_counter = 0;
     this->videos.clear();
     this->changes_made = true;
-
-    // Setting ids to default values, -1 indicating invalid value.
-    this->dir = -1;
-    this->dir_videos = -1;
-    this->dir_bookmarks = -1;
 }
 /**
  * @brief Project::Project
  */
-Project::Project(FileHandler* file_handler){
-    this->file_handler = file_handler;
+Project::Project(ProjectManager *project_manager){
+    this->project_manager = project_manager;
     this->name = "";
-    this->save_name = "";
+    this->m_full_path = "";
     this->videos.clear();
     this->video_counter = 0;
     // Setting ids to default values, -1 indicating invalid value.
     this->id = -1;
-    this->dir = -1;
-    this->dir_bookmarks = -1;
-    this->dir_videos = -1;
-
 }
 
 /**
@@ -117,6 +108,13 @@ void Project::delete_artifacts(){
         QFile file (QString::fromStdString(temp->get_file_path()));
         file.remove();
     }
+    // Delete directories
+    delete_saveable();
+    QDir directory;
+    QString q_dir = QString::fromStdString(this->dir);
+    QString q_dir_bookmarks = QString::fromStdString(this->dir_bookmarks);
+    directory.rmdir(q_dir_bookmarks);
+    directory.rmdir(q_dir);
 }
 
 /**
@@ -126,10 +124,10 @@ void Project::delete_artifacts(){
  */
 void Project::read(const QJsonObject& json){
     this->name = json["name"].toString().toStdString();
-    this->dir = file_handler->create_directory(json["root_dir"].toString());
-    this->dir_bookmarks = file_handler->create_directory(json["bookmark_dir"].toString());
-    this->dir_videos = file_handler->create_directory(json["video_dir"].toString());
-    this->save_name = this->name;
+    this->dir = json["root_dir"].toString().toStdString();
+    this->dir_bookmarks = json["bookmark_dir"].toString().toStdString();
+    this->dir_videos = json["video_dir"].toString().toStdString();
+    this->m_full_path = this->dir +"/"+ this->name;
     // Read videos from json
     QJsonArray json_vid_projs = json["videos"].toArray();
     for (int i = 0; i < json_vid_projs.size(); ++i) {
@@ -155,9 +153,10 @@ void Project::read(const QJsonObject& json){
  */
 void Project::write(QJsonObject& json){
     json["name"] = QString::fromStdString(this->name);
-    json["root_dir"] =  file_handler->get_dir(this->dir).absolutePath();
-    json["bookmark_dir"] = file_handler->get_dir(this->dir_bookmarks).absolutePath();
-    json["video_dir"] = file_handler->get_dir(this->dir_videos).absolutePath();
+    json["root_dir"] =  QString::fromStdString(this->dir);
+    json["bookmark_dir"] = QString::fromStdString(this->dir_bookmarks);
+    json["video_dir"] = QString::fromStdString(this->dir_videos);
+    json["full_path"] = QString::fromStdString(m_full_path);
     QJsonArray json_proj;
     // Write Videos to json
     for(auto it = this->videos.begin(); it != this->videos.end(); it++){
@@ -183,7 +182,7 @@ void Project::write(QJsonObject& json){
  * @param v_id id of video to add analysis to
  * @param analysis
  */
-ID Project::add_analysis(ID v_id, Analysis analysis){
+ID Project::add_analysis(ID v_id, AnalysisMeta analysis){
     this->changes_made = true;
     return this->videos.at(v_id)->add_analysis(analysis);
 }
@@ -213,8 +212,13 @@ bool Project::is_saved(){
  * @return sets saved =true
  */
 void Project::save_project(){
+    QDir directory;
+    directory.mkpath(QString::fromStdString(this->dir));
+    directory.mkpath(QString::fromStdString(this->dir_bookmarks));
+    save_saveable(this->name, this->dir);
     this->changes_made = false;
 }
+
 
 /**
  * @brief Project::get_videos
