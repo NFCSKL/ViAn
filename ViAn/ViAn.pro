@@ -49,9 +49,9 @@ SOURCES += GUI/mainwindow.cpp \
     GUI/bookmarkitem.cpp \
     GUI/reportgenerator.cpp \
     GUI/makeproject.cpp \
+    GUI/myslider.cpp \
     GUI/fpsdialog.cpp \
     GUI/analysiswindow.cpp \
-
 
 HEADERS  += GUI/mainwindow.h \
     GUI/icononbuttonhandler.h \
@@ -61,6 +61,7 @@ HEADERS  += GUI/mainwindow.h \
     GUI/bookmarkview.h \
     GUI/makeproject.h \
     GUI/bookmarkitem.h \
+    GUI/myslider.h \
     GUI/fpsdialog.h \
     GUI/analysiswindow.h \
 
@@ -86,6 +87,7 @@ SOURCES += Video/video_player.cpp \
     Video/shapes/text.cpp \
     Video/shapes/zoomrectangle.cpp \
     Video/shapes/analysarea.cpp
+
 HEADERS += Video/video_player.h \
     Video/overlay.h \
     Video/analysisoverlay.h \

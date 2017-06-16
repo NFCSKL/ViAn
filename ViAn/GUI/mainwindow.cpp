@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QMessageBox>
 #include <iostream>
+#include <algorithm>
 #include <sstream>
 #include <QCloseEvent>
 #include <QColorDialog>
@@ -11,6 +12,7 @@
 #include <thread>
 #include "icononbuttonhandler.h"
 #include "Video/shapes/shape.h"
+#include "myslider.h"
 #include "Analysis/MotionDetection.h"
 #include "Analysis/AnalysisMethod.h"
 
@@ -25,10 +27,10 @@ using namespace cv;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow){
+
     ui->setupUi(this);
+
     video_slider = ui->video_slider;
-
-
     icon_on_button_handler = new IconOnButtonHandler();
     icon_on_button_handler->set_pictures_to_buttons(ui);
 
@@ -851,6 +853,7 @@ void MainWindow::play_video() {
     // Updates the overlay to the state choosen in the GUI.
     mvideo_player->set_showing_overlay(ui->action_show_hide_overlay->isChecked());
 
+    ui->video_slider->clear_rects();
     set_slider_labels();
     ui->speed_label->setText("Play speed: 1x");
 
@@ -1350,12 +1353,12 @@ void MainWindow::on_action_original_size_triggered() {
             on_action_fill_screen_triggered();
             set_status_bar("Filling the screen with the video.");
         }
-
     } else {
         set_status_bar("No video loaded.");
         ui->action_original_size->toggle(); // unchecks it again
     }
 }
+
 /**
  * @brief MainWindow::on_action_invert_analysis_area_triggered
  * Switches between choosing area for analysing and area for not analysing.
@@ -1370,7 +1373,7 @@ void MainWindow::on_action_invert_analysis_area_triggered() {
 }
 
 /**
- * @brief MainWindow::on_action_do_analysis_triggered
+ * @brief MainWindow::on_action_perform_analysis_triggered
  */
 void MainWindow::on_action_perform_analysis_triggered() {
     QTreeWidgetItem *video;
@@ -1388,6 +1391,7 @@ void MainWindow::on_action_perform_analysis_triggered() {
         set_status_bar("Multiple or no projects selected.");
     }
 }
+
 /**
  * @brief MainWindow::on_action_create_report_triggered
  * Invoked when the Create report button is clicked.
@@ -1484,8 +1488,7 @@ void MainWindow::on_action_clear_analysis_overlay_triggered() {
 /**
  * @brief MainWindow::on_action_set_analysis_area_to_video_triggered
  */
-void MainWindow::on_action_set_analysis_area_to_video_triggered()
-{
+void MainWindow::on_action_set_analysis_area_to_video_triggered() {
     MyQTreeWidgetItem *analysis_in_tree;
     if(ui->project_tree->selectedItems().size() == 1) {
         analysis_in_tree =(MyQTreeWidgetItem*)ui->project_tree->selectedItems().first();
@@ -1495,9 +1498,28 @@ void MainWindow::on_action_set_analysis_area_to_video_triggered()
                 ID p_id = ((MyQTreeWidgetItem*)video_in_tree->parent())->id;
                 Analysis analysis = file_handler->get_project(p_id)->get_video(video_in_tree->id)->get_analysis(analysis_in_tree->id);
                 emit set_analysis_results(analysis);
+                show_pois_on_slider(analysis);
             }
         }
     }
+}
+
+/**
+ * @brief MainWindow::show_pois_on_slider
+ * Colors an area on the slider for each POI in analysis
+ * @param analysis
+ */
+void MainWindow::show_pois_on_slider(Analysis analysis) {
+    ui->video_slider->clear_rects();
+    total = mvideo_player->get_num_frames();
+    double start, end;
+
+    for (POI p : analysis.POIs) {
+        start = (double)p.start_frame/total;
+        end = (double)p.end_frame/total;
+        ui->video_slider->add_slider_rect(start, end);
+    }
+    ui->video_slider->repaint();
 }
 
 /**

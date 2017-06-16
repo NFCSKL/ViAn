@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QBasicTimer>
 #include <string>
+#include <vector>
 #include <QCloseEvent>
 #include <QSlider>
 #include <QFileDialog>
@@ -18,6 +19,7 @@
 #include "ui_mainwindow.h"
 #include "Filehandler/filehandler.h"
 #include "bookmarkview.h"
+#include "myslider.h"
 #include "reportgenerator.h"
 #include "action.h"
 #include "qtreeitems.h"
@@ -203,6 +205,8 @@ private:
     bool slider_paused_video = false;
     int prev_slider_pos = 0;
 
+    int total = 0;
+
     std::chrono::milliseconds slider_timer = std::chrono::duration_cast< std::chrono::milliseconds >(
                 std::chrono::system_clock::now().time_since_epoch()
             );
@@ -231,6 +235,9 @@ private:
     void toggle_toolbar();
     void enable_video_buttons();
 
+    void set_total_time();
+    void set_current_time();
+
     void on_slider_moving();
     void on_slider_click(int new_pos, QPoint local_mouse_pos);
     int slider_pos_under_mouse(QPoint local_mouse_pos);
@@ -248,6 +255,8 @@ private:
     void remove_analysis_from_file_handler(MyQTreeWidgetItem *analysis_in_tree);
     void abort_current_analysis();
     void start_next_analysis();
+
+    void show_pois_on_slider(Analysis analysis);
 };
 
 #endif // MAINWINDOW_H

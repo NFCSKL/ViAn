@@ -152,6 +152,7 @@ private:
     bool slider_moving = false;
     bool choosing_analysis_area = false;
 
+
     QImage img;
     QMutex* m_mutex;
     QWaitCondition* m_paused_wait;
