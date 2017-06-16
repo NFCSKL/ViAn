@@ -15,31 +15,32 @@
 #include "video.h"
 #include "Filehandler/saveable.h"
 #include "Project/Analysis/analysis.h"
+#include "projectmanager.h"
 
 typedef int ID;
 class FileHandler;
-
+class ProjectManager;
 /**
  * @brief The Project class
  * incomplete class, will be added on
  * along with parser functionality
  */
 class Project : public Saveable{
-    FileHandler* file_handler;
-    bool changes_made;
+    ProjectManager* project_manager;
+    bool changes_made = true;
     std::map<ID,VideoProject*> videos;
     std::vector<Report*> reports;
 public:
     std::string name;
     ID id;
     ID video_counter;
-    ID dir;
-    ID dir_bookmarks;
-    ID dir_videos;
+    std::string dir = "";
+    std::string dir_bookmarks = "";
+    std::string dir_videos = "";
 
 public:
-    Project(FileHandler* file_handler);
-    Project(FileHandler* file_handler, ID id, std::string name);
+    Project(ProjectManager* projet_manager);
+    Project(ProjectManager* projet_manager, ID id, std::string name);
     ~Project();
     void add_report(Report* report);
     ID add_video(Video *vid);
@@ -56,6 +57,7 @@ public:
     void add_analysis(Analysis an);
     bool is_saved();
     void save_project();
+    void load_project();
     std::map<ID, VideoProject *>& get_videos();
     VideoProject* get_video(ID id);
     bool proj_equals(Project& other);

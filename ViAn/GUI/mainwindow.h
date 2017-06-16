@@ -26,6 +26,7 @@
 #include "makeproject.h"
 #include "analysiswindow.h"
 #include <QQueue>
+#include "projectmanager.h"
 #include "Analysis/AnalysisController.h"
 #define SCROLL_AREA_MARGIN 25
 
@@ -209,8 +210,8 @@ private:
 
 
     AnalysisWindow *analysis_window;
-
-    FileHandler *file_handler;
+    FileHandler* file_handler;
+    ProjectManager *project_manager;
     void setup_file_handler();
     void setup_video_player(video_player *mplayer);
 
