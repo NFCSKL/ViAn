@@ -1,4 +1,12 @@
 #include "project.h"
+/**
+ * @brief Project::Project
+ * Empty private constructor, used for Project::fromFile
+ */
+Project::Project()
+{
+
+}
 
 /**
  * @brief Project::Project
@@ -253,9 +261,4 @@ std::string Project::getDir() const
 std::string Project::getName() const
 {
     return m_name;
-}
-
-Project::Project()
-{
-
 }
