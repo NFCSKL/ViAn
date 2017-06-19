@@ -29,8 +29,13 @@ public:
     ID id;
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
+
     ID add_analysis(AnalysisMeta &analysis);
     ID add_bookmark(Bookmark* bookmark);
+
+    void remove_analysis(const int& id);
+    void remove_bookmark(const int& id);
+
     void delete_artifacts();
     VideoProject(Video* v); //Needs to have a video
     VideoProject();

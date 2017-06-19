@@ -9,17 +9,13 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QDir>
-
-#include "Filehandler/filehandler.h"
+// vian
 #include "videoproject.h"
 #include "video.h"
 #include "Filehandler/saveable.h"
 #include "Project/Analysis/analysismeta.h"
-#include "projectmanager.h"
-#include "projecttestsuite.h"
-typedef int ID;
-class FileHandler;
-class ProjectManager;
+
+using ID = int;
 /**
  * @brief The Project class
  * incomplete class, will be added on
@@ -34,7 +30,7 @@ class Project : public Saveable{
     ID video_counter;
 public:  
     Q_DECL_DEPRECATED int id;
-    const std::string name;
+    std::string name;
     std::string dir = "";
     std::string dir_bookmarks = "";
     std::string dir_videos = "";
@@ -44,10 +40,10 @@ public:
     ~Project();
 
     void add_report(Report* report);
-    ID add_video(const Video *vid);
-    ID add_video_project(const VideoProject* vid_proj);
-    ID add_bookmark(const int& vid_id, const Bookmark *bookmark);
-    ID add_analysis(const int& vid_id, const AnalysisMeta& analysis);
+    ID add_video(Video *vid);
+    ID add_video_project(VideoProject *vid_proj);
+    Q_DECL_DEPRECATED ID add_bookmark(const int& vid_id,  Bookmark *bookmark);
+    Q_DECL_DEPRECATED ID add_analysis(const int& vid_id,  AnalysisMeta& analysis);
     void add_report(const string &file_path);
     void remove_video_project(const int &id);
 
@@ -58,7 +54,7 @@ public:
     void delete_artifacts();
 
     bool is_saved() const;
-    void save_project() const;
+    void save_project();
     void load_project();
     std::map<ID, VideoProject *>& get_videos();
     VideoProject* get_video(ID id);

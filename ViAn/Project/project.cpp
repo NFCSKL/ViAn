@@ -55,7 +55,7 @@ void Project::remove_video_project(const int& id){
  * @brief Project::add_video
  * @return Video ID to be used for identifying the video.
  */
-ID Project::add_video(const Video* vid){
+ID Project::add_video(Video* vid){
     VideoProject* vid_proj = new VideoProject(vid);
     vid_proj->id  = this->video_counter;
     this->videos.insert(std::make_pair(this->video_counter, vid_proj));
@@ -85,7 +85,7 @@ void Project::add_report(Report* report){
  * @brief Project::add_video
  * @return Video ID to be used for identifying the video.
  */
-ID Project::add_video_project(const VideoProject *vid_proj){
+ID Project::add_video_project(VideoProject *vid_proj){
     vid_proj->id = this->video_counter;
     this->videos.insert(std::make_pair(this->video_counter, vid_proj));
     this->changes_made = true;
@@ -150,7 +150,7 @@ void Project::read(const QJsonObject& json){
  * @param json
  * Write project parameters to json object.
  */
-void Project::write(QJsonObject& json) const{
+void Project::write(QJsonObject& json){
     json["name"] = QString::fromStdString(this->name);
     json["root_dir"] =  QString::fromStdString(this->dir);
     json["bookmark_dir"] = QString::fromStdString(this->dir_bookmarks);
@@ -181,7 +181,7 @@ void Project::write(QJsonObject& json) const{
  * @param v_id id of video to add analysis to
  * @param analysis
  */
-ID Project::add_analysis(const int &vid_id, const AnalysisMeta &analysis){
+ID Project::add_analysis(const int &vid_id, AnalysisMeta &analysis){
     this->changes_made = true;
     return this->videos.at(vid_id)->add_analysis(analysis);
 }
@@ -192,7 +192,7 @@ ID Project::add_analysis(const int &vid_id, const AnalysisMeta &analysis){
  * @param bookmark
  * Add new bookmark to Videoproj corresponding to id.
  */
-ID Project::add_bookmark(const int &vid_id, const Bookmark *bookmark){
+ID Project::add_bookmark(const int &vid_id, Bookmark *bookmark){
     VideoProject* v = this->videos.at(vid_id);
     this->changes_made = true;
     return v->add_bookmark(bookmark);
@@ -210,7 +210,7 @@ bool Project::is_saved() const{
  * @brief Project::save_project
  * @return sets saved =true
  */
-void Project::save_project() const{
+void Project::save_project(){
     QDir directory;
     directory.mkpath(QString::fromStdString(this->dir));
     directory.mkpath(QString::fromStdString(this->dir_bookmarks));

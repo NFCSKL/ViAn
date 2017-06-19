@@ -7,10 +7,13 @@ ProjectTestsuite::ProjectTestsuite(QObject *parent)
 }
 
 void ProjectTestsuite::init_project_test(){
-    Project* proj = new Project();
+    m_proj = new Project(0, "TEST_PROJ");
 }
 
 void ProjectTestsuite::add_proj_test(){
+//    m_proj->add_report();
+//    m_proj->add_video();
+//    m_proj->add_video_project();
 
 }
 

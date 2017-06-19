@@ -1,6 +1,6 @@
 #ifndef PROJECTMANAGER_H
 #define PROJECTMANAGER_H
-
+#include <mutex>
 // ViAn files
 #include "Project/project.h"
 #include "Filehandler/saveable.h"

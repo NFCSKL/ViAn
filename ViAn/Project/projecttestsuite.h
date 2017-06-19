@@ -7,7 +7,7 @@
 
 class ProjectTestsuite
 {
-
+    Project* m_proj;
 public:
     explicit ProjectTestsuite(QObject *parent = 0);
 private slots:

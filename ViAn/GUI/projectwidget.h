@@ -3,8 +3,7 @@
 
 #include <QWidget>
 #include <QTreeWidget>
-#include <Filehandler/filehandler.h>
-
+#include "projectmanager.h"
 class ProjectWidget : public QTreeWidget
 {
     Q_OBJECT
