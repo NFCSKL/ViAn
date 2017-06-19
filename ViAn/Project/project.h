@@ -42,19 +42,23 @@ public:
     Project(ProjectManager* project_manager);
     Project(ProjectManager* project_manager, ID id, std::string name);
     ~Project();
+
     void add_report(Report* report);
     ID add_video(Video *vid);
     ID add_video_project(VideoProject* vid_proj);
     ID add_bookmark(ID video_counter, Bookmark *bookmark);
     ID add_analysis(ID video_counter, AnalysisMeta analysis);
+    void add_analysis(Analysis an);
     void add_report(std::string file_path);
 
-    void delete_artifacts();
     void remove_video_project(ID id);
+
+    void delete_artifacts();
+
     // read and write operator for Projects
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
-    void add_analysis(Analysis an);
+
     bool is_saved();
     void save_project();
     void load_project();
