@@ -35,7 +35,7 @@ public:
     void delete_saveable();
 
     virtual void read(const QJsonObject& json) = 0;
-    virtual void write(QJsonObject& json) = 0;
+    virtual void write(QJsonObject& json) = 0 ;
 
     std::string full_path() const;
 };

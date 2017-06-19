@@ -5,11 +5,10 @@
  * @param id
  * @param name
  */
-Project::Project(ProjectManager *project_manager, ID id, std::string name){
-    this->project_manager = project_manager;
-    this->name = name;
-    this->m_full_path = name;
+Project::Project(const int &id, const std::string& name){
     this->id = id;
+    this->name = name;
+    this->m_full_path = "";
     this->video_counter = 0;
     this->videos.clear();
     this->changes_made = true;
@@ -17,14 +16,14 @@ Project::Project(ProjectManager *project_manager, ID id, std::string name){
 /**
  * @brief Project::Project
  */
-Project::Project(ProjectManager *project_manager){
-    this->project_manager = project_manager;
+Project::Project(){
     this->name = "";
     this->m_full_path = "";
     this->videos.clear();
     this->video_counter = 0;
-    // Setting ids to default values, -1 indicating invalid value.
     this->id = -1;
+    // Setting ids to default values, -1 indicating invalid value.
+    this->changes_made = true;
 }
 
 /**
@@ -45,7 +44,7 @@ Project::~Project(){
  * @param id
  * Remove video from videos and delete its contents.
  */
-void Project::remove_video_project(ID id){
+void Project::remove_video_project(const int& id){
     VideoProject* temp = this->videos.at(id);
     delete temp;
     videos.erase(id);
@@ -56,7 +55,7 @@ void Project::remove_video_project(ID id){
  * @brief Project::add_video
  * @return Video ID to be used for identifying the video.
  */
-ID Project::add_video(Video* vid){
+ID Project::add_video(const Video* vid){
     VideoProject* vid_proj = new VideoProject(vid);
     vid_proj->id  = this->video_counter;
     this->videos.insert(std::make_pair(this->video_counter, vid_proj));
@@ -68,7 +67,7 @@ ID Project::add_video(Video* vid){
  * @brief Project::add_report
  * @param file_path
  */
-void Project::add_report(std::string file_path){
+void Project::add_report(const std::string& file_path){
     this->reports.push_back(new Report(file_path));
     this->changes_made = true;
 }
@@ -86,7 +85,7 @@ void Project::add_report(Report* report){
  * @brief Project::add_video
  * @return Video ID to be used for identifying the video.
  */
-ID Project::add_video_project(VideoProject* vid_proj){
+ID Project::add_video_project(const VideoProject *vid_proj){
     vid_proj->id = this->video_counter;
     this->videos.insert(std::make_pair(this->video_counter, vid_proj));
     this->changes_made = true;
@@ -151,7 +150,7 @@ void Project::read(const QJsonObject& json){
  * @param json
  * Write project parameters to json object.
  */
-void Project::write(QJsonObject& json){
+void Project::write(QJsonObject& json) const{
     json["name"] = QString::fromStdString(this->name);
     json["root_dir"] =  QString::fromStdString(this->dir);
     json["bookmark_dir"] = QString::fromStdString(this->dir_bookmarks);
@@ -182,9 +181,9 @@ void Project::write(QJsonObject& json){
  * @param v_id id of video to add analysis to
  * @param analysis
  */
-ID Project::add_analysis(ID v_id, AnalysisMeta analysis){
+ID Project::add_analysis(const int &vid_id, const AnalysisMeta &analysis){
     this->changes_made = true;
-    return this->videos.at(v_id)->add_analysis(analysis);
+    return this->videos.at(vid_id)->add_analysis(analysis);
 }
 
 /**
@@ -193,8 +192,8 @@ ID Project::add_analysis(ID v_id, AnalysisMeta analysis){
  * @param bookmark
  * Add new bookmark to Videoproj corresponding to id.
  */
-ID Project::add_bookmark(ID v_id, Bookmark *bookmark){
-    VideoProject* v = this->videos.at(v_id);
+ID Project::add_bookmark(const int &vid_id, const Bookmark *bookmark){
+    VideoProject* v = this->videos.at(vid_id);
     this->changes_made = true;
     return v->add_bookmark(bookmark);
 }
@@ -203,7 +202,7 @@ ID Project::add_bookmark(ID v_id, Bookmark *bookmark){
  * @brief Project::is_saved
  * @return true if saved
  */
-bool Project::is_saved(){
+bool Project::is_saved() const{
     return !this->changes_made;
 }
 
@@ -211,7 +210,7 @@ bool Project::is_saved(){
  * @brief Project::save_project
  * @return sets saved =true
  */
-void Project::save_project(){
+void Project::save_project() const{
     QDir directory;
     directory.mkpath(QString::fromStdString(this->dir));
     directory.mkpath(QString::fromStdString(this->dir_bookmarks));
@@ -235,4 +234,16 @@ std::map<ID, VideoProject* > &Project::get_videos(){
  */
 VideoProject* Project::get_video(ID id) {
     return this->videos[id];
+}
+
+/**
+ * @brief Project::operator ==
+ * Compare data contents of two projects. return
+ * true if same data.
+ * @param other
+ * @return
+ */
+bool Project::operator==(const Project &other)
+{
+
 }

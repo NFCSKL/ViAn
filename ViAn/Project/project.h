@@ -16,7 +16,7 @@
 #include "Filehandler/saveable.h"
 #include "Project/Analysis/analysismeta.h"
 #include "projectmanager.h"
-
+#include "projecttestsuite.h"
 typedef int ID;
 class FileHandler;
 class ProjectManager;
@@ -26,45 +26,43 @@ class ProjectManager;
  * along with parser functionality
  */
 class Project : public Saveable{
-    ProjectManager* project_manager;
+    friend class ProjectTestsuite;
+
     bool changes_made = true;
     std::map<ID,VideoProject*> videos;
     std::vector<Report*> reports;
-public:
-    std::string name;
-    ID id;
     ID video_counter;
+public:  
+    Q_DECL_DEPRECATED int id;
+    const std::string name;
     std::string dir = "";
     std::string dir_bookmarks = "";
     std::string dir_videos = "";
-
 public:
-    Project(ProjectManager* project_manager);
-    Project(ProjectManager* project_manager, ID id, std::string name);
+    Project();
+    Project(const int& id, const string &name);
     ~Project();
 
     void add_report(Report* report);
-    ID add_video(Video *vid);
-    ID add_video_project(VideoProject* vid_proj);
-    ID add_bookmark(ID video_counter, Bookmark *bookmark);
-    ID add_analysis(ID video_counter, AnalysisMeta analysis);
-    void add_analysis(Analysis an);
-    void add_report(std::string file_path);
+    ID add_video(const Video *vid);
+    ID add_video_project(const VideoProject* vid_proj);
+    ID add_bookmark(const int& vid_id, const Bookmark *bookmark);
+    ID add_analysis(const int& vid_id, const AnalysisMeta& analysis);
+    void add_report(const string &file_path);
+    void remove_video_project(const int &id);
 
-    void remove_video_project(ID id);
-
-    void delete_artifacts();
 
     // read and write operator for Projects
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
+    void delete_artifacts();
 
-    bool is_saved();
-    void save_project();
+    bool is_saved() const;
+    void save_project() const;
     void load_project();
     std::map<ID, VideoProject *>& get_videos();
     VideoProject* get_video(ID id);
-    bool proj_equals(Project& other);
+    bool operator==(const Project& other);
 // TODO
 
 //    void add_drawing();      

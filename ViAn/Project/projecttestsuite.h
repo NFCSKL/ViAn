@@ -3,7 +3,7 @@
 #include <QJsonObject>
 #include <QObject>
 #include <QTest>
-
+#include "project.h"
 
 class ProjectTestsuite
 {

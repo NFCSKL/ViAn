@@ -51,7 +51,7 @@ Project* ProjectManager::create_project(const std::string& proj_name,
                                         const std::string& dir_path,
                                         const std::string& vid_path)
 {
-    Project* proj =  new Project(this, this->project_id, proj_name);
+    Project* proj =  new Project(this->project_id++, proj_name);
     proj->dir = dir_path + "/" + proj_name;
     proj->dir_bookmarks = proj->dir + "/Bookmarks";
     proj->dir_videos = vid_path;
@@ -112,9 +112,9 @@ void ProjectManager::remove_video_from_project(ID proj_id, ID vid_id){
  * Used for simplicity of call and
  * for hiding save format.
  */
-Project* ProjectManager::load_project(std::string full_project_path){
+Project* ProjectManager::load_project(const std::string& full_project_path){
 //   maybe handle this in project class? overriding savveable?
-     Project* proj = new Project(this);
+     Project* proj = new Project();
      proj->load_saveable(full_project_path); // Decide format internally, here for flexibility
      proj->save_project();
      proj->id = add_project(proj);

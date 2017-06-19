@@ -23,7 +23,7 @@ public:
     Project* get_project(ID id);
     Project* create_project(const string &proj_name, const string &dir_path, const std::string& vid_path);
     bool delete_project(ID proj_id);
-    Project* load_project(std::string full_project_path);
+    Project* load_project(const string &full_project_path);
     void save_project(ID id);
     void open_project(ID id);
     void close_project(ID id);
