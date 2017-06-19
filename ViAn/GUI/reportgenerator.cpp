@@ -6,9 +6,8 @@
  * @param proj, the current project that we are creating document for.
  * @param file_handler, the file_handler that is used to get path information for saving.
  */
-ReportGenerator::ReportGenerator(Project* proj, FileHandler *file_handler) {
+ReportGenerator::ReportGenerator(Project* proj) {
     this->proj = proj;
-    this->file_handler = file_handler;
 }
 
 /**
@@ -47,7 +46,7 @@ void ReportGenerator::create_report() {
 
             //5. SAVE AND CLOSE FILE
             QString file_path = save_report(active_document);
-            this->proj->add_report(file_path.toStdString());
+            this->proj->add_report(new Report(file_path.toStdString()));
         }
         close_report(doc, word);
     }else{
@@ -193,8 +192,8 @@ std::string ReportGenerator::date_time_generator() {
  */
 QString ReportGenerator::save_report(QAxObject* active_document) {
     std::string dt = date_time_generator();
-    std::string proj_path = file_handler->get_dir(proj->dir).absolutePath().toStdString();
-    std::string path = proj_path.append("/").append(proj->name).append("_").append(dt).append(".docx");
+    std::string proj_path = proj->getDir();
+    std::string path = proj_path.append("/").append(proj->getName()).append("_").append(dt).append(".docx");
     active_document->dynamicCall("SaveAs (const QString&)", QString::fromStdString(path));
     return QString::fromStdString(path);
 }
