@@ -3,11 +3,13 @@
 
 #include <QToolBar>
 #include <QAction>
+#include <QActionGroup>
 
 class DrawingToolbar : public QToolBar
 {
     void create_actions();
     void create_buttons();
+    void set_exclusive_checkability();
 public:
     DrawingToolbar();
 
@@ -20,6 +22,9 @@ public:
     QAction* text_tool_act;
     QAction* undo_tool_act;
     QAction* clear_tool_act;
+
+    QActionGroup* tools;
+
 };
 
 #endif // DRAWINGTOOLBAR_H

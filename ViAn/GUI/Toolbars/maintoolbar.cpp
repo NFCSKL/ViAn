@@ -6,6 +6,10 @@ MainToolbar::MainToolbar() {
     create_buttons();
 }
 
+/**
+ * @brief MainToolbar::create_actions
+ * Creates all actions and sets the drawing toolbar action to be checkable
+ */
 void MainToolbar::create_actions() {
     add_video_act = new QAction(QIcon("../ViAn/Icons/add_video.png"), tr("Add video"), this);
     save_act = new QAction(QIcon("../ViAn/Icons/save.png"),tr("Save project"), this);
@@ -15,6 +19,10 @@ void MainToolbar::create_actions() {
     toggle_draw_toolbar_act->setChecked(true);
 }
 
+/**
+ * @brief MainToolbar::create_buttons
+ * Adds all actions to the toolbar
+ */
 void MainToolbar::create_buttons() {
     addAction(save_act);
     addAction(open_act);
