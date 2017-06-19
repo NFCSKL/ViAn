@@ -29,10 +29,10 @@ public:
     virtual ~Saveable();
     // Saveable methods
 
-    bool load_saveable(const std::string &full_path, const SAVE_FORMAT &save_format = DEFAULT_SAVE_FORMAT);
-    bool save_saveable(const std::string &file_name, const std::string &dir_path, const SAVE_FORMAT &save_format = DEFAULT_SAVE_FORMAT);
-    bool save_saveable(const std::string &full_path, const SAVE_FORMAT &save_format = DEFAULT_SAVE_FORMAT);
-    void delete_saveable();
+    virtual bool load_saveable(const std::string &full_path, const SAVE_FORMAT &save_format = DEFAULT_SAVE_FORMAT);
+    virtual bool save_saveable(const std::string &file_name, const std::string &dir_path, const SAVE_FORMAT &save_format = DEFAULT_SAVE_FORMAT);
+    virtual bool save_saveable(const std::string &full_path, const SAVE_FORMAT &save_format = DEFAULT_SAVE_FORMAT);
+    virtual bool delete_saveable();
 
     virtual void read(const QJsonObject& json) = 0;
     virtual void write(QJsonObject& json) = 0 ;

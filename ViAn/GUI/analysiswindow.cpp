@@ -38,7 +38,7 @@ void AnalysisWindow::on_add_button_clicked() {
 
     if(!ui->name_input->text().isEmpty()) {
         ANALYSIS_TYPE type = ANALYSIS_NAMES_TYPE_MAP.at(ui->analysis_choise_list->currentText().toStdString());
-        QString save_path = QString::fromStdString(proj->dir) + "/" + ui->name_input->text() + QString::fromStdString(std::to_string(type));
+        QString save_path = QString::fromStdString(proj->getDir()) + "/" + ui->name_input->text() + QString::fromStdString(std::to_string(type));
         mainwindow->add_analysis_to_queue(save_path,type, ui->name_input->text(), current_video, ui->use_analysis_area->isChecked());
         QString text = QString::fromStdString(current_video->get_name() + "/") + ui->name_input->text();
         ui->analysis_list->insertItem(ui->analysis_list->count(), text);

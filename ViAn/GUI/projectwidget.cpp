@@ -37,7 +37,7 @@ void ProjectWidget::create_default_tree() {
 void ProjectWidget::add_video() {
     if (m_proj == nullptr)  return; // TODO: HANDLE CASE
 
-    QString video_path = QFileDialog().getOpenFileName(this, tr("Add video"), m_proj->dir_videos.c_str());
+    QString video_path = QFileDialog().getOpenFileName(this, tr("Add video"), m_proj->m_dir_videos.c_str());
 
     int index = video_path.lastIndexOf('/') + 1;
     QString vid_name = video_path.right(video_path.length() - index);

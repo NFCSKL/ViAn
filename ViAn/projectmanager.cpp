@@ -51,13 +51,10 @@ Project* ProjectManager::create_project(const std::string& proj_name,
                                         const std::string& dir_path,
                                         const std::string& vid_path)
 {
-    Project* proj =  new Project(this->project_id++, proj_name);
-    proj->dir = dir_path + "/" + proj_name;
-    proj->dir_bookmarks = proj->dir + "/Bookmarks";
-    proj->dir_videos = vid_path;
+    Project* proj =  new Project(proj_name, dir_path, vid_path);
     add_project(proj);                          // Add project to file sytstem
     proj->save_project();                         // Save project file
-    open_project(proj->id);                     // Open project
+    open_project(proj->m_id);                     // Open project
     return proj;
 }
 
@@ -71,7 +68,7 @@ bool ProjectManager::delete_project(ID proj_id){
     Project* temp = get_project(proj_id);
     this->proj_map_lock.lock();
     if(this->projects.erase(proj_id)){
-        close_project(temp->id);
+        close_project(temp->m_id);
         temp->delete_artifacts();
         delete temp;
         this->proj_map_lock.unlock();
@@ -90,7 +87,7 @@ bool ProjectManager::delete_project(ID proj_id){
  */
 ID ProjectManager::add_video(Project* proj, std::string file_path){
     Video* v = new Video(file_path);
-    return proj->add_video(v); // video id set in proj->add_video
+    return proj->add_video_project(new VideoProject(v)); // video id set in proj->add_video
 }
 
 /**
@@ -114,10 +111,8 @@ void ProjectManager::remove_video_from_project(ID proj_id, ID vid_id){
  */
 Project* ProjectManager::load_project(const std::string& full_project_path){
 //   maybe handle this in project class? overriding savveable?
-     Project* proj = new Project();
-     proj->load_saveable(full_project_path); // Decide format internally, here for flexibility
-     proj->save_project();
-     proj->id = add_project(proj);
+     Project* proj = Project::fromFile(full_project_path);
+     proj->m_id = add_project(proj);
      return proj;
 }
 
@@ -160,17 +155,3 @@ void ProjectManager::close_project(ID id){
     open_projects.erase(std::remove(open_projects.begin(), open_projects.end(), id), open_projects.end());
 }
 
-/**
- * @brief ProjectManager::proj_equals
- * @param proj
- * @param proj2
- * @return true if project contents are the same
- */
-bool ProjectManager::proj_equals(Project& proj, Project& proj2){
-    bool video_equals =  std::equal(proj.get_videos().begin(), proj.get_videos().end(),
-               proj2.get_videos().begin(),
-               [](const std::pair<ID,VideoProject*> v, const std::pair<ID,VideoProject*> v2){return *(v.second->get_video()) == *(v2.second->get_video());}); // lambda function comparing using video==
-                                                                                                                      // by dereferencing pointers in vector
-    return proj.name == proj2.name &&
-           video_equals;
-}

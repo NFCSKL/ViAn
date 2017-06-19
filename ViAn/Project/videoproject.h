@@ -33,18 +33,19 @@ public:
     ID add_analysis(AnalysisMeta &analysis);
     ID add_bookmark(Bookmark* bookmark);
 
-    void remove_analysis(const int& id);
-    void remove_bookmark(const int& id);
+    void delete_analysis(const int& id);
+    void delete_bookmark(const int& id);
 
     void delete_artifacts();
+
     VideoProject(Video* v); //Needs to have a video
     VideoProject();
     Video* get_video();
     Overlay* get_overlay();
+
     std::map<ID,Bookmark*> get_bookmarks();
     std::map<ID,AnalysisMeta> get_analyses();
     AnalysisMeta get_analysis(ID id);
-    void delete_analysis(ID id);
 };
 
 
