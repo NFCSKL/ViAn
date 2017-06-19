@@ -45,7 +45,7 @@ public:
 
     std::map<ID,Bookmark*> get_bookmarks();
     std::map<ID,AnalysisMeta> get_analyses();
-    AnalysisMeta get_analysis(ID id);
+    AnalysisMeta get_analysis(const int &id);
 };
 
 

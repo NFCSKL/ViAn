@@ -6,7 +6,7 @@
  * @param id
  * @param name
  */
-Project* Project::fromFile(const string &full_path)
+Project* Project::fromFile(const std::string &full_path)
 {
     Project* proj = new Project();
     proj->load_saveable(full_path);
@@ -253,4 +253,9 @@ std::string Project::getDir() const
 std::string Project::getName() const
 {
     return m_name;
+}
+
+Project::Project()
+{
+
 }
