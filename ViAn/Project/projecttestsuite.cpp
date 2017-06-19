@@ -71,7 +71,12 @@ void ProjectTestsuite::read_write_test(){
 
     Project* proj2 = Project::fromFile(m_proj->full_path());    ;
 
-    QVERIFY(m_proj == proj2);
+    QVERIFY(m_proj->m_name == proj2->m_name);
+    QVERIFY(m_proj->m_dir == proj2->m_dir);
+    QVERIFY(m_proj->m_dir_videos == proj2->m_dir_videos);
+
+    QVERIFY(m_proj->m_reports.size() == 3);
+    QVERIFY(m_proj->m_videos.size() == 3);
 
     m_proj->remove_video_project(idx1);
     m_proj->remove_video_project(idx2);

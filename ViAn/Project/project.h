@@ -64,7 +64,6 @@ public:
     bool load_project();
     std::map<ID, VideoProject *>& get_videos();
     VideoProject* get_video(ID m_id);
-    bool operator==(const Project& other);
 // TODO
 
 //    void add_drawing();      
@@ -72,6 +71,8 @@ public:
     std::string getDir_videos() const;
     std::string getDir() const;
     std::string getName() const;
+private:
+    Project();
 };
 
 

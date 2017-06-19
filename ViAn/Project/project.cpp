@@ -8,10 +8,18 @@
  */
 Project* Project::fromFile(const string &full_path)
 {
-    load_saveable(full_path);
-    m_changes = false;
+    Project* proj = new Project();
+    proj->load_saveable(full_path);
+    proj->m_changes = false;
+    return proj;
 }
 
+/**
+ * @brief Project::Project
+ * @param name     := name of the project
+ * @param dir_path := directory to save project in
+ * @param vid_path := path for videos folder
+ */
 Project::Project(const std::string& name, const std::string& dir_path, const std::string& vid_path){
     m_name = name;
     m_full_path = dir_path + name;
@@ -223,31 +231,6 @@ std::map<ID, VideoProject*> &Project::get_videos(){
 VideoProject* Project::get_video(ID id) {
     return m_videos[id];
 }
-
-/**
- * @brief Project::operator ==
- * Compare data contents of two projects. return
- * true if same data.
- * @param other
- * @return
- */
-bool Project::operator==(const Project &other)
-{
-    bool files_same =
-            m_name == other.m_name &&
-            m_dir == other.m_dir &&
-            m_dir_videos == other.m_dir_videos;
-    std::function v_eql =
-            [](const std::pair<ID,VideoProject*> v, const std::pair<ID,VideoProject*> v2){return *v == *v2 ;};
-    std::function r_eql =
-            [](const Report* r, const Report* r2){return *r == *r2 ;};
-    bool vid_projs = std::equal(proj.m_videos.begin(), proj.m_videos.end(),proj2.m_videos.begin(), v_eql);
-    bool reports = std::equal(proj.m_reports.begin(), proj.m_reports.end(), proj2.m_reports.begin(), r_eql);
-
-    return files_same && vid_projs && reports;
-
-}
-
 
 /**
  * @brief Project::Project
