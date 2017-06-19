@@ -1,6 +1,9 @@
 #include "maintoolbar.h"
 #include <QIcon>
 
+/**
+ * @brief MainToolbar::MainToolbar
+ */
 MainToolbar::MainToolbar() {
     create_actions();
     create_buttons();

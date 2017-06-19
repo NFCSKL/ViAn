@@ -1,7 +1,11 @@
 #include "drawingtoolbar.h"
 
 #include <QIcon>
+#include <QColorDialog>
 
+/**
+ * @brief DrawingToolbar::DrawingToolbar
+ */
 DrawingToolbar::DrawingToolbar() {
     create_actions();
     create_buttons();
@@ -32,6 +36,8 @@ void DrawingToolbar::create_actions() {
         act->setCheckable(true);
     }
     tools->setExclusive(true);
+
+    connect(color_tool_act, &QAction::triggered, this, &DrawingToolbar::color_tool_clicked);
 }
 
 /**
@@ -44,5 +50,18 @@ void DrawingToolbar::create_buttons() {
     addAction(undo_tool_act);
     addAction(clear_tool_act);
 }
+
+/**
+ * @brief DrawingToolbar::color_tool_clicked
+ * Opens a color dialog when the color tool is clicked
+ */
+void DrawingToolbar::color_tool_clicked() {
+    QColor color = QColorDialog::getColor();
+    if (color.isValid()) {
+        // TODO set overlay color
+    }
+}
+
+
 
 

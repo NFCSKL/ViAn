@@ -588,20 +588,6 @@ void MainWindow::on_action_show_hide_overlay_triggered() {
 }
 
 /**
- * @brief MainWindow::on_action_colour_triggered
- * Selects a colour for the overlay drawing tool.
- */
-void MainWindow::on_action_colour_triggered() {
-    QColor col = QColorDialog::getColor();
-    if (col.isValid()) {
-        mvideo_player->set_overlay_colour(col);
-        std::string msg = "Color: ";
-        msg.append(col.name().toStdString());
-        set_status_bar(msg);
-    }
-}
-
-/**
  * @brief MainWindow::on_action_rectangle_triggered
  * Selects the rectangle shape for the overlay drawing tool.
  */

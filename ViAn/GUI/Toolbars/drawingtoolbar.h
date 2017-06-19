@@ -25,6 +25,8 @@ public:
 
     QActionGroup* tools;
 
+private slots:
+    void color_tool_clicked();
 };
 
 #endif // DRAWINGTOOLBAR_H
