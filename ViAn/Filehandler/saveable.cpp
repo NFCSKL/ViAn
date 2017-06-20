@@ -70,7 +70,9 @@ bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_
 bool Saveable::delete_saveable()
 {
     QFile file(QString::fromStdString(m_full_path));
-    file.remove();
+    if(file.exists()) return file.remove();
+    qWarning("No file to delete");
+    return false;
 }
 
 /**
