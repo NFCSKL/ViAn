@@ -107,13 +107,13 @@ void VideoProjectTest::read_write_test(){
 void VideoProjectTest::save_load_test(){
     VideoProject* vid_proj = new VideoProject();
 
-    int id1  = vid_proj->add_analysis(new AnalysisMeta());
-    int id2  = vid_proj->add_analysis(new AnalysisMeta());
-    int id3  = vid_proj->add_analysis(new AnalysisMeta());
+    vid_proj->add_analysis(new AnalysisMeta());
+    vid_proj->add_analysis(new AnalysisMeta());
+    vid_proj->add_analysis(new AnalysisMeta());
 
-    int id4  = vid_proj->add_bookmark(new Bookmark());
-    int id5  = vid_proj->add_bookmark(new Bookmark());
-    int id6  = vid_proj->add_bookmark(new Bookmark());
+    vid_proj->add_bookmark(new Bookmark());
+    vid_proj->add_bookmark(new Bookmark());
+    vid_proj->add_bookmark(new Bookmark());
 
     QDir dir;
     dir.mkpath("C:/TEST/VID_PROJ_TEST/");
@@ -127,6 +127,10 @@ void VideoProjectTest::save_load_test(){
     QCOMPARE(vid_proj->m_bm_cnt, vid_proj2->m_bm_cnt);
     QCOMPARE(vid_proj->m_analyses.size(), vid_proj2->m_analyses.size());
     QCOMPARE(vid_proj->m_bookmarks.size(), vid_proj2->m_bookmarks.size());
+
+    vid_proj2->delete_saveable();
+    dir.rmpath("C:/TEST/VID_PROJ_TEST/");
+    QVERIFY(!dir.exists("C:/TEST/VID_PROJ_TEST/"));
 }
 /**
  * @brief VideoProjectTest::delete_artifacts_test

@@ -19,9 +19,9 @@ const std::map<std::string, ANALYSIS_TYPE> ANALYSIS_NAMES_TYPE_MAP = {std::make_
 class Analysis : public Saveable {
     friend class AnalysisMeta;
     std::string name;
-    ANALYSIS_TYPE type;
-public:
 
+public:
+    ANALYSIS_TYPE type;
     Analysis();
     Analysis(const Analysis &obj);
     ~Analysis();    
