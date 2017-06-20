@@ -46,7 +46,7 @@ bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_
                     : QString::fromStdString(full_path + ".dat"));
     if(!save_file.open(QIODevice::WriteOnly)){  // Attempt to open full_path
         qWarning("Couldn't open save file %s",
-                 save_file.fileName().toStdString().c_str());   // Send warning if unsuccessful
+                 save_file.fileName());   // Send warning if unsuccessful
         return false;
     }
     QJsonObject json_saveable;                  // Data to be saved
@@ -86,7 +86,7 @@ bool Saveable::load_saveable(const std::string& full_path, const SAVE_FORMAT& sa
     QFile load_file(QString::fromStdString(full_path));
     if (!load_file.open(QIODevice::ReadOnly)) {     // Attempt to open file
         qWarning("Couldn't open load file %s ",
-                 load_file.fileName().toStdString().c_str()); // Could not open file
+                 load_file.fileName()); // Could not open file
         return false;
     }
     QByteArray save_data = load_file.readAll();         // Read file to be loaded

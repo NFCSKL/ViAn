@@ -56,8 +56,6 @@ public slots:
     void set_total_time(int time);
     void load_marked_video(VideoProject* vid_proj);
 
-    void load_marked_video(VideoProject* vid_proj);
-
 private:
     const QSize BTN_SIZE = QSize(30, 30);
 
