@@ -3,6 +3,11 @@
 /**
  * @brief Analysis::Analysis
  */
+std::string Analysis::getName() const
+{
+    return name;
+}
+
 Analysis::Analysis() {
 }
 
@@ -21,7 +26,7 @@ Analysis::Analysis(const Analysis &obj) {
  * @brief Analysis::set_name
  * @param QString name
  */
-void Analysis::set_name(QString name){
+void Analysis::set_name(const std::string& name){
     this->name = name;
 }
 
