@@ -9,6 +9,12 @@ Project::Project()
 
 }
 
+/**
+ * @brief Project::Project
+ * @param file_handler
+ * @param id
+ * @param name
+ */
 Project* Project::fromFile(const std::string &full_path)
 {
     Project* proj = new Project();
@@ -187,7 +193,7 @@ bool Project::save_project(){
  * @brief Project::get_videos
  * @return videos&
  */
-std::map<ID, VideoProject*> &Project::get_videos(){
+std::map<ID, const VideoProject*> &Project::get_videos(){
     return m_videos;
 }
 
@@ -196,7 +202,7 @@ std::map<ID, VideoProject*> &Project::get_videos(){
  * @param id
  * @return Returns the video with the specified id.
  */
-VideoProject* Project::get_video(ID id) {
+const VideoProject* Project::get_video(ID id) {
     return m_videos[id];
 }
 

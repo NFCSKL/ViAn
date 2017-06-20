@@ -13,9 +13,9 @@ VideoProjectTest::VideoProjectTest(QObject *parent) : QObject(parent)
 void VideoProjectTest::add_analysis_test(){
     VideoProject* vid_proj = new VideoProject();
 
-    int id1  = vid_proj->add_analysis(new AnalysisMeta());
-    int id2  = vid_proj->add_analysis(new AnalysisMeta());
-    int id3  = vid_proj->add_analysis(new AnalysisMeta());
+    vid_proj->add_analysis(new AnalysisMeta());
+    vid_proj->add_analysis(new AnalysisMeta());
+    vid_proj->add_analysis(new AnalysisMeta());
     QCOMPARE(vid_proj->m_analyses.size(), unsigned(3));
 }
 
@@ -27,9 +27,9 @@ void VideoProjectTest::add_analysis_test(){
 void VideoProjectTest::add_bookmark_test(){
     VideoProject* vid_proj = new VideoProject();
 
-    int id1  = vid_proj->add_bookmark(new Bookmark());
-    int id2  = vid_proj->add_bookmark(new Bookmark());
-    int id3  = vid_proj->add_bookmark(new Bookmark());
+    vid_proj->add_bookmark(new Bookmark());
+    vid_proj->add_bookmark(new Bookmark());
+    vid_proj->add_bookmark(new Bookmark());
     QCOMPARE(vid_proj->m_bookmarks.size(), unsigned(3));
 }
 
@@ -79,13 +79,13 @@ void VideoProjectTest::delete_bookmark(){
 void VideoProjectTest::read_write_test(){
     VideoProject* vid_proj = new VideoProject();
 
-    int id1  = vid_proj->add_analysis(new AnalysisMeta());
-    int id2  = vid_proj->add_analysis(new AnalysisMeta());
-    int id3  = vid_proj->add_analysis(new AnalysisMeta());
+    vid_proj->add_analysis(new AnalysisMeta());
+    vid_proj->add_analysis(new AnalysisMeta());
+    vid_proj->add_analysis(new AnalysisMeta());
 
-    int id4  = vid_proj->add_bookmark(new Bookmark());
-    int id5  = vid_proj->add_bookmark(new Bookmark());
-    int id6  = vid_proj->add_bookmark(new Bookmark());
+    vid_proj->add_bookmark(new Bookmark());
+    vid_proj->add_bookmark(new Bookmark());
+    vid_proj->add_bookmark(new Bookmark());
 
     QJsonObject json_vid_proj;
     vid_proj->write(json_vid_proj);
