@@ -1,5 +1,5 @@
 #include "projectwidget.h"
-#include "createprojectdialog.h"
+#include "projectdialog.h"
 #include "TreeItems/itemtypes.h"
 #include <QFileDialog>
 #include <QDebug>
@@ -13,9 +13,9 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
  * @brief ProjectWidget::new_project
  * Creates a create project dialog
  */
-void ProjectWidget::new_project() {
+void ProjectWidget::new_project() const {
     if (m_proj == nullptr) {
-        CreateProjectDialog* proj_dialog = new CreateProjectDialog();
+        ProjectDialog* proj_dialog = new ProjectDialog();
         QObject::connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(add_project(QString, QString)));
     } else {
         // TODO project already loadedq
@@ -89,7 +89,7 @@ void ProjectWidget::tree_add_analysis(){
  * @param vid_proj
  * @param vid_name
  */
-void ProjectWidget::tree_add_video(VideoProject* vid_proj, QString vid_name) {
+void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_name) {
     VideoItem* vid = new VideoItem(vid_proj, VIDEO_ITEM);
     vid->setText(0, vid_name);
     m_videos->addChild(vid);
@@ -102,7 +102,7 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, QString vid_name) {
  * @param item
  * @param col
  */
-void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, int col) {
+void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     switch(item->type()){
     case VIDEO_ITEM: {
         qDebug() << "Video Selected";
