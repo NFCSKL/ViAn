@@ -117,11 +117,11 @@ void VideoProjectTest::save_load_test(){
 
     QDir dir;
     dir.mkpath("C:/TEST/VID_PROJ_TEST/");
-    std::string file_path("C:/TEST/VID_PROJ_TEST/test.json");
-    vid_proj->save_saveable(file_path);
+    std::string file_path("C:/TEST/VID_PROJ_TEST/test");
+    vid_proj->save_saveable(file_path, Saveable::JSON);
 
     VideoProject* vid_proj2 = new VideoProject();
-    vid_proj2->load_saveable(file_path);
+    vid_proj2->load_saveable(file_path + ".json");
 
     QCOMPARE(vid_proj->m_ana_cnt, vid_proj2->m_ana_cnt);
     QCOMPARE(vid_proj->m_bm_cnt, vid_proj2->m_bm_cnt);
