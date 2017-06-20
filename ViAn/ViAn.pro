@@ -19,10 +19,10 @@ TEMPLATE = app
 SOURCES += main.cpp \
     Project/Analysis/analysismeta.cpp \
     GUI/TreeItems/itemtypes.cpp \
-    Project/projecttestsuite.cpp \
     GUI/Toolbars/maintoolbar.cpp \
     GUI/Toolbars/drawingtoolbar.cpp \
-    GUI/projectdialog.cpp
+    GUI/projectdialog.cpp \
+    Project/Test/videoprojecttest.cpp
 
 #
 # TEST
@@ -34,10 +34,10 @@ HEADERS += Test/test_video_player.h \
     Test/test_report_generator.h \
     Project/Analysis/analysismeta.h \
     GUI/TreeItems/itemtypes.h \
-    Project/projecttestsuite.h \
     GUI/Toolbars/maintoolbar.h \
     GUI/Toolbars/drawingtoolbar.h \
-    GUI/projectdialog.h
+    GUI/projectdialog.h \
+    Project/Test/videoprojecttest.h
 
 #
 # LIBRARY
@@ -145,7 +145,8 @@ HEADERS  += \
 #
 # Project
 #
-SOURCES += Project/report.cpp \
+SOURCES += Project/Test/projecttestsuite.cpp \
+    Project/report.cpp \
     Project/project.cpp \
     Project/video.cpp \
     Project/videoproject.cpp \
@@ -155,7 +156,8 @@ SOURCES += Project/report.cpp \
     Project/Analysis/poi.cpp
 
 
-HEADERS += Project/project.h \
+HEADERS +=Project/Test/projecttestsuite.h \
+    Project/project.h \
     Project/video.h \
     Project/videoproject.h \
     Project/bookmark.h  \

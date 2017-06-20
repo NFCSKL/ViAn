@@ -17,9 +17,10 @@
  */
 class Saveable
 {
-
-public:
+protected:
     std::string m_full_path;
+public:
+
     enum SAVE_FORMAT {JSON, BINARY};    // Formats supported by save_project
     static const SAVE_FORMAT DEFAULT_SAVE_FORMAT = JSON;
 
@@ -31,7 +32,7 @@ public:
 
     virtual bool load_saveable(const std::string &full_path, const SAVE_FORMAT &save_format = DEFAULT_SAVE_FORMAT);
     virtual bool save_saveable(const std::string &file_name, const std::string &dir_path, const SAVE_FORMAT &save_format = DEFAULT_SAVE_FORMAT);
-    virtual bool save_saveable(const std::string &full_path, const SAVE_FORMAT &save_format = DEFAULT_SAVE_FORMAT);
+    virtual bool save_saveable(const std::string &file_name, const SAVE_FORMAT &save_format = DEFAULT_SAVE_FORMAT);
     virtual bool delete_saveable();
 
     virtual void read(const QJsonObject& json) = 0;
