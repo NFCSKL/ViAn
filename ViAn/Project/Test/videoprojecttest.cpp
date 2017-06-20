@@ -104,7 +104,7 @@ void VideoProjectTest::read_write_test(){
  * Tests if written and read video projects to and from file
  * are similar (Doesn't test for complete equality)
  */
-void VideoProjectTest::save_load_test(){
+void VideoProjectTest::save_load_delete_test(){
     VideoProject* vid_proj = new VideoProject();
 
     vid_proj->add_analysis(new AnalysisMeta());
@@ -131,11 +131,4 @@ void VideoProjectTest::save_load_test(){
     vid_proj2->delete_saveable();
     dir.rmpath("C:/TEST/VID_PROJ_TEST/");
     QVERIFY(!dir.exists("C:/TEST/VID_PROJ_TEST/"));
-}
-/**
- * @brief VideoProjectTest::delete_artifacts_test
- * @todo not quite sure how this test should work yet
- */
-void VideoProjectTest::delete_artifacts_test(){
-
 }
