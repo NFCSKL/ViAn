@@ -91,6 +91,7 @@ bool Saveable::load_saveable(const std::string& full_path, const SAVE_FORMAT& sa
     QJsonDocument load_doc(save_format == JSON          // Decide format to decode to
         ? QJsonDocument::fromJson(save_data)
         : QJsonDocument::fromBinaryData(save_data));
+
     this->read(load_doc.object());                      // Read data to be loaded, OBS! Implement this when inheriting
     m_full_path = full_path;
     return true;
