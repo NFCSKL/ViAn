@@ -117,6 +117,7 @@ void VideoWidget::set_btn_size() {
     
     for (QPushButton* btn : btns) {
         btn->setFixedSize(BTN_SIZE);
+        btn->setEnabled(false);
     }
 }
 
@@ -213,6 +214,8 @@ void VideoWidget::init_control_buttons() {
 
     connect(prev_frame_btn, &QPushButton::clicked, this, &VideoWidget::prev_frame_clicked);
     connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
+
+    connect(analysis_btn, &QPushButton::clicked, this, &VideoWidget::analysis_btn_clicked);
 
     connect(bookmark_btn, &QPushButton::clicked, this, &VideoWidget::on_bookmark_clicked);
 
@@ -373,6 +376,13 @@ void VideoWidget::prev_frame_clicked() {
     }
 }
 
+void VideoWidget::analysis_btn_clicked() {
+    //TOdo perform analysis
+    //Video* video = m_vid_proj->get_video();
+    //m_acontroller = new AnalysisController(m_vid_proj->get_video()->file_path, m_vid_proj->get_video()->full_path(), 0);
+    emit analysis_clicked(m_vid_proj, "iana");
+}
+
 /**
  * @brief VideoWidget::zoom_in_clicked
  * zoom in button clicked.
@@ -456,4 +466,13 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj) {
 
     m_video_player->load_video(m_vid_proj->get_video()->file_path, nullptr);
     emit ret_first_frame();
+    if (!video_btns_enabled) {
+        enable_video_btns();
+    }
+}
+
+void VideoWidget::enable_video_btns() {
+    for (QPushButton* btn : btns) {
+        btn->setEnabled(true);
+    }
 }

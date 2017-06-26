@@ -19,7 +19,7 @@ public slots:
     void new_project(void) const;
     void add_project(const QString project_name, const QString project_path);
     void add_video();
-    void add_analysis();
+    void add_analysis(VideoProject* vid_proj, QString name);
     void save_project();
     void open_project();
 private slots:
@@ -28,7 +28,7 @@ private:
     void create_default_tree();
     void tree_add_video();
     void tree_add_video(VideoProject* vid_proj, const QString& video_name);
-    void tree_add_analysis();
+    void tree_add_analysis(VideoProject* vid_proj, QString name);
 
 };
 

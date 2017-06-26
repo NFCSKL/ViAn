@@ -24,6 +24,7 @@ AnalysisController::AnalysisController(std::string save_path, std::string video_
 
 /**
  * @brief AnalysisController::AnalysisController
+ * @param save_path                     path to the save
  * @param file_path                     path to the video file to be analysed
  * @param type                          analysis type
  * @param inclusion_exclusion_points    Points for the inclusion/exclusion polygon

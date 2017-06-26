@@ -5,7 +5,6 @@
 #include <QDebug>
 
 ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
-    add_analysis();
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this , SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
 }
 
@@ -69,18 +68,24 @@ void ProjectWidget::add_video() {
  * @brief ProjectWidget::add_analysis
  * Slot function to add an analysis
  */
-void ProjectWidget::add_analysis(){
-    tree_add_analysis();
+void ProjectWidget::add_analysis(VideoProject* vid_proj, QString name){
+    tree_add_analysis(vid_proj, name);
 }
 
 /**
  * @brief ProjectWidget::tree_add_analysis
  * Adds the analysis to the project tree
  */
-void ProjectWidget::tree_add_analysis(){
+void ProjectWidget::tree_add_analysis(VideoProject* vid_proj, QString name){
     AnalysisItem* ana = new AnalysisItem(ANALYSIS_ITEM);
-    addTopLevelItem(ana);
-    ana->setText(0,"aina");
+    for (int i = 0; i < m_videos->childCount(); i++) {
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(m_videos->child(i));
+        if (vid_item->get_video_project() == vid_proj) {
+            m_videos->child(i)->addChild(ana);
+            ana->setText(0, name);
+            m_videos->child(i)->setExpanded(true);
+        }
+    }
 }
 
 /**

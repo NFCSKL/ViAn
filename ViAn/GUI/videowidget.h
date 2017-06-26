@@ -39,6 +39,7 @@ signals:
     void ret_first_frame(void);
     void set_playback_frame(int, bool);
     void new_bookmark(int, cv::Mat);
+    void analysis_clicked(VideoProject*, QString);
 public slots:
     void set_current_time(int time);
     void set_total_time(int time);
@@ -46,6 +47,7 @@ public slots:
     void stop_clicked(void);
     void next_frame_clicked(void);
     void prev_frame_clicked(void);
+    void analysis_btn_clicked();
     void zoom_in_clicked();
     void zoom_out_clicked();
     void set_slider_max(int value);
@@ -107,6 +109,9 @@ private:
     VideoProject* m_vid_proj;
 
     bool slider_is_blocked = false;
+    bool video_btns_enabled = false;
+
+    void enable_video_btns();
 
     void init_control_buttons();
 
