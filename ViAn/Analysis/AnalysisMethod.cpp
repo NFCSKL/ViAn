@@ -78,13 +78,6 @@ Analysis AnalysisMethod::run_analysis() {
                 }
                 m_POI->add_detections(current_frame_index, detections);
             }
-
-            // Makes sure that a POI that stretches to the end of the
-            // video gets an end frame.
-            if (current_frame_index == (num_frames-1) && detecting) {
-                m_POI->set_end_frame(current_frame_index);
-                m_analysis.add_POI(*m_POI);
-            }
         } else if (!detections.empty()) {
             /* If the current frame is not sampled, the detections from the previously
              * sampled frame should still be valid and should therefore be shown as
@@ -99,6 +92,12 @@ Analysis AnalysisMethod::run_analysis() {
         }
         emit send_progress(get_progress());
         ++current_frame_index;
+    }
+    // Makes sure that a POI that stretches to the end of the
+    // video gets an end frame.
+    if (detecting) {
+        m_POI->set_end_frame(current_frame_index);
+        m_analysis.add_POI(*m_POI);
     }
     capture.release();
     return m_analysis;

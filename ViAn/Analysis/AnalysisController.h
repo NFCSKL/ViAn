@@ -20,8 +20,8 @@ private:
     void setup_analysis(std::string video_path, ANALYSIS_TYPE type);
     AnalysisMethod* method;
 signals:
-    void analysis_done(AnalysisMeta analysis);
-    void progress_signal(int progress);
+    void analysis_done(AnalysisMeta);
+    void progress_signal(int);
 
 private slots:
     void on_start();                // Start or resume the analysis

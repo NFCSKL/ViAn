@@ -52,6 +52,7 @@ public slots:
     void prev_frame_clicked(void);
     void analysis_btn_clicked(void);
     void send_progress(int);
+    void analysis_done(AnalysisMeta);
     void zoom_in_clicked();
     void zoom_out_clicked();
     void set_slider_max(int value);

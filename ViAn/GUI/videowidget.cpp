@@ -384,11 +384,12 @@ void VideoWidget::analysis_btn_clicked() {
     //Video* video = m_vid_proj->get_video();
     emit add_analysis_bar();
     AnalysisController* an_col = new AnalysisController(m_vid_proj->get_video()->file_path, m_vid_proj->get_video()->file_path, MOTION_DETECTION);
+    an_col->start();
     QObject::connect(an_col, SIGNAL(progress_signal(int)),
                      this, SLOT(send_progress(int)));
-    std::cout << m_vid_proj->full_path() << std::endl;
-    //an_col->run();
-    emit analysis_clicked(m_vid_proj, "iana");
+    QObject::connect(an_col, &AnalysisController::analysis_done,
+                     this, &VideoWidget::analysis_done);
+    std::cout << m_vid_proj->get_video()->file_path << std::endl;
 }
 
 /**
@@ -398,6 +399,15 @@ void VideoWidget::analysis_btn_clicked() {
  */
 void VideoWidget::send_progress(int progress) {
     emit show_progress(progress);
+}
+
+void VideoWidget::analysis_done(AnalysisMeta analysis) {
+    std::vector<std::pair<int,int>> pois = analysis.m_poi_intervals;
+    for (std::pair<int,int> poi : pois) {
+        std::cout << "start - end " << poi.first << " - " << poi.second << std::endl;
+    }
+    emit analysis_clicked(m_vid_proj, "iana");
+
 }
 
 /**
