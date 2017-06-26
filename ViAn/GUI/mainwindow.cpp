@@ -72,7 +72,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(video_wgt, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
     connect(project_wgt, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
     connect(draw_toolbar, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
-    
+    connect(video_wgt, &VideoWidget::add_analysis_bar, status_bar, &StatusBar::add_analysis_bar);
+    connect(video_wgt, SIGNAL(show_progress(int)), status_bar, SLOT(update_analysis_bar(int)));
+
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::load_marked_video);
 
     connect(video_wgt, SIGNAL(analysis_clicked(VideoProject*, QString)), project_wgt, SLOT(add_analysis(VideoProject*, QString)));

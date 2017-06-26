@@ -40,6 +40,8 @@ signals:
     void set_playback_frame(int, bool);
     void new_bookmark(int, cv::Mat);
     void analysis_clicked(VideoProject*, QString);
+    void show_progress(int);
+    void add_analysis_bar(void);
     void set_status_bar(QString);
 public slots:
     void set_current_time(int time);
@@ -48,7 +50,8 @@ public slots:
     void stop_clicked(void);
     void next_frame_clicked(void);
     void prev_frame_clicked(void);
-    void analysis_btn_clicked();
+    void analysis_btn_clicked(void);
+    void send_progress(int);
     void zoom_in_clicked();
     void zoom_out_clicked();
     void set_slider_max(int value);

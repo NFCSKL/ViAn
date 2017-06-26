@@ -21,7 +21,7 @@ private:
     AnalysisMethod* method;
 signals:
     void analysis_done(AnalysisMeta analysis);
-    void show_analysis_progress(int progress);
+    void progress_signal(int progress);
 
 private slots:
     void on_start();                // Start or resume the analysis

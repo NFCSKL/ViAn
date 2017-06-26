@@ -105,5 +105,5 @@ void AnalysisController::on_abort() {
  * @param progress
  */
 void AnalysisController::on_progress_update(int progress) {
-    emit show_analysis_progress(progress);
+    emit progress_signal(progress);
 }

@@ -5,6 +5,7 @@
 #include <QShortcut>
 
 #include "Video/video_player.h"
+#include "Analysis/AnalysisController.h"
 
 VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new QScrollArea) {
     // Init video player
@@ -381,8 +382,22 @@ void VideoWidget::prev_frame_clicked() {
 void VideoWidget::analysis_btn_clicked() {
     //TOdo perform analysis
     //Video* video = m_vid_proj->get_video();
-    //m_acontroller = new AnalysisController(m_vid_proj->get_video()->file_path, m_vid_proj->get_video()->full_path(), 0);
+    emit add_analysis_bar();
+    AnalysisController* an_col = new AnalysisController(m_vid_proj->get_video()->file_path, m_vid_proj->get_video()->file_path, MOTION_DETECTION);
+    QObject::connect(an_col, SIGNAL(progress_signal(int)),
+                     this, SLOT(send_progress(int)));
+    std::cout << m_vid_proj->full_path() << std::endl;
+    //an_col->run();
     emit analysis_clicked(m_vid_proj, "iana");
+}
+
+/**
+ * @brief send_progress
+ * @param progress
+ * Slot for sending the analysis progress
+ */
+void VideoWidget::send_progress(int progress) {
+    emit show_progress(progress);
 }
 
 /**
