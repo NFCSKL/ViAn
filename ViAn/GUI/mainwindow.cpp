@@ -38,6 +38,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     project_dock->setWidget(project_wgt);
     addDockWidget(Qt::LeftDockWidgetArea, project_dock);
 
+    // Initialize analysis widget
+    analysis_wgt = new AnalysisWidget();
+    connect(video_wgt, SIGNAL(start_analysis(VideoProject*)), project_wgt, SLOT(start_analysis(VideoProject*)));
+    connect(project_wgt, SIGNAL(begin_analysis(std::string,std::string,QTreeWidgetItem*)), analysis_wgt, SLOT(start_analysis(std::string,std::string,QTreeWidgetItem*)));
+
+
     // Initialize bookmark widget
     bookmark_wgt = new BookmarkWidget();
     addDockWidget(Qt::RightDockWidgetArea, bookmark_dock);
@@ -72,12 +78,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(video_wgt, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
     connect(project_wgt, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
     connect(draw_toolbar, SIGNAL(set_status_bar(QString)), status_bar, SLOT(on_set_status_bar(QString)));
-    connect(video_wgt, &VideoWidget::add_analysis_bar, status_bar, &StatusBar::add_analysis_bar);
-    connect(video_wgt, SIGNAL(show_progress(int)), status_bar, SLOT(update_analysis_bar(int)));
+    connect(analysis_wgt, &AnalysisWidget::add_analysis_bar, status_bar, &StatusBar::add_analysis_bar);
+    connect(analysis_wgt, &AnalysisWidget::remove_analysis_bar, status_bar, &StatusBar::remove_analysis_bar);
+    connect(analysis_wgt, SIGNAL(show_progress(int)), status_bar, SLOT(update_analysis_bar(int)));
 
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::load_marked_video);
-
-    connect(video_wgt, SIGNAL(analysis_clicked(VideoProject*, QString)), project_wgt, SLOT(add_analysis(VideoProject*, QString)));
+    connect(analysis_wgt, SIGNAL(name_in_tree(QTreeWidgetItem*,QString)), project_wgt, SLOT(set_analysis_name(QTreeWidgetItem*,QString)));
 }
 
 

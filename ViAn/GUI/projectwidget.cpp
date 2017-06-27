@@ -82,11 +82,29 @@ void ProjectWidget::tree_add_analysis(VideoProject* vid_proj, QString name){
         VideoItem* vid_item = dynamic_cast<VideoItem*>(m_videos->child(i));
         if (vid_item->get_video_project() == vid_proj) {
             m_videos->child(i)->addChild(ana);
-            ana->setText(0, name);
+            ana->setText(0, "Loading...");
             m_videos->child(i)->setExpanded(true);
         }
     }
     emit set_status_bar("Analysis added");
+}
+
+void ProjectWidget::start_analysis(VideoProject* vid_proj) {
+    AnalysisItem* ana = new AnalysisItem(ANALYSIS_ITEM);
+    for (int i = 0; i < m_videos->childCount(); i++) {
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(m_videos->child(i));
+        if (vid_item->get_video_project() == vid_proj) {
+            m_videos->child(i)->addChild(ana);
+            ana->setText(0, "Loading");
+            m_videos->child(i)->setExpanded(true);
+            QTreeWidgetItem* item = dynamic_cast<QTreeWidgetItem*>(ana);
+            emit begin_analysis(m_proj->getDir(), vid_proj->get_video()->file_path, item);
+        }
+    }
+}
+
+void ProjectWidget::set_analysis_name(QTreeWidgetItem* item, QString name) {
+    item->setText(0, name);
 }
 
 /**

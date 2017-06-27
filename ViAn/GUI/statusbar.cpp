@@ -29,3 +29,8 @@ void StatusBar::add_analysis_bar() {
 void StatusBar::update_analysis_bar(int progress) {
     anal_prog->setValue(progress);
 }
+
+void StatusBar::remove_analysis_bar() {
+    removeWidget(anal_prog);
+    delete anal_prog;
+}

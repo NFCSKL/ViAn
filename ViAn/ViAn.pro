@@ -24,7 +24,8 @@ SOURCES += main.cpp \
     GUI/analysisslider.cpp \
     GUI/projectdialog.cpp \
     Project/Test/videoprojecttest.cpp \
-    GUI/statusbar.cpp
+    GUI/statusbar.cpp \
+    GUI/analysiswidget.cpp
 
 #
 # TEST
@@ -41,7 +42,8 @@ HEADERS += Test/test_video_player.h \
     GUI/analysisslider.h \
     GUI/projectdialog.h \
     Project/Test/videoprojecttest.h \
-    GUI/statusbar.h
+    GUI/statusbar.h \
+    GUI/analysiswidget.h
 
 #
 # LIBRARY
