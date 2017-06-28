@@ -60,6 +60,7 @@ private:
     void init_file_menu();
     void init_edit_menu();
     void init_view_menu();
+    void init_analysis_menu();
     void init_tools_menu();
     void init_help_menu();
 };

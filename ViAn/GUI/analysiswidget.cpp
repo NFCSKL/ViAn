@@ -1,5 +1,6 @@
 #include "analysiswidget.h"
 #include "Analysis/AnalysisController.h"
+#include "TreeItems/itemtypes.h"
 #include "videowidget.h"
 #include <QDebug>
 #include <QTreeWidgetItem>
@@ -38,13 +39,11 @@ void AnalysisWidget::perform_analysis(tuple<std::string, std::string, QTreeWidge
 }
 
 void AnalysisWidget::analysis_done(AnalysisMeta analysis) {
-    //AnalysisController* an_col = analysis_queue.front().first;
-    //an_col->wait();
     analysis_queue.pop_front();
-    //delete an_col;
-
     emit remove_analysis_bar();
     emit name_in_tree(current_analysis, "Analysis");
+    AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(current_analysis);
+    ana_item->set_analysis(analysis.get_analysis());
     current_analysis = nullptr;
     duration = 0;
 
@@ -55,7 +54,6 @@ void AnalysisWidget::analysis_done(AnalysisMeta analysis) {
 
     std::cout << (std::clock()-start)/(double)CLOCKS_PER_SEC << std::endl;
     if (!analysis_queue.empty()) {
-        //tuple<std::string, std::string, QTreeWidgetItem*> analys = analysis_queue.front();
         current_analysis = get<2>(analysis_queue.front());
         move_queue();
         perform_analysis(analysis_queue.front());

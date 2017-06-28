@@ -31,7 +31,6 @@ void AnalysisMethod::set_include_exclude_area(std::vector<cv::Point> points, boo
 }
 
 
-
 /**
  * @brief AnalysisMethod::sample_current_frame
  * Checks if the current frame is to be analysed.

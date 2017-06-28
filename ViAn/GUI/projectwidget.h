@@ -15,6 +15,7 @@ public:
 signals:
     void selected_media();
     void marked_video(VideoProject* vid_proj);
+    void marked_analysis(Analysis);
     void set_status_bar(QString);
     void send_path(std::string);
     void begin_analysis(std::string, std::string, QTreeWidgetItem*);

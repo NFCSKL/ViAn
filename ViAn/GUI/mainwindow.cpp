@@ -56,6 +56,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     init_file_menu();
     init_edit_menu();
     init_view_menu();
+    init_analysis_menu();
     init_tools_menu();
     init_help_menu();
 
@@ -224,8 +225,22 @@ void MainWindow::init_view_menu() {
 }
 
 /**
+ * @brief MainWindow::init_analysis_menu
+ * Set up the analysis menu
+ */
+void MainWindow::init_analysis_menu() {
+    QMenu* analysis_menu = menuBar()->addMenu(tr("&Analysis"));
+
+    QAction* analysis_act = new QAction(tr("&Perform_analysis"), this);
+    analysis_act->setIcon(QIcon("../ViAn/Icons/analysis.png"));
+    analysis_act->setStatusTip(tr("Perform analysis"));
+    analysis_menu->addAction(analysis_act);
+    connect(analysis_act, &QAction::triggered, video_wgt, &VideoWidget::analysis_btn_clicked);
+}
+
+/**
  * @brief MainWindow::init_tools_menu
- * Set up the init menu
+ * Set up the tools menu
  */
 void MainWindow::init_tools_menu() {
     QMenu* tool_menu = menuBar()->addMenu(tr("&Tools"));
