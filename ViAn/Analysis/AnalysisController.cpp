@@ -40,6 +40,12 @@ AnalysisController::AnalysisController(std::string save_path, std::string video_
     method->set_include_exclude_area(inclusion_exclusion_points, exclude_poly);
 }
 
+void AnalysisController::new_analysis(std::string save_path, std::string video_path, ANALYSIS_TYPE type) {
+    m_save_path = save_path;
+    m_video_path = video_path;
+    setup_analysis(video_path, type);
+}
+
 /**
  * @brief AnalysisController::setup_analysis
  * Sets up the analysis method and connects needed signals and slots.

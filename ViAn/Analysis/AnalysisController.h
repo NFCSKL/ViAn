@@ -16,6 +16,7 @@ public:
     AnalysisController(std::string save_path, std::string video_path, ANALYSIS_TYPE type, QObject* parent = 0);
     AnalysisController(std::string save_path, std::string video_path, ANALYSIS_TYPE type, std::vector<cv::Point> inclusion_exclusion_points, bool exclude_poly, QObject* parent = 0);
     void run() override;
+    void new_analysis(std::string save_path, std::string video_path, ANALYSIS_TYPE type);
 private:
     void setup_analysis(std::string video_path, ANALYSIS_TYPE type);
     AnalysisMethod* method;

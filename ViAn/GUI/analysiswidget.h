@@ -13,16 +13,17 @@ class AnalysisWidget : public QWidget
     Q_OBJECT
 public:
     explicit AnalysisWidget(QWidget *parent = nullptr);
+    AnalysisController* an_col;
     VideoProject* vid_proj;
     std::string dots = "";
     std::clock_t start;
     int duration = 0;
-    std::deque<std::pair<AnalysisController*, QTreeWidgetItem*>> analysis_queue;
+    std::deque<std::tuple<std::string, std::string, QTreeWidgetItem*>> analysis_queue;
     QTreeWidgetItem* current_analysis;
     
 private:
 
-    void perform_analysis(AnalysisController *an_col);
+    void perform_analysis(std::tuple<string, string, QTreeWidgetItem *> analys);
     void move_queue();
     
 public slots:
