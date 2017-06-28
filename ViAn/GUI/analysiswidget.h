@@ -17,7 +17,7 @@ public:
     std::string dots = "";
     std::clock_t start;
     int duration = 0;
-    std::vector<std::pair<AnalysisController*, QTreeWidgetItem*>> analysis_queue;
+    std::deque<std::pair<AnalysisController*, QTreeWidgetItem*>> analysis_queue;
     QTreeWidgetItem* current_analysis;
     
 private:

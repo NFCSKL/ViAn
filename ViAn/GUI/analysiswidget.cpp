@@ -37,10 +37,19 @@ void AnalysisWidget::perform_analysis(AnalysisController* an_col) {
 }
 
 void AnalysisWidget::analysis_done(AnalysisMeta analysis) {
-    analysis_queue.erase(analysis_queue.begin());
+    //std::pair<AnalysisController*, QTreeWidgetItem*> pair = analysis_queue.front();
+    //AnalysisController* an_col = analysis_queue.front().first;
+    analysis_queue.pop_front();
+    //delete an_col;
+
+    //analysis_queue.erase(analysis_queue.begin());
+    //delete pair.first;
+    //delete analysis_queue.front();
+
     emit remove_analysis_bar();
     emit name_in_tree(current_analysis, "Analysis");
     current_analysis = nullptr;
+    duration = 0;
     std::vector<std::pair<int,int>> pois = analysis.m_poi_intervals;
     for (std::pair<int,int> poi : pois) {
         std::cout << "start - end " << poi.first << " - " << poi.second << std::endl;
@@ -49,13 +58,13 @@ void AnalysisWidget::analysis_done(AnalysisMeta analysis) {
     if (!analysis_queue.empty()) {
         std::pair<AnalysisController*, QTreeWidgetItem*> pair = analysis_queue.front();
         current_analysis = pair.second;
-        perform_analysis(pair.first);
         move_queue();
+        perform_analysis(pair.first);
     }
 }
 
 void AnalysisWidget::move_queue() {
-    for (int i = 0; i < analysis_queue.size(); i++) {
+    for (unsigned int i = 0; i < analysis_queue.size(); i++) {
         std::string name = "Queued #"+to_string(i);
         emit name_in_tree(analysis_queue.at(i).second, QString::fromStdString(name));
     }
