@@ -89,6 +89,7 @@ Analysis AnalysisMethod::run_analysis() {
             // TODO do pause stuff
             paused = false;
         }
+
         emit send_progress(get_progress());
         ++current_frame_index;
     }
