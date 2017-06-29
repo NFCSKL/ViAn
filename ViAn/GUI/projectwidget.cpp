@@ -65,30 +65,10 @@ void ProjectWidget::add_video() {
 }
 
 /**
- * @brief ProjectWidget::add_analysis
- * Slot function to add an analysis
+ * @brief ProjectWidget::start_analysis
+ * @param vid_proj
+ * Start analysis on the selected video
  */
-void ProjectWidget::add_analysis(VideoProject* vid_proj, QString name){
-    tree_add_analysis(vid_proj, name);
-}
-
-/**
- * @brief ProjectWidget::tree_add_analysis
- * Adds the analysis to the project tree
- */
-void ProjectWidget::tree_add_analysis(VideoProject* vid_proj, QString name){
-    AnalysisItem* ana = new AnalysisItem(ANALYSIS_ITEM);
-    for (int i = 0; i < m_videos->childCount(); i++) {
-        VideoItem* vid_item = dynamic_cast<VideoItem*>(m_videos->child(i));
-        if (vid_item->get_video_project() == vid_proj) {
-            m_videos->child(i)->addChild(ana);
-            ana->setText(0, "Loading...");
-            m_videos->child(i)->setExpanded(true);
-        }
-    }
-    emit set_status_bar("Analysis added");
-}
-
 void ProjectWidget::start_analysis(VideoProject* vid_proj) {
     AnalysisItem* ana = new AnalysisItem(ANALYSIS_ITEM);
     for (int i = 0; i < m_videos->childCount(); i++) {
@@ -103,7 +83,13 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj) {
     }
 }
 
-void ProjectWidget::set_analysis_name(QTreeWidgetItem* item, QString name) {
+/**
+ * @brief ProjectWidget::set_tree_item_name
+ * @param item
+ * @param name
+ * Slot to set the name if an item in the project tree
+ */
+void ProjectWidget::set_tree_item_name(QTreeWidgetItem* item, QString name) {
     item->setText(0, name);
 }
 
@@ -133,10 +119,17 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
         emit marked_video(vid_item->get_video_project());
+        emit set_detections(false);
+        emit enable_poi_btns(false);
         break;
     } case ANALYSIS_ITEM: {
+        tree_item_clicked(item->parent(), 0);
         AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
         emit marked_analysis(ana_item->get_analysis());
+        emit set_detections(true);
+        if (!ana_item->get_analysis().POIs.empty()) {
+            emit enable_poi_btns(true);
+        }
         break;
     } case FOLDER_ITEM: {
         break;
@@ -181,7 +174,7 @@ void ProjectWidget::open_project() {
  * TODO Fix
  */
 void ProjectWidget::close_project() {
-    emit set_status_bar("Closed the project");
+    emit set_status_bar("TODO - Closed the project");
 }
 
 /**
@@ -189,5 +182,5 @@ void ProjectWidget::close_project() {
  * TODO FIX
  */
 void ProjectWidget::remove_project() {
-    emit set_status_bar("Removed the project");
+    emit set_status_bar("TODO - Removed the project");
 }

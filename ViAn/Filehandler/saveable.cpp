@@ -41,8 +41,6 @@ bool Saveable::save_saveable(const std::string& file_name,
  */
 bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_FORMAT &save_format)
 {
-    qDebug("in savable");
-    std::cout << "full path " << full_path << std::endl;
     QFile save_file(save_format == JSON           // Decide full_path, directory path + file name + file ending
                     ? QString::fromStdString(full_path + ".json")
                     : QString::fromStdString(full_path + ".dat"));
@@ -51,8 +49,6 @@ bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_
                  save_file.fileName();   // Send warning if unsuccessful
         return false;
     }
-    qDebug() << "Could open save file"+
-             save_file.fileName();   // Send warning if unsuccessful
     QJsonObject json_saveable;                  // Data to be saved
     this->write(json_saveable);                 // Write data to be saved, OBS! Implement this when inheriting
     QJsonDocument save_doc(json_saveable);      // File to write to

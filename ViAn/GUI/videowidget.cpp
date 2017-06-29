@@ -57,6 +57,8 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
     connect(this, &VideoWidget::set_stop_video, m_video_player, &video_player::on_stop_video);
     connect(this, &VideoWidget::next_video_frame, m_video_player, &video_player::next_frame);
     connect(this, &VideoWidget::prev_video_frame, m_video_player, &video_player::previous_frame);
+
+    connect(this, SIGNAL(set_detections_on_frame(int)), frame_wgt, SLOT(set_detections_on_frame(int)));
 }
 
 /**
@@ -148,8 +150,6 @@ void VideoWidget::set_btn_size() {
     btns.push_back(stop_btn);
     btns.push_back(next_frame_btn);
     btns.push_back(prev_frame_btn);
-    btns.push_back(next_poi_btn);
-    btns.push_back(prev_poi_btn);
     btns.push_back(bookmark_btn);
     btns.push_back(analysis_btn);
     btns.push_back(tag_btn);
@@ -162,6 +162,9 @@ void VideoWidget::set_btn_size() {
         btn->setFixedSize(BTN_SIZE);
         btn->setEnabled(false);
     }
+    next_poi_btn->setFixedSize(BTN_SIZE);
+    prev_poi_btn->setFixedSize(BTN_SIZE);
+    enable_poi_btns(false);
 }
 
 /**
@@ -415,7 +418,9 @@ void VideoWidget::prev_frame_clicked() {
 }
 
 void VideoWidget::analysis_btn_clicked() {
-    emit start_analysis(m_vid_proj);
+    if (m_vid_proj != nullptr) {
+        emit start_analysis(m_vid_proj);
+    }
 }
 
 /**
@@ -444,6 +449,7 @@ void VideoWidget::on_new_frame(int frame_num) {
         playback_slider->setValue(frame_num);
     current_frame = frame_num;
     set_current_time(frame_num / m_video_player->get_frame_rate());
+    emit set_detections_on_frame(frame_num);
 }
 
 void VideoWidget::on_playback_slider_pressed() {
@@ -478,23 +484,26 @@ void VideoWidget::fit_clicked() {
  * @param vid_proj
  */
 void VideoWidget::load_marked_video(VideoProject* vid_proj) {
-    m_vid_proj = vid_proj;
-    if (m_video_player->is_paused()) {
-        // Playback thread sleeping, wake it
-        emit set_stop_video();
+    if (m_vid_proj != vid_proj) {
+        if (m_video_player->is_paused()) {
+            // Playback thread sleeping, wake it
+            emit set_stop_video();
 
-        // Playback thread sleeping, wake it
-        paused_wait.wakeOne();
+            // Playback thread sleeping, wake it
+            paused_wait.wakeOne();
+        }
+
+        if (m_video_player->isRunning()) {
+            // Playback thread is running, stop will make it finish
+            // wait until it does
+            emit set_stop_video();
+            m_video_player->wait();
+        }
+        m_vid_proj = vid_proj;
+        m_video_player->load_video(m_vid_proj->get_video()->file_path, nullptr);
+        emit set_status_bar("Video loaded");
     }
 
-    if (m_video_player->isRunning()) {
-        // Playback thread is running, stop will make it finish
-        // wait until it does
-        emit set_stop_video();
-        m_video_player->wait();
-    }
-    m_video_player->load_video(m_vid_proj->get_video()->file_path, nullptr);
-    emit set_status_bar("Video loaded");
     if (!video_btns_enabled) {
         enable_video_btns();
     }
@@ -505,6 +514,11 @@ void VideoWidget::enable_video_btns() {
         btn->setEnabled(true);
     }
     m_video_player->start();
+}
+
+void VideoWidget::enable_poi_btns(bool b) {
+    next_poi_btn->setEnabled(b);
+    prev_poi_btn->setEnabled(b);
 }
 
 void VideoWidget::update_bar_pos(int change_x, int change_y) {

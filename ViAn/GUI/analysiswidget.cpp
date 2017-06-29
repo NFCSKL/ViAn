@@ -12,6 +12,13 @@ AnalysisWidget::AnalysisWidget(QWidget *parent) {
     connect(an_col, SIGNAL(analysis_done(AnalysisMeta)), this, SLOT(analysis_done(AnalysisMeta)));
 }
 
+/**
+ * @brief AnalysisWidget::start_analysis
+ * @param save_path     : path to the save map
+ * @param video_path    : full path of the video
+ * @param item          : video to be analysed
+ * Puts the analysis in the queue and if the was empty starts the analysis directly
+ */
 void AnalysisWidget::start_analysis(std::string save_path, std::string video_path, QTreeWidgetItem* item) {
     std::size_t index = video_path.find_last_of('/') + 1;
     std::string vid_name = video_path.substr(index);
@@ -19,7 +26,6 @@ void AnalysisWidget::start_analysis(std::string save_path, std::string video_pat
     vid_name = vid_name.substr(0,index);
 
     tuple<std::string, std::string, QTreeWidgetItem*> analys (save_path+vid_name+"-analysis", video_path, item);
-    //std::pair<AnalysisController*, QTreeWidgetItem*> pair = make_pair(an_col, item);
     if (!analysis_queue.empty()) {
         analysis_queue.push_back(analys);
         std::string name = "Queued #"+to_string(analysis_queue.size()-1);
@@ -31,6 +37,12 @@ void AnalysisWidget::start_analysis(std::string save_path, std::string video_pat
     }
 }
 
+/**
+ * @brief AnalysisWidget::perform_analysis
+ * @param analys
+ * Actually starts the analysis
+ * Takes in a tuple consisting of <savepath, videopath, video to be analysed>
+ */
 void AnalysisWidget::perform_analysis(tuple<std::string, std::string, QTreeWidgetItem*> analys) {
     emit add_analysis_bar();
     an_col->new_analysis(get<0>(analys), get<1>(analys), MOTION_DETECTION);
@@ -38,6 +50,12 @@ void AnalysisWidget::perform_analysis(tuple<std::string, std::string, QTreeWidge
     an_col->start();
 }
 
+/**
+ * @brief AnalysisWidget::analysis_done
+ * @param analysis
+ * Slot function to be called when an analysis is completed
+ * Removes the current analysis from the queue and start the next one if there is one
+ */
 void AnalysisWidget::analysis_done(AnalysisMeta analysis) {
     analysis_queue.pop_front();
     emit remove_analysis_bar();
@@ -47,20 +65,17 @@ void AnalysisWidget::analysis_done(AnalysisMeta analysis) {
     current_analysis = nullptr;
     duration = 0;
 
-    std::vector<std::pair<int,int>> pois = analysis.m_poi_intervals;
-    for (std::pair<int,int> poi : pois) {
-        std::cout << "start - end " << poi.first << " - " << poi.second << std::endl;
-    }
-
-    std::cout << (std::clock()-start)/(double)CLOCKS_PER_SEC << std::endl;
     if (!analysis_queue.empty()) {
         current_analysis = get<2>(analysis_queue.front());
         move_queue();
         perform_analysis(analysis_queue.front());
-        std::cout << "size: " << analysis_queue.size() << std::endl;
     }
 }
 
+/**
+ * @brief AnalysisWidget::move_queue
+ * Update all the analyses in the queue with the correct queue number in the project tree
+ */
 void AnalysisWidget::move_queue() {
     for (unsigned int i = 0; i < analysis_queue.size(); i++) {
         std::string name = "Queued #"+to_string(i);

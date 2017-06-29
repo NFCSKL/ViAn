@@ -11,8 +11,7 @@ MotionDetection::MotionDetection(std::string source_file) {
 }
 
 MotionDetection::~MotionDetection() {
-    //delete background_subtractor;
-    //background_subtractor.release();
+
 }
 
 /**

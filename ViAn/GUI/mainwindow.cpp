@@ -84,7 +84,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(analysis_wgt, SIGNAL(show_progress(int)), status_bar, SLOT(update_analysis_bar(int)));
 
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::load_marked_video);
-    connect(analysis_wgt, SIGNAL(name_in_tree(QTreeWidgetItem*,QString)), project_wgt, SLOT(set_analysis_name(QTreeWidgetItem*,QString)));
+    connect(analysis_wgt, SIGNAL(name_in_tree(QTreeWidgetItem*,QString)), project_wgt, SLOT(set_tree_item_name(QTreeWidgetItem*,QString)));
+
+    connect(analysis_wgt, SIGNAL(send_analysis(Analysis)), video_wgt->frame_wgt, SLOT(set_analysis(Analysis)));
+    connect(project_wgt, SIGNAL(marked_analysis(Analysis)), video_wgt->frame_wgt, SLOT(set_analysis(Analysis)));
+    connect(project_wgt, SIGNAL(set_detections(bool)), video_wgt->frame_wgt, SLOT(set_detections(bool)));
+    connect(project_wgt, SIGNAL(enable_poi_btns(bool)), video_wgt, SLOT(enable_poi_btns(bool)));
 }
 
 
