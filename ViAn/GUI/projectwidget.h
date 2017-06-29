@@ -17,8 +17,8 @@ signals:
     void marked_video(VideoProject* vid_proj);
     void marked_analysis(Analysis);
     void set_status_bar(QString);
-    void send_path(std::string);
     void begin_analysis(std::string, std::string, QTreeWidgetItem*);
+
 public slots:
     void new_project(void) const;
     void add_project(const QString project_name, const QString project_path);
