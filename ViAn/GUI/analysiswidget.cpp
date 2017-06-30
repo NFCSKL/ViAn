@@ -25,7 +25,7 @@ void AnalysisWidget::start_analysis(std::string save_path, std::string video_pat
     index = vid_name.find_last_of('.');
     vid_name = vid_name.substr(0,index);
 
-    tuple<std::string, std::string, QTreeWidgetItem*> analys (save_path+vid_name+"-analysis", video_path, item);
+    tuple<std::string, std::string, QTreeWidgetItem*> analys (save_path+vid_name+"-motion-analysis", video_path, item);
     if (!analysis_queue.empty()) {
         analysis_queue.push_back(analys);
         std::string name = "Queued #"+to_string(analysis_queue.size()-1);

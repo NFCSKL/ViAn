@@ -24,16 +24,19 @@ void FrameWidget::set_scroll_area_size(QSize size) {
     m_scroll_area_size = size;
 }
 
-void FrameWidget::set_analysis(Analysis analysis) {
+void FrameWidget::set_analysis(Analysis* analysis) {
     m_analysis = analysis;
 }
 
 void FrameWidget::set_detections_on_frame(int frame_num) {
-    ooi_rects = m_analysis.get_detections_on_frame(frame_num);
+    if (m_analysis) {
+        ooi_rects = m_analysis->get_detections_on_frame(frame_num);
+    }
 }
 
 void FrameWidget::set_detections(bool detections) {
     m_detections = detections;
+    repaint();  //Repaint to update the current frame directly
 }
 
 void FrameWidget::draw_image(cv::Mat image) {

@@ -36,7 +36,6 @@ signals:
     void remove_analysis_bar(void);
     void show_progress(int);
     void name_in_tree(QTreeWidgetItem*, QString);
-    void send_analysis(Analysis);
 };
 
 #endif // ANALYSISWIDGET_H

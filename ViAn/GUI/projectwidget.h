@@ -15,7 +15,7 @@ public:
 signals:
     void selected_media();
     void marked_video(VideoProject* vid_proj);
-    void marked_analysis(Analysis);
+    void marked_analysis(Analysis*);
     void set_detections(bool);
     void enable_poi_btns(bool);
     void set_status_bar(QString);

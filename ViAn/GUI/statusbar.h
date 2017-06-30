@@ -9,7 +9,7 @@ class StatusBar : public QStatusBar
     Q_OBJECT
 public:
     StatusBar();
-    QProgressBar* anal_prog;
+    QProgressBar* ana_prog;
 private:
     const int PROG_BAR_WIDTH = 200;
     const int PROG_BAR_HEIGHT = 15;

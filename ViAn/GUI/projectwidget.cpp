@@ -127,7 +127,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
         emit marked_analysis(ana_item->get_analysis());
         emit set_detections(true);
-        if (!ana_item->get_analysis().POIs.empty()) {
+        if (!ana_item->get_analysis()->POIs.empty()) {
             emit enable_poi_btns(true);
         }
         break;

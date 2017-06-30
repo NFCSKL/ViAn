@@ -24,7 +24,7 @@ class FrameWidget : public QWidget
 
     click_tool tool = NONE;
     cv::Mat current_frame;
-    Analysis m_analysis;
+    Analysis* m_analysis;
     // Zoom
     QPoint zoom_start_pos, zoom_end_pos, prev_pos;
     bool draw_zoom_rect = false;
@@ -52,7 +52,7 @@ public slots:
     void draw_from_playback(cv::Mat frame);
     void toggle_zoom(bool value);
     void set_scroll_area_size(QSize size);
-    void set_analysis(Analysis);
+    void set_analysis(Analysis*);
     void set_detections_on_frame(int);
     void set_detections(bool);
 protected:

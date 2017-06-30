@@ -12,8 +12,8 @@ class AnalysisItem : public QTreeWidgetItem
 
 public:
     AnalysisItem(int type);
-    set_analysis(Analysis analysis);
-    Analysis get_analysis();
+    void set_analysis(Analysis analysis);
+    Analysis *get_analysis();
 };
 
 class FolderItem : public QTreeWidgetItem
