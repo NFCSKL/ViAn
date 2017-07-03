@@ -1,6 +1,7 @@
 #include "videowidget.h"
 #include "utility.h"
 #include "drawscrollarea.h"
+#include "tagdialog.h"
 
 #include <QTime>
 #include <QDebug>
@@ -113,6 +114,7 @@ void VideoWidget::set_btn_icons() {
     bookmark_btn = new QPushButton(QIcon("../ViAn/Icons/bookmark.png"), "", this);
     analysis_btn = new QPushButton(QIcon("../ViAn/Icons/analysis.png"), "", this);
     tag_btn = new QPushButton(QIcon("../ViAn/Icons/tag.png"), "", this);
+    new_tag_btn = new QPushButton(QIcon("../ViAn/Icons/marker.png"), "", this);
     zoom_in_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_in.png"), "", this);
     zoom_out_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_out.png"), "", this);
     fit_btn = new QPushButton(QIcon("../ViAn/Icons/fit_screen.png"), "", this);
@@ -153,6 +155,7 @@ void VideoWidget::set_btn_size() {
     btns.push_back(bookmark_btn);
     btns.push_back(analysis_btn);
     btns.push_back(tag_btn);
+    btns.push_back(new_tag_btn);
     btns.push_back(zoom_in_btn);
     btns.push_back(zoom_out_btn);
     btns.push_back(fit_btn);
@@ -196,6 +199,8 @@ void VideoWidget::set_btn_shortcuts() {
     next_frame_sc = new QShortcut(Qt::Key_Right, this);
     prev_frame_sc = new QShortcut(Qt::Key_Left, this);
     zoom_in_sc = new QShortcut(Qt::Key_Z, this);
+
+    tag_sc = new QShortcut(Qt::Key_T, this);
 
     //TODO Add functionality and test
     //QShortcut* next_poi_sc = new QShortcut(QKeySequence(tr("Ctrl+Qt::Key_Right), this);
@@ -248,6 +253,7 @@ void VideoWidget::add_btns_to_layouts() {
 
     other_btns->addWidget(bookmark_btn);
     other_btns->addWidget(tag_btn);
+    other_btns->addWidget(new_tag_btn);
     control_row->addLayout(other_btns);
 
     zoom_btns->addWidget(zoom_in_btn);
@@ -283,6 +289,11 @@ void VideoWidget::connect_btns() {
     connect(zoom_in_sc, &QShortcut::activated, zoom_in_btn, &QPushButton::toggle);
 
     connect(bookmark_btn, &QPushButton::clicked, this, &VideoWidget::on_bookmark_clicked);
+
+    connect(tag_btn, &QPushButton::clicked, this, &VideoWidget::tag_frame);
+    connect(tag_sc, &QShortcut::activated, this, &VideoWidget::tag_frame);
+
+    connect(new_tag_btn, &QPushButton::clicked, this, &VideoWidget::new_tag_clicked);
 
     //connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
 
@@ -349,8 +360,7 @@ void VideoWidget::set_total_time(int time) {
     total_time->setText(convert_time(time));
 }
 
-void VideoWidget::on_bookmark_clicked()
-{
+void VideoWidget::on_bookmark_clicked() {
     cv::Mat bookmark_frame = frame_wgt->get_mat();
 
     emit new_bookmark(current_frame, bookmark_frame);
@@ -423,6 +433,37 @@ void VideoWidget::analysis_btn_clicked() {
     if (m_vid_proj != nullptr) {
         emit start_analysis(m_vid_proj);
     }
+}
+
+void VideoWidget::tag_frame() {
+
+    if (tag_clicked) {
+        //m_tag = new Tag();
+        //tag->add_frame(current_frame);
+        //emit add_tag(m_vid_proj, m_tag);
+        tag_clicked = true;
+    } else {
+        m_tag->add_frame(current_frame);
+        std::cout << "tagged frame number: " << current_frame << std::endl;
+    }
+}
+
+void VideoWidget::new_tag_clicked() {
+    TagDialog* tag_dialog = new TagDialog();
+    connect(tag_dialog, SIGNAL(tag_name(QString)), this, SLOT(new_tag(QString)));
+}
+
+void VideoWidget::new_tag(QString name) {
+    m_tag = new Tag(name);
+    emit add_tag(m_vid_proj, m_tag);
+}
+
+void VideoWidget::set_tag(Tag* tag) {
+    this->m_tag = tag;
+    for (int frame : m_tag->frames) {
+        std::cout << frame << std::endl;
+    }
+
 }
 
 /**

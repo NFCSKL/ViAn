@@ -17,7 +17,7 @@ void ProjectWidget::new_project() const {
         ProjectDialog* proj_dialog = new ProjectDialog();
         QObject::connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(add_project(QString, QString)));
     } else {
-        // TODO project already loadedq
+        // TODO project already loaded
     }
 }
 
@@ -30,7 +30,8 @@ void ProjectWidget::new_project() const {
  */
 void ProjectWidget::add_project(QString project_name, QString project_path) {
     std::string _tmp_name = project_name.toStdString();
-    std::string _tmp_path = project_path.toStdString();    
+    std::string _tmp_path = project_path.toStdString();
+    parentWidget()->parentWidget()->setWindowTitle(project_name);
     m_proj = new Project(_tmp_name, _tmp_path);
     create_default_tree();
 }
@@ -83,6 +84,18 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj) {
     }
 }
 
+void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
+    TagItem* tag_item = new TagItem(tag, TAG_ITEM);
+    for (int i = 0; i < m_videos->childCount(); i++) {
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(m_videos->child(i));
+        if (vid_item->get_video_project() == vid_proj) {
+            m_videos->child(i)->addChild(tag_item);
+            tag_item->setText(0, QString::fromStdString(tag_item->get_tag()->m_name));
+            m_videos->child(i)->setExpanded(true);
+        }
+    }
+}
+
 /**
  * @brief ProjectWidget::set_tree_item_name
  * @param item
@@ -130,6 +143,11 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         if (!ana_item->get_analysis()->POIs.empty()) {
             emit enable_poi_btns(true);
         }
+        break;
+    } case TAG_ITEM: {
+        tree_item_clicked(item->parent(), 0);
+        TagItem* tag_item = dynamic_cast<TagItem*>(item);
+        emit marked_tag(tag_item->get_tag());
         break;
     } case FOLDER_ITEM: {
         break;
