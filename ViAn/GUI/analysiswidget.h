@@ -14,7 +14,6 @@ class AnalysisWidget : public QWidget
 public:
     explicit AnalysisWidget(QWidget *parent = nullptr);
     AnalysisController* an_col;
-    VideoProject* vid_proj;
     std::string dots = "";
     std::clock_t start;
     int duration = 0;
@@ -37,6 +36,7 @@ signals:
     void show_progress(int);
     void name_in_tree(QTreeWidgetItem*, QString);
     void add_slider_interval(int, int);
+    void save_analysis(AnalysisMeta*);
 };
 
 #endif // ANALYSISWIDGET_H

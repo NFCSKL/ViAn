@@ -129,10 +129,14 @@ void VideoProject::write(QJsonObject& json){
     json["bookmarks"] = json_bookmarks;
     // Write analyses to json
     QJsonArray json_analyses;
+    std::cout << "Length: " << m_analyses.size() << std::endl;
     for(auto it2 = m_analyses.begin(); it2 != m_analyses.end(); it2++){
         QJsonObject json_analysis;
         AnalysisMeta* an = it2->second;
+        std::cout << an->file_analysis << std::endl;
+        std::cout << "3" << std::endl;
         an->write(json_analysis);
+        std::cout << "4" << std::endl;
         json_analyses.append(json_analysis);
     }
     json["analyses"] = json_analyses;
@@ -159,8 +163,9 @@ ID VideoProject::add_bookmark(Bookmark *bookmark){
  * Adds analysis to video project.
  */
 ID VideoProject::add_analysis(AnalysisMeta* analysis){
-    this->m_analyses.insert(std::make_pair(this->m_ana_cnt, analysis));
-    return this->m_ana_cnt++;
+    m_analyses.insert(std::make_pair(m_ana_cnt, analysis));
+    std::cout << "add_analysis: " << m_analyses[0]->m_name << std::endl;
+    return m_ana_cnt++;
 }
 
 /**

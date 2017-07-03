@@ -588,3 +588,6 @@ void VideoWidget::set_current_frame_size(QSize size) {
     current_frame_size = size;
 }
 
+void VideoWidget::save_analysis(AnalysisMeta* analysis) {
+    m_vid_proj->add_analysis(analysis);
+}

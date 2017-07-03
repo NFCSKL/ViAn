@@ -60,9 +60,9 @@ void AnalysisWidget::analysis_done(AnalysisMeta analysis) {
     analysis_queue.pop_front();
     emit remove_analysis_bar();
     emit name_in_tree(current_analysis, "Analysis");
+    emit save_analysis(&analysis);
     AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(current_analysis);
     ana_item->set_analysis(analysis.get_analysis());
-
     current_analysis = nullptr;
     duration = 0;
 

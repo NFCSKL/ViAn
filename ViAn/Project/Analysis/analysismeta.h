@@ -5,9 +5,10 @@
 #include <iostream>
 class AnalysisMeta : public Saveable
 {
-    std::string file_analysis;
+
 public:
     std::string m_name;
+    std::string file_analysis;
     std::vector<std::pair<int,int>> m_poi_intervals;
     AnalysisMeta(const Analysis &analysis);
     AnalysisMeta();
