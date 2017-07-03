@@ -15,6 +15,8 @@ class AnalysisSlider : public QSlider {
 public:
     explicit AnalysisSlider(Qt::Orientation orientation, QWidget *parent = 0);
 
+    int last_poi_end;
+
     void set_blocked(bool value);
     bool is_blocked();
     bool get_was_paused();

@@ -414,7 +414,6 @@ void VideoWidget::next_frame_clicked() {
         emit next_video_frame();
         emit set_status_bar("Went forward a frame to number " + QString::number(step_frame));
     }
-
 }
 
 /**
@@ -478,8 +477,13 @@ void VideoWidget::set_slider_max(int value) {
 void VideoWidget::on_new_frame(int frame_num) {
     if (analysis_only) {
         if (!playback_slider->is_in_POI(frame_num)) {
-            next_poi_btn_clicked();
-            //POI_end = playback_slider->get_next_poi_end(current_frame);
+            if (frame_num == playback_slider->last_poi_end) {
+                //analysis_play_btn_clicked();
+                //analysis_play_btn->setChecked(false);
+                stop_clicked();
+            } else {
+                next_poi_btn_clicked();
+            }
         }
     }
     if (!playback_slider->is_blocked()) {

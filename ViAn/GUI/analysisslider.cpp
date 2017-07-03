@@ -53,16 +53,6 @@ void AnalysisSlider::set_analysis(Analysis* analysis) {
  * @param end frame
  */
 void AnalysisSlider::add_slider_interval(int start_frame, int end_frame) {
-    /*double first, second;
-    first = (double)start_frame/maximum();
-    second = (double)end_frame/maximum();
-    std::pair<double, double> pair;
-    if (first > second) {
-        pair = std::make_pair(second, first);
-    } else {
-        pair = std::make_pair(first, second);
-    }*/
-
     std::pair<int, int> pair;
     if (start_frame > end_frame) {
         pair = std::make_pair(end_frame, start_frame);
@@ -70,6 +60,7 @@ void AnalysisSlider::add_slider_interval(int start_frame, int end_frame) {
         pair = std::make_pair(start_frame, end_frame);
     }
     rects.push_back(pair);
+    last_poi_end = end_frame;
 }
 
 int AnalysisSlider::get_next_poi_start(int frame) {
@@ -102,7 +93,7 @@ int AnalysisSlider::get_prev_poi_start(int frame) {
 
 bool AnalysisSlider::is_in_POI(int frame) {
     for (std::pair<int, int> rect : rects) {
-        if (frame > rect.first && frame < rect.second) {
+        if (frame >= rect.first && frame < rect.second) {
             return true;
         }
     }return false;
