@@ -478,8 +478,8 @@ void VideoWidget::on_new_frame(int frame_num) {
     if (analysis_only) {
         if (!playback_slider->is_in_POI(frame_num)) {
             if (frame_num == playback_slider->last_poi_end) {
-                //analysis_play_btn_clicked();
-                //analysis_play_btn->setChecked(false);
+                analysis_play_btn_clicked();
+                analysis_play_btn->setChecked(false);
                 stop_clicked();
             } else {
                 next_poi_btn_clicked();
@@ -559,6 +559,8 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj) {
         m_vid_proj = vid_proj;
         m_video_player->load_video(m_vid_proj->get_video()->file_path, nullptr);
         emit set_status_bar("Video loaded");
+        play_btn->setIcon(QIcon("../ViAn/Icons/play.png"));
+        m_video_player->start();
     }
 
     if (!video_btns_enabled) {
@@ -570,13 +572,16 @@ void VideoWidget::enable_video_btns() {
     for (QPushButton* btn : btns) {
         btn->setEnabled(true);
     }
-    m_video_player->start();
 }
 
 void VideoWidget::enable_poi_btns(bool b) {
     next_poi_btn->setEnabled(b);
     prev_poi_btn->setEnabled(b);
     analysis_play_btn->setEnabled(b);
+    if (!b) {
+        analysis_play_btn->setChecked(b);
+        analysis_only = b;
+    }
 }
 
 void VideoWidget::update_bar_pos(int change_x, int change_y) {
