@@ -6,6 +6,8 @@
 
 ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this , SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
+    setHeaderLabel("Create a new or open a project");
+    //setHeaderHidden(true);
 }
 
 /**
@@ -32,6 +34,8 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
     std::string _tmp_name = project_name.toStdString();
     std::string _tmp_path = project_path.toStdString();
     parentWidget()->parentWidget()->setWindowTitle(project_name);
+    //setHeaderHidden(false);
+    setHeaderLabel(project_name);
     m_proj = new Project(_tmp_name, _tmp_path);
     create_default_tree();
 }
@@ -42,7 +46,7 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
  */
 void ProjectWidget::create_default_tree() {
     m_videos = new FolderItem(FOLDER_ITEM);
-    m_videos->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
+    m_videos->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
     m_videos->setText(0, tr("Videos"));
     addTopLevelItem(m_videos);
 }

@@ -432,6 +432,8 @@ void VideoWidget::prev_frame_clicked() {
 void VideoWidget::analysis_btn_clicked() {
     if (m_vid_proj != nullptr) {
         emit start_analysis(m_vid_proj);
+    } else {
+        emit set_status_bar("No video selected");
     }
 }
 
@@ -442,9 +444,11 @@ void VideoWidget::tag_frame() {
         //tag->add_frame(current_frame);
         //emit add_tag(m_vid_proj, m_tag);
         tag_clicked = true;
-    } else {
+    } else if (m_tag != nullptr){
         m_tag->add_frame(current_frame);
         std::cout << "tagged frame number: " << current_frame << std::endl;
+    } else {
+        emit set_status_bar("Select a tag");
     }
 }
 
@@ -454,16 +458,20 @@ void VideoWidget::new_tag_clicked() {
 }
 
 void VideoWidget::new_tag(QString name) {
-    m_tag = new Tag(name);
-    emit add_tag(m_vid_proj, m_tag);
+    Tag* tag = new Tag(name);
+    emit add_tag(m_vid_proj, tag);
 }
 
 void VideoWidget::set_tag(Tag* tag) {
-    this->m_tag = tag;
+    m_tag = tag;
     for (int frame : m_tag->frames) {
         std::cout << frame << std::endl;
     }
+}
 
+void VideoWidget::clear_tag() {
+    m_tag = nullptr;
+    std::cout << "cleaned" << std::endl;
 }
 
 /**

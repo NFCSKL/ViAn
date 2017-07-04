@@ -41,6 +41,7 @@ public:
     QWaitCondition paused_wait;
     video_player* m_video_player;
     FrameWidget* frame_wgt;
+    AnalysisSlider* playback_slider;
 
 signals:
     void first_frame(cv::Mat frame);
@@ -71,6 +72,7 @@ public slots:
     void new_tag_clicked();
     void new_tag(QString name);
     void set_tag(Tag*);
+    void clear_tag(void);
     void zoom_out_clicked(void);
     void set_slider_max(int value);
     void on_new_frame(int frame_num);
@@ -95,7 +97,6 @@ private:
     QVBoxLayout* vertical_layout;
     DrawScrollArea* scroll_area;
     QSlider* speed_slider;
-    AnalysisSlider* playback_slider;
     QLabel* current_time;
     QLabel* total_time;
 
@@ -138,7 +139,7 @@ private:
 
     QString convert_time(int time);
     VideoProject* m_vid_proj;
-    Tag* m_tag;
+    Tag* m_tag = nullptr;
 
     bool tag_clicked = false;
 

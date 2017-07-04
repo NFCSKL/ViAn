@@ -85,6 +85,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(analysis_wgt, SIGNAL(show_progress(int)), status_bar, SLOT(update_analysis_bar(int)));
 
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::load_marked_video);
+    connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::clear_tag);
+
     connect(analysis_wgt, SIGNAL(name_in_tree(QTreeWidgetItem*,QString)), project_wgt, SLOT(set_tree_item_name(QTreeWidgetItem*,QString)));
 
     connect(project_wgt, SIGNAL(marked_analysis(Analysis*)), video_wgt->frame_wgt, SLOT(set_analysis(Analysis*)));
@@ -92,6 +94,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, SIGNAL(enable_poi_btns(bool)), video_wgt, SLOT(enable_poi_btns(bool)));
 
     connect(project_wgt, SIGNAL(marked_tag(Tag*)), video_wgt, SLOT(set_tag(Tag*)));
+    connect(project_wgt, SIGNAL(marked_tag(Tag*)), video_wgt->playback_slider, SLOT(set_tag(Tag*)));
     connect(video_wgt, SIGNAL(add_tag(VideoProject*, Tag*)), project_wgt, SLOT(add_tag(VideoProject*, Tag*)));
 }
 
@@ -357,5 +360,5 @@ void MainWindow::cont_bri() {
  *  runs when the options action is triggered
  */
 void MainWindow::options() {
-    emit set_status_bar("Opening options.");
+    emit set_status_bar("Opening options");
 }

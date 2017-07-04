@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QSlider>
 #include <vector>
+#include <set>
+#include "Project/Analysis/tag.h"
 
 
 class AnalysisSlider : public QSlider {
@@ -12,6 +14,7 @@ class AnalysisSlider : public QSlider {
 public:
     explicit AnalysisSlider(Qt::Orientation orientation, QWidget *parent = 0);
     void add_slider_interval(int start_frame, int end_frame);
+    void set_tag(Tag*);
     void clear_slider();
     void set_blocked(bool value);
     bool is_blocked();
@@ -23,6 +26,7 @@ protected:
 
 private:
     std::vector<std::pair<double, double>> rects;
+    std::set<int> frames;
 };
 
 #endif // ANALYSISSLIDER_H
