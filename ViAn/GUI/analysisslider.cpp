@@ -38,10 +38,14 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     painter.drawComplexControl(QStyle::CC_Slider, option);
 }
 
+/**
+ * @brief AnalysisSlider::set_analysis
+ * Adds all POIs to the slider
+ * @param analysis
+ */
 void AnalysisSlider::set_analysis(Analysis* analysis) {
     for (POI p : analysis->POIs) {
         add_slider_interval(p.start_frame, p.end_frame);
-        std::cout << p.start_frame << " - " << p.end_frame << std::endl;
     }
 }
 
@@ -63,6 +67,12 @@ void AnalysisSlider::add_slider_interval(int start_frame, int end_frame) {
     last_poi_end = end_frame;
 }
 
+/**
+ * @brief AnalysisSlider::get_next_poi_start
+ * Return the start frame of the POI after frame
+ * @param frame     : current frame
+ * @return
+ */
 int AnalysisSlider::get_next_poi_start(int frame) {
     for (std::pair<int, int> rect : rects) {
         if ( rect.first > frame) {
@@ -72,6 +82,12 @@ int AnalysisSlider::get_next_poi_start(int frame) {
     return frame;
 }
 
+/**
+ * @brief AnalysisSlider::get_next_poi_end
+ * Return the end frame of the POI after frame
+ * @param frame     : current frame
+ * @return
+ */
 int AnalysisSlider::get_next_poi_end(int frame) {
     for (std::pair<int, int> rect : rects) {
         if ( rect.first > frame) {
@@ -81,6 +97,12 @@ int AnalysisSlider::get_next_poi_end(int frame) {
     return frame;
 }
 
+/**
+ * @brief AnalysisSlider::get_prev_poi_start
+ * Return the start frame of the POI before frame
+ * @param frame     : current frame
+ * @return
+ */
 int AnalysisSlider::get_prev_poi_start(int frame) {
     int new_frame = frame;
     for (std::pair<int, int> rect : rects) {
@@ -91,6 +113,12 @@ int AnalysisSlider::get_prev_poi_start(int frame) {
     return new_frame;
 }
 
+/**
+ * @brief AnalysisSlider::is_in_POI
+ * Checks to see if frame is in a POI.
+ * @param frame
+ * @return
+ */
 bool AnalysisSlider::is_in_POI(int frame) {
     for (std::pair<int, int> rect : rects) {
         if (frame >= rect.first && frame < rect.second) {
