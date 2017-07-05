@@ -19,7 +19,9 @@ signals:
     void marked_analysis(Analysis*);
     void marked_tag(Tag*);
     void set_detections(bool);
-    void enable_poi_btns(bool);
+    void enable_poi_btns(bool, bool);
+    void set_poi_slider(bool);
+    void set_tag_slider(bool);
     void set_status_bar(QString);
     void begin_analysis(std::string, std::string, QTreeWidgetItem*);
 
