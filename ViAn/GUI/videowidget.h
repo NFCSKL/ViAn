@@ -66,7 +66,7 @@ public slots:
     void next_frame_clicked(void);
     void prev_frame_clicked(void);
     void analysis_btn_clicked(void);
-    void analysis_play_btn_clicked(void);
+    void analysis_play_btn_toggled(bool value);
     void next_poi_btn_clicked(void);
     void prev_poi_btn_clicked(void);
     void zoom_out_clicked();

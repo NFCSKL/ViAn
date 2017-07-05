@@ -282,7 +282,7 @@ void VideoWidget::connect_btns() {
     connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
 
     connect(analysis_btn, &QPushButton::clicked, this, &VideoWidget::analysis_btn_clicked);
-    connect(analysis_play_btn, &QPushButton::clicked, this, &VideoWidget::analysis_play_btn_clicked);
+    connect(analysis_play_btn, &QPushButton::toggled, this, &VideoWidget::analysis_play_btn_toggled);
 
     connect(next_poi_btn, &QPushButton::clicked, this, &VideoWidget::next_poi_btn_clicked);
     connect(next_poi_sc, &QShortcut::activated, this, &VideoWidget::next_poi_btn_clicked);
@@ -435,8 +435,8 @@ void VideoWidget::analysis_btn_clicked() {
     }
 }
 
-void VideoWidget::analysis_play_btn_clicked() {
-    analysis_only = !analysis_only;
+void VideoWidget::analysis_play_btn_toggled(bool value) {
+    analysis_only = value;
     /*if (!playback_slider->is_in_POI(current_frame)) {
         next_poi_btn_clicked();
     }
@@ -478,7 +478,7 @@ void VideoWidget::on_new_frame(int frame_num) {
     if (analysis_only) {
         if (!playback_slider->is_in_POI(frame_num)) {
             if (frame_num == playback_slider->last_poi_end) {
-                analysis_play_btn_clicked();
+                analysis_play_btn_toggled(false);
                 analysis_play_btn->setChecked(false);
                 stop_clicked();
             } else {
