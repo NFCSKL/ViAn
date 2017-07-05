@@ -63,12 +63,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     // Main toolbar
     MainToolbar* main_toolbar = new MainToolbar();
+    main_toolbar->setWindowTitle(tr("Main toolbar"));
     QAction* toggle_toolbar = main_toolbar->toggleViewAction();
     addToolBar(main_toolbar);
     connect(main_toolbar->add_video_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
 
     // Draw toolbar
     DrawingToolbar* draw_toolbar = new DrawingToolbar();
+    draw_toolbar->setWindowTitle(tr("Draw toolbar"));
     QAction* toggle_draw_toolbar = draw_toolbar->toggleViewAction();
     addToolBar(draw_toolbar);
     connect(main_toolbar->toggle_draw_toolbar_act, &QAction::triggered, toggle_draw_toolbar, &QAction::trigger);   

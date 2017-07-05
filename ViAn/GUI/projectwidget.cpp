@@ -60,13 +60,15 @@ void ProjectWidget::add_video() {
     if (m_proj == nullptr)  return; // TODO: HANDLE CASE
 
     QString video_path = QFileDialog().getOpenFileName(this, tr("Add video"), m_proj->getDir_videos().c_str());
-    int index = video_path.lastIndexOf('/') + 1;
-    QString vid_name = video_path.right(video_path.length() - index);
+    if (!video_path.isEmpty()) {
+        int index = video_path.lastIndexOf('/') + 1;
+        QString vid_name = video_path.right(video_path.length() - index);
 
-    VideoProject* vid_proj = new VideoProject(new Video(video_path.toStdString()));
-    m_proj->add_video_project(vid_proj);
+        VideoProject* vid_proj = new VideoProject(new Video(video_path.toStdString()));
+        m_proj->add_video_project(vid_proj);
 
-    tree_add_video(vid_proj, vid_name);
+        tree_add_video(vid_proj, vid_name);
+    }
 }
 
 /**
