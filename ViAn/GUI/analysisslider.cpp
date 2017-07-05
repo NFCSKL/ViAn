@@ -44,8 +44,10 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
  * @param analysis
  */
 void AnalysisSlider::set_analysis(Analysis* analysis) {
-    for (POI p : analysis->POIs) {
-        add_slider_interval(p.start_frame, p.end_frame);
+    if (analysis != nullptr) {
+        for (POI p : analysis->POIs) {
+            add_slider_interval(p.start_frame, p.end_frame);
+        }
     }
 }
 
