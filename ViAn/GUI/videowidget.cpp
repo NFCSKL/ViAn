@@ -448,7 +448,7 @@ void VideoWidget::analysis_btn_clicked() {
 void VideoWidget::tag_frame() {
     if (m_tag != nullptr){
         m_tag->add_frame(current_frame);
-        std::cout << "tagged frame number: " << current_frame << std::endl;
+        emit set_status_bar("Tagged frame number: " + QString::number(current_frame));
         emit new_frame_tagged(m_tag);
     } else {
         emit set_status_bar("Select a tag");
@@ -467,9 +467,6 @@ void VideoWidget::new_tag(QString name) {
 
 void VideoWidget::set_tag(Tag* tag) {
     m_tag = tag;
-    for (int frame : m_tag->frames) {
-        std::cout << frame << std::endl;
-    }
 }
 
 void VideoWidget::clear_tag() {
@@ -478,10 +475,6 @@ void VideoWidget::clear_tag() {
 
 void VideoWidget::analysis_play_btn_clicked() {
     analysis_only = !analysis_only;
-    /*if (!playback_slider->is_in_POI(current_frame)) {
-        next_poi_btn_clicked();
-    }
-    POI_end = playback_slider->get_next_poi_end(current_frame);*/
 }
 
 void VideoWidget::next_poi_btn_clicked() {

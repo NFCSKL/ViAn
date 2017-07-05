@@ -29,7 +29,6 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
 
     if (m_show_pois) {
         for (auto it = rects.begin(); it != rects.end(); ++it) {
-            std::cout << "first - second " << groove_rect.left() + (double)(*it).first * groove_rect.width() / maximum() << " - " << ((double)(*it).second - (*it).first) * groove_rect.width() / maximum()  << std::endl;
             QRect rect(groove_rect.left() + (double)(*it).first * groove_rect.width() / maximum(), groove_rect.top(),
                        ((double)(*it).second - (*it).first) * groove_rect.width() / maximum(), groove_rect.height());
             painter.fillRect(rect, QBrush(Qt::yellow));
@@ -168,17 +167,12 @@ void AnalysisSlider::set_show_pois(bool show_pois) {
  * @param show_tags
  */
 void AnalysisSlider::set_show_tags(bool show_tags) {
-    std::cout << "set show tags" << std::endl;
     m_show_tags = show_tags;
     repaint();
 }
 
 void AnalysisSlider::set_tag(Tag* tag) {
-    std::cout << "set me" << std::endl;
     frames = tag->frames;
-    for (int i : frames) {
-        std::cout << i << std::endl;
-    }
 }
 
 /**
