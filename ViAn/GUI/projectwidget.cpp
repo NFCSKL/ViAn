@@ -6,8 +6,6 @@
 
 ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this , SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
-    setHeaderLabel("Create a new or open a project");
-    //setHeaderHidden(true);
 }
 
 /**
@@ -34,8 +32,6 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
     std::string _tmp_name = project_name.toStdString();
     std::string _tmp_path = project_path.toStdString();
     parentWidget()->parentWidget()->setWindowTitle(project_name);
-    //setHeaderHidden(false);
-    setHeaderLabel(project_name);
     m_proj = new Project(_tmp_name, _tmp_path);
     create_default_tree();
 }
@@ -124,6 +120,14 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
     m_videos->addChild(vid);
     emit set_status_bar("Video added");
     m_videos->setExpanded(true);
+    for (std::pair<int,Analysis*> ana : vid_proj->get_analyses()){
+        AnalysisItem* ana_item = new AnalysisItem(ANALYSIS_ITEM);
+        ana_item->set_analysis(*ana.second);
+        ana_item->setText(0, QString::fromStdString(ana.second->getName()));
+        vid->addChild(ana_item);
+        vid->setExpanded(true);
+
+    }
 }
 
 /**

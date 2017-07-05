@@ -157,6 +157,7 @@ void Project::write(QJsonObject& json){
     for(auto it = m_videos.begin(); it != m_videos.end(); it++){
         QJsonObject json_vid_proj;
         VideoProject* v = it->second;
+        std::cout << "jfkla " << v->get_analyses().size() << std::endl;
         v->write(json_vid_proj);
         json_proj.append(json_vid_proj);
     }

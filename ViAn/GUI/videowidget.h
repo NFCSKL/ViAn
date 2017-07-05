@@ -95,7 +95,7 @@ public slots:
     void on_bookmark_clicked(void);
     //void next_poi_clicked(void);
     //void prev_poi_clicked(void);
-    void save_analysis(AnalysisMeta*);
+    void save_analysis(Analysis *);
 
 private:
     const QSize BTN_SIZE = QSize(30, 30);
