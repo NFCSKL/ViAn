@@ -19,6 +19,8 @@
 #include "Project/videoproject.h"
 #include "drawscrollarea.h"
 
+#include "Project/Analysis/tag.h" //TODO remove
+
 
 class VideoWidget : public QWidget
 {
@@ -57,6 +59,8 @@ signals:
     void set_detections_on_frame(int);
     
     void start_analysis(VideoProject*);
+    void add_tag(VideoProject*, Tag*);
+    void new_frame_tagged(Tag*);
     void set_status_bar(QString);
 public slots:
     void set_current_time(int time);
@@ -66,10 +70,15 @@ public slots:
     void next_frame_clicked(void);
     void prev_frame_clicked(void);
     void analysis_btn_clicked(void);
+    void tag_frame(void);
+    void new_tag_clicked();
+    void new_tag(QString name);
+    void set_tag(Tag*);
+    void clear_tag(void);
+    void zoom_out_clicked(void);
     void analysis_play_btn_clicked(void);
     void next_poi_btn_clicked(void);
     void prev_poi_btn_clicked(void);
-    void zoom_out_clicked();
     void set_slider_max(int value);
     void on_new_frame(int frame_num);
     void on_playback_slider_pressed(void);
@@ -80,7 +89,7 @@ public slots:
     //void next_poi_clicked(void);
     //void prev_poi_clicked(void);
     void load_marked_video(VideoProject* vid_proj);
-    void enable_poi_btns(bool);
+    void enable_poi_btns(bool, bool ana_play_btn);
     void update_bar_pos(int change_x, int change_y);
     void set_current_frame_size(QSize size);
     void on_bookmark_clicked(void);
@@ -109,6 +118,7 @@ private:
     QPushButton* analysis_play_btn;
     QPushButton* bookmark_btn;    
     QPushButton* tag_btn;
+    QPushButton* new_tag_btn;
     QPushButton* zoom_in_btn;
     QPushButton* zoom_out_btn;
     QPushButton* fit_btn;
@@ -130,11 +140,15 @@ private:
     QShortcut* next_poi_sc;
     QShortcut* prev_poi_sc;
     QShortcut* zoom_in_sc;
+    QShortcut* tag_sc;
     
     std::vector<QPushButton*> btns;
 
     QString convert_time(int time);
     VideoProject* m_vid_proj;
+    Tag* m_tag = nullptr;
+
+    bool tag_clicked = false;
 
     bool slider_is_blocked = false;
     bool video_btns_enabled = false;

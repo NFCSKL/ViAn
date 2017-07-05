@@ -6,6 +6,8 @@
 
 ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this , SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
+    setHeaderLabel("Create a new or open a project");
+    //setHeaderHidden(true);
 }
 
 /**
@@ -17,7 +19,7 @@ void ProjectWidget::new_project() const {
         ProjectDialog* proj_dialog = new ProjectDialog();
         QObject::connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(add_project(QString, QString)));
     } else {
-        // TODO project already loadedq
+        // TODO project already loaded
     }
 }
 
@@ -30,7 +32,10 @@ void ProjectWidget::new_project() const {
  */
 void ProjectWidget::add_project(QString project_name, QString project_path) {
     std::string _tmp_name = project_name.toStdString();
-    std::string _tmp_path = project_path.toStdString();    
+    std::string _tmp_path = project_path.toStdString();
+    parentWidget()->parentWidget()->setWindowTitle(project_name);
+    //setHeaderHidden(false);
+    setHeaderLabel(project_name);
     m_proj = new Project(_tmp_name, _tmp_path);
     create_default_tree();
 }
@@ -41,7 +46,7 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
  */
 void ProjectWidget::create_default_tree() {
     m_videos = new FolderItem(FOLDER_ITEM);
-    m_videos->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
+    m_videos->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
     m_videos->setText(0, tr("Videos"));
     addTopLevelItem(m_videos);
 }
@@ -55,13 +60,15 @@ void ProjectWidget::add_video() {
     if (m_proj == nullptr)  return; // TODO: HANDLE CASE
 
     QString video_path = QFileDialog().getOpenFileName(this, tr("Add video"), m_proj->getDir_videos().c_str());
-    int index = video_path.lastIndexOf('/') + 1;
-    QString vid_name = video_path.right(video_path.length() - index);
+    if (!video_path.isEmpty()) {
+        int index = video_path.lastIndexOf('/') + 1;
+        QString vid_name = video_path.right(video_path.length() - index);
 
-    VideoProject* vid_proj = new VideoProject(new Video(video_path.toStdString()));
-    m_proj->add_video_project(vid_proj);
+        VideoProject* vid_proj = new VideoProject(new Video(video_path.toStdString()));
+        m_proj->add_video_project(vid_proj);
 
-    tree_add_video(vid_proj, vid_name);
+        tree_add_video(vid_proj, vid_name);
+    }
 }
 
 /**
@@ -79,6 +86,18 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj) {
             m_videos->child(i)->setExpanded(true);
             QTreeWidgetItem* item = dynamic_cast<QTreeWidgetItem*>(ana);
             emit begin_analysis(m_proj->getDir(), vid_proj->get_video()->file_path, item);
+        }
+    }
+}
+
+void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
+    TagItem* tag_item = new TagItem(tag, TAG_ITEM);
+    for (int i = 0; i < m_videos->childCount(); i++) {
+        VideoItem* vid_item = dynamic_cast<VideoItem*>(m_videos->child(i));
+        if (vid_item->get_video_project() == vid_proj) {
+            m_videos->child(i)->addChild(tag_item);
+            tag_item->setText(0, QString::fromStdString(tag_item->get_tag()->m_name));
+            m_videos->child(i)->setExpanded(true);
         }
     }
 }
@@ -121,7 +140,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit marked_video(vid_item->get_video_project());
         emit set_detections(false);
         emit set_poi_slider(false);
-        emit enable_poi_btns(false);
+        emit enable_poi_btns(false,false);
         break;
     } case ANALYSIS_ITEM: {
         tree_item_clicked(item->parent(), 0);
@@ -130,9 +149,18 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit set_detections(true);
         emit set_poi_slider(true);
         if (!ana_item->get_analysis()->POIs.empty()) {
-            emit enable_poi_btns(true);
+            emit enable_poi_btns(true, true);
         }
+        break;
+    } case TAG_ITEM: {
+        tree_item_clicked(item->parent(), 0);
+        TagItem* tag_item = dynamic_cast<TagItem*>(item);
+        emit marked_tag(tag_item->get_tag());
+        emit set_tag_slider(true);
+        emit enable_poi_btns(true, false);
+        /*if (!tag_item->get_tag()->frames.empty()) {
 
+        }*/
         break;
     } case FOLDER_ITEM: {
         break;

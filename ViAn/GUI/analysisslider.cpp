@@ -29,9 +29,19 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
 
     if (m_show_pois) {
         for (auto it = rects.begin(); it != rects.end(); ++it) {
-            QRect rect(groove_rect.left() + (double)(*it).first * groove_rect.width() / maximum(),
-                       groove_rect.top(), ((double)(*it).second - (*it).first) * groove_rect.width() / maximum(), groove_rect.height());
+            QRect rect(groove_rect.left() + (double)(*it).first * groove_rect.width() / maximum(), groove_rect.top(),
+                       ((double)(*it).second - (*it).first) * groove_rect.width() / maximum(), groove_rect.height());
             painter.fillRect(rect, QBrush(Qt::yellow));
+        }
+    }
+
+    if (m_show_tags) {
+        double c = (double)(groove_rect.right()-groove_rect.left())/maximum();
+        for (auto it = frames.begin(); it != frames.end(); ++it) {
+            double frame = (double)(*it);
+            double first = (groove_rect.left()+frame*c);
+            QRect rect(first, groove_rect.top(), 1, groove_rect.height());
+            painter.fillRect(rect, QBrush(Qt::red));
         }
     }
     option.subControls = QStyle::SC_SliderHandle;
@@ -73,13 +83,21 @@ void AnalysisSlider::add_slider_interval(int start_frame, int end_frame) {
  * @param frame     : current frame
  * @return
  */
-int AnalysisSlider::get_next_poi_start(int frame) {
-    for (std::pair<int, int> rect : rects) {
-        if ( rect.first > frame) {
-            return rect.first;
+int AnalysisSlider::get_next_poi_start(int curr_frame) {
+    if (!rects.empty()) {
+        for (std::pair<int, int> rect : rects) {
+            if ( rect.first > curr_frame) {
+                return rect.first;
+            }
+        }
+    } else if (!frames.empty()) {
+        for (int frame : frames) {
+            if (frame > curr_frame) {
+                return frame;
+            }
         }
     }
-    return frame;
+    return curr_frame;
 }
 
 /**
@@ -103,12 +121,20 @@ int AnalysisSlider::get_next_poi_end(int frame) {
  * @param frame     : current frame
  * @return
  */
-int AnalysisSlider::get_prev_poi_start(int frame) {
-    int new_frame = frame;
-    for (std::pair<int, int> rect : rects) {
-        if ( rect.second > frame) {
-            break;
-        } else new_frame = rect.first;
+int AnalysisSlider::get_prev_poi_start(int curr_frame) {
+    int new_frame = curr_frame;
+    if (!rects.empty()) {
+        for (std::pair<int, int> rect : rects) {
+            if ( rect.second > curr_frame) {
+                break;
+            } else new_frame = rect.first;
+        }
+    } else if (!frames.empty()) {
+        for (int frame : frames) {
+            if (frame >= curr_frame) {
+                break;
+            } else new_frame = frame;
+        }
     }
     return new_frame;
 }
@@ -137,11 +163,28 @@ void AnalysisSlider::set_show_pois(bool show_pois) {
 }
 
 /**
+ * @brief AnalysisSlider::set_show_tags
+ * @param show_tags
+ */
+void AnalysisSlider::set_show_tags(bool show_tags) {
+    m_show_tags = show_tags;
+    repaint();
+}
+
+void AnalysisSlider::set_tag(Tag* tag) {
+    frames = tag->frames;
+}
+
+/**
  * @brief AnalysisSlider::clear_slider
  * Clear the rects vector.
  */
 void AnalysisSlider::clear_slider() {
     rects.clear();
+}
+
+void AnalysisSlider::clear_tags() {
+    frames.clear();
 }
 
 void AnalysisSlider::set_blocked(bool value) {
