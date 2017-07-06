@@ -86,13 +86,13 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj) {
     }
 }
 
-void ProjectWidget::add_tag(VideoProject* vid_proj, Tag* tag) {
+void ProjectWidget::add_tag(VideoProject* vid_proj, Analysis tag) {
     TagItem* tag_item = new TagItem(tag, TAG_ITEM);
     for (int i = 0; i < m_videos->childCount(); i++) {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(m_videos->child(i));
         if (vid_item->get_video_project() == vid_proj) {
             m_videos->child(i)->addChild(tag_item);
-            tag_item->setText(0, QString::fromStdString(tag_item->get_tag()->m_name));
+            tag_item->setText(0, QString::fromStdString(tag_item->get_tag()->getName()));
             m_videos->child(i)->setExpanded(true);
         }
     }

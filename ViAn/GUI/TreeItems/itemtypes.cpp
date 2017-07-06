@@ -21,12 +21,12 @@ Analysis* AnalysisItem::get_analysis() {
     return &m_analysis;
 }
 
-TagItem::TagItem(Tag* tag, int type) : QTreeWidgetItem(type) {
+TagItem::TagItem(Analysis tag, int type) : QTreeWidgetItem(type) {
     m_tag = tag;
 }
 
-Tag* TagItem::get_tag() {
-    return m_tag;
+Analysis* TagItem::get_tag() {
+    return &m_tag;
 }
 
 FolderItem::FolderItem(int type) : QTreeWidgetItem(type) {

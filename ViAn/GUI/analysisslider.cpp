@@ -90,12 +90,6 @@ int AnalysisSlider::get_next_poi_start(int curr_frame) {
                 return rect.first;
             }
         }
-    } else if (!frames.empty()) {
-        for (int frame : frames) {
-            if (frame > curr_frame) {
-                return frame;
-            }
-        }
     }
     return curr_frame;
 }
@@ -125,17 +119,17 @@ int AnalysisSlider::get_prev_poi_start(int curr_frame) {
     int new_frame = curr_frame;
     if (!rects.empty()) {
         for (std::pair<int, int> rect : rects) {
-            if ( rect.second > curr_frame) {
+            if ( rect.second >= curr_frame) {
                 break;
             } else new_frame = rect.first;
         }
-    } else if (!frames.empty()) {
+    }/* else if (!frames.empty()) {
         for (int frame : frames) {
             if (frame >= curr_frame) {
                 break;
             } else new_frame = frame;
         }
-    }
+    }*/
     return new_frame;
 }
 
@@ -171,8 +165,13 @@ void AnalysisSlider::set_show_tags(bool show_tags) {
     repaint();
 }
 
-void AnalysisSlider::set_tag(Tag* tag) {
-    frames = tag->frames;
+void AnalysisSlider::set_tag(Analysis* tag) {
+    for (POI p : tag->POIs) {
+        add_slider_interval(p.start_frame, p.end_frame);
+        for (int i = p.start_frame; i <= p.end_frame; ++i) {
+            frames.insert(i);
+        }
+    }
 }
 
 /**

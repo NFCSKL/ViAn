@@ -19,10 +19,10 @@ public:
 
 class TagItem : public QTreeWidgetItem
 {
-    Tag* m_tag;
+    Analysis m_tag;
 public:
-    TagItem(Tag *tag, int type);
-    Tag* get_tag();
+    TagItem(Analysis tag, int type);
+    Analysis *get_tag();
 };
 
 class VideoItem : public QTreeWidgetItem

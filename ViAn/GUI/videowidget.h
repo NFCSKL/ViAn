@@ -59,8 +59,8 @@ signals:
     void set_detections_on_frame(int);
     
     void start_analysis(VideoProject*);
-    void add_tag(VideoProject*, Tag*);
-    void new_frame_tagged(Tag*);
+    void add_tag(VideoProject*, Analysis);
+    void new_frame_tagged(Analysis*);
     void set_status_bar(QString);
 public slots:
     void set_current_time(int time);
@@ -73,7 +73,7 @@ public slots:
     void tag_frame(void);
     void new_tag_clicked();
     void new_tag(QString name);
-    void set_tag(Tag*);
+    void set_tag(Analysis *);
     void clear_tag(void);
     void zoom_out_clicked(void);
     void analysis_play_btn_clicked(void);
@@ -141,7 +141,7 @@ private:
 
     QString convert_time(int time);
     VideoProject* m_vid_proj;
-    Tag* m_tag = nullptr;
+    Analysis* m_tag = nullptr;
 
     bool tag_clicked = false;
 

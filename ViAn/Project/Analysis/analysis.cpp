@@ -45,6 +45,17 @@ void Analysis::add_POI(POI poi){
     this->POIs.push_back(poi);
 }
 
+void Analysis::add_frame(int frame) {
+    for (POI &p : POIs) {
+        if (p.is_in_POI(frame)) return;
+        if (p.at_edge(frame)) return;
+    }
+    POI* poi = new POI();
+    poi->start_frame = frame;
+    poi->end_frame = frame;
+    add_POI(*poi);
+}
+
 /**
  * @brief Analysis::read
  * Reads analysis from json format.

@@ -447,9 +447,11 @@ void VideoWidget::analysis_btn_clicked() {
 
 void VideoWidget::tag_frame() {
     if (m_tag != nullptr){
-        m_tag->add_frame(current_frame);
-        emit set_status_bar("Tagged frame number: " + QString::number(current_frame));
-        emit new_frame_tagged(m_tag);
+        if (m_tag->type == TAG) {
+            m_tag->add_frame(current_frame);
+            emit set_status_bar("Tagged frame number: " + QString::number(current_frame));
+            emit new_frame_tagged(m_tag);
+        }
     } else {
         emit set_status_bar("Select a tag");
     }
@@ -461,11 +463,14 @@ void VideoWidget::new_tag_clicked() {
 }
 
 void VideoWidget::new_tag(QString name) {
-    Tag* tag = new Tag(name);
+    Analysis tag;
+    tag.set_name(name.toStdString());
+    tag.type = TAG;
+    m_vid_proj->add_analysis(&tag);
     emit add_tag(m_vid_proj, tag);
 }
 
-void VideoWidget::set_tag(Tag* tag) {
+void VideoWidget::set_tag(Analysis* tag) {
     m_tag = tag;
 }
 
