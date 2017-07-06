@@ -119,6 +119,7 @@ void VideoProject::read(const QJsonObject& json){
  */
 void VideoProject::write(QJsonObject& json){
     this->video->write(json);
+    // Write bookmarks to json
     QJsonArray json_bookmarks;
     for(auto it = m_bookmarks.begin(); it != m_bookmarks.end(); it++){
         QJsonObject json_bookmark;
