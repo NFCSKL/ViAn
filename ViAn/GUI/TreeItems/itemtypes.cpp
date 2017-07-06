@@ -18,7 +18,6 @@ AnalysisItem::AnalysisItem(int type) : QTreeWidgetItem(type) {
 }
 
 AnalysisItem::~AnalysisItem() {
-    delete &m_analysis;
 }
 
 void AnalysisItem::set_analysis(Analysis analysis) {
