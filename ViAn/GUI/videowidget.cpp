@@ -637,8 +637,3 @@ void VideoWidget::set_current_frame_size(QSize size) {
     current_frame_size = size;
 }
 
-
-//TODO remove
-void VideoWidget::save_analysis(Analysis* analysis) {
-    m_vid_proj->add_analysis(analysis);
-}

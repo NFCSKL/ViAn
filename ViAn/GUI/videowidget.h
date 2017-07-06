@@ -86,16 +86,11 @@ public slots:
     void on_playback_slider_value_changed(void);
     void on_playback_slider_moved(void);
     void fit_clicked(void);
-    //void next_poi_clicked(void);
-    //void prev_poi_clicked(void);
     void load_marked_video(VideoProject* vid_proj);
     void enable_poi_btns(bool, bool ana_play_btn);
     void update_bar_pos(int change_x, int change_y);
     void set_current_frame_size(QSize size);
     void on_bookmark_clicked(void);
-    //void next_poi_clicked(void);
-    //void prev_poi_clicked(void);
-    void save_analysis(Analysis *);
 
 private:
     const QSize BTN_SIZE = QSize(30, 30);
