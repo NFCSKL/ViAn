@@ -5,10 +5,18 @@
 #include <QHeaderView>
 #include <QDebug>
 #include <QMenu>
+#include <QFileInfo>
+#include <QDirIterator>
+#include <iostream>
+#include <algorithm>
 
 ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     header()->close();
     setContextMenuPolicy(Qt::CustomContextMenu);
+//    setSelectionMode(QAbstractItemView::SingleSelection);
+//    setDragDropMode(QAbstractItemView::DragDrop);
+    setAcceptDrops(true);
+//    setDropIndicatorShown(true);
     connect(this, &ProjectWidget::customContextMenuRequested, this, &ProjectWidget::context_menu);
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this , SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
 }
@@ -39,6 +47,8 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
     std::string _tmp_path = project_path.toStdString();    
     m_proj = new Project(_tmp_name, _tmp_path);
     create_default_tree();
+    _tmp_path.append(_tmp_name);
+    emit proj_path(m_proj->getDir());
 }
 
 /**
@@ -97,6 +107,7 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj) {
  * @param name
  * Slot to set the name if an item in the project tree
  */
+
 void ProjectWidget::set_tree_item_name(QTreeWidgetItem* item, QString name) {
     item->setText(0, name);
 }
@@ -113,6 +124,64 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
     m_videos->addChild(vid);
     emit set_status_bar("Video added: " + vid_name);
     m_videos->setExpanded(true);
+}
+
+QStringList ProjectWidget::mimeTypes() const {
+    return QStringList() << "application/x-qabstractitemmodeldatalist" << "text/uri-list";
+}
+
+void ProjectWidget::file_dropped(QString path) {
+    std::set<std::string> exts {"mkv", "flv", "vob", "ogv", "ogg",
+                                "264", "263", "mjpeg", "avc", "m2ts",
+                                "mts", "avi", "mov", "qt", "wmv", "mp4",
+                                "m4p", "m4v", "mpg", "mp2", "mpeg",
+                                "mpe", "mpv", "m2v", "m4v", "3gp", "3g2",
+                                "flv", "f4v", "f4p", "f4a", "f4b"};
+    QFileInfo tmp(path);
+    std::string ext = tmp.suffix().toStdString();
+    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+    if (exts.find(ext) != exts.end()) {
+        // Add file
+        int index = path.lastIndexOf('/') + 1;
+        QString vid_name = path.right(path.length() - index);
+
+        // TODO Check if file is already added
+        VideoProject* vid_proj = new VideoProject(new Video(path.toStdString()));
+        m_proj->add_video_project(vid_proj);
+        tree_add_video(vid_proj, vid_name);
+    }
+
+}
+
+void ProjectWidget::folder_dropped(QString path) {
+    QDirIterator d_iter(path);
+    while (d_iter.hasNext()) {
+        QFileInfo tmp(d_iter.next());
+        if (tmp.isDir() && tmp.absoluteFilePath().length() > path.length())
+            folder_dropped(tmp.absoluteFilePath());
+        else
+            file_dropped(tmp.absoluteFilePath());
+    }
+}
+
+
+void ProjectWidget::dragEnterEvent(QDragEnterEvent *event) {
+    qDebug()  << "dragEnterEvent";
+    if (event->mimeData()->hasUrls() && m_proj != nullptr) event->acceptProposedAction();
+}
+
+void ProjectWidget::dropEvent(QDropEvent *event) {
+    qDebug()  << "dropEvent";
+    for (auto &url : event->mimeData()->urls()) {
+        QString video_path = url.toLocalFile();
+        QFileInfo f_info(video_path);
+        qDebug() << video_path;
+        if (f_info.isDir()) {
+            folder_dropped(video_path);
+        } else {
+            file_dropped(video_path);
+        }
+    }
 }
 
 /**
@@ -242,8 +311,10 @@ void ProjectWidget::open_project() {
         clear();
         create_default_tree();
         m_proj = Project::fromFile(project_path.toStdString());
+        emit proj_path(m_proj->getDir());
         for (auto vid_pair : m_proj->get_videos()) {
             VideoProject* vid_proj = vid_pair.second;
+            emit load_bookmarks(vid_proj);
             QString video_path = QString::fromStdString(vid_proj->get_video()->file_path);
             int index = video_path.lastIndexOf('/') + 1;
             QString vid_name = video_path.right(video_path.length() - index);
@@ -260,6 +331,7 @@ void ProjectWidget::close_project() {
     // TODO Check for unsaved changes before closing
     if (m_proj == nullptr) return;
     emit set_status_bar("Closing project");
+    emit project_closed();
     this->clear();
     delete m_proj;
     m_proj = nullptr;
@@ -286,5 +358,5 @@ void ProjectWidget::remove_project() {
     this->clear();
     delete m_proj;
     m_proj = nullptr;
-
+    emit project_closed();
 }
