@@ -8,6 +8,8 @@ class ProjectWidget : public QTreeWidget
 {
     Q_OBJECT
     QTreeWidgetItem* m_videos;
+    QTreeWidgetItem* clicked_item = nullptr;
+    QPoint* clicked_point = nullptr;
 public:
     explicit ProjectWidget(QWidget *parent = nullptr);
     Project* m_proj = nullptr;
@@ -34,6 +36,10 @@ public slots:
     void remove_project();
 private slots:
     void tree_item_clicked(QTreeWidgetItem *item, const int& col);
+    void context_menu(const QPoint& point);
+    void remove_item();
+    void rename_item();
+    void create_folder_item();
 private:
     void create_default_tree();
     void tree_add_video();

@@ -4,9 +4,12 @@
 #include <QFileDialog>
 #include <QHeaderView>
 #include <QDebug>
+#include <QMenu>
 
 ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     header()->close();
+    setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, &ProjectWidget::customContextMenuRequested, this, &ProjectWidget::context_menu);
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this , SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
 }
 
@@ -145,6 +148,77 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         break;
     }
 
+}
+
+/**
+ * @brief ProjectWidget::context_menu
+ * Slot function triggered by customContextMenuRequested
+ * Creates a context menu
+ * @param point :   click position
+ */
+void ProjectWidget::context_menu(const QPoint &point) {
+    if (m_proj == nullptr) return;
+    clicked_item = itemAt(point);
+    QMenu menu(this);
+    menu.addAction("New Folder", this, SLOT(create_folder_item()));
+    if (clicked_item == nullptr) {
+        // Not clicking any item
+
+    } else {
+        menu.addAction("Rename", this, SLOT(rename_item()));
+        menu.addSeparator();
+        menu.addAction("Remove", this, SLOT(remove_item()));
+        switch (clicked_item->type()) {
+        case VIDEO_ITEM:
+            //rename
+            // remove
+            break;
+        case ANALYSIS_ITEM:
+            //rename
+            //remove
+            break;
+        case FOLDER_ITEM:
+            //rename
+            //remove - should remove all children
+            break;
+        default:
+            break;
+        }
+    }
+    menu.exec(mapToGlobal(point));
+    clicked_item = nullptr;
+//    delete clicked_point;
+//    if (clicked_point ==  nullptr) qDebug() << "NULLPTR";
+}
+
+void ProjectWidget::remove_item() {
+    qDebug() << "Removing item: " << clicked_item->text(0);
+    delete clicked_item;
+}
+
+void ProjectWidget::rename_item(){
+    qDebug() << "Renaming item: " << clicked_item->text(0);
+    editItem(clicked_item);
+}
+
+void ProjectWidget::create_folder_item() {
+    FolderItem* item = new FolderItem(FOLDER_ITEM);
+    item->setText(0, tr("New Folder"));
+    if (clicked_item == nullptr) {
+        // Click occured on background add to top level
+        insertTopLevelItem(0, item);
+    } else if (clicked_item->type() == FOLDER_ITEM) {
+        // Clicked on folder item. Add new folder as child
+        clicked_item->insertChild(0, item);
+    } else if (clicked_item->type() == VIDEO_ITEM) {
+        QTreeWidgetItem* p_item =  clicked_item->parent();
+        if (p_item == nullptr) {
+            insertTopLevelItem(0, item);
+        } else {
+            int index = p_item->indexOfChild(clicked_item);
+            p_item->insertChild(index + 1, item);
+        }
+    }
 }
 
 /**

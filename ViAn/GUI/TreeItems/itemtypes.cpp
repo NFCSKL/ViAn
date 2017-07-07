@@ -2,6 +2,7 @@
 
 
 VideoItem::VideoItem(VideoProject* video_project, int type): QTreeWidgetItem(type) {
+    setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
     m_vid_proj = video_project;
 }
 
@@ -14,7 +15,7 @@ VideoProject* VideoItem::get_video_project() {
 }
 
 AnalysisItem::AnalysisItem(int type) : QTreeWidgetItem(type) {
-
+    setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
 }
 
 AnalysisItem::~AnalysisItem() {
@@ -29,5 +30,7 @@ Analysis* AnalysisItem::get_analysis() {
 }
 
 FolderItem::FolderItem(int type) : QTreeWidgetItem(type) {
-
+    setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
+    const QIcon folder_icon("../ViAn/Icons/folder.png");
+    setIcon(0, folder_icon);
 }
