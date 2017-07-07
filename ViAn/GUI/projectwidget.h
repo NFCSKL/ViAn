@@ -7,10 +7,10 @@
 #include <QDropEvent>
 #include <QMimeData>
 #include "Project/project.h"
+#include "TreeItems/itemtypes.h"
 class ProjectWidget : public QTreeWidget
 {
     Q_OBJECT
-    QTreeWidgetItem* m_videos;
     QTreeWidgetItem* clicked_item = nullptr;
     QPoint* clicked_point = nullptr;
 public:
@@ -48,15 +48,16 @@ private slots:
     void rename_item();
     void create_folder_item();
 private:
-    void create_default_tree();
     void tree_add_video();
     void tree_add_video(VideoProject* vid_proj, const QString& video_name);
     QStringList mimeTypes() const;
     void file_dropped(QString path);
     void folder_dropped(QString path);
+    void insert_dropped(VideoItem* item);
+    VideoItem* get_video_item(VideoProject* v_proj);
+    VideoItem* search_folder(FolderItem* f_item, VideoProject* v_proj);
 signals:
     void project_closed();
-protected:
 
 
 };

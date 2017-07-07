@@ -10,13 +10,18 @@
 #include <iostream>
 #include <algorithm>
 
+#include "Project/projecttreestate.h"
+
 ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     header()->close();
     setContextMenuPolicy(Qt::CustomContextMenu);
-//    setSelectionMode(QAbstractItemView::SingleSelection);
-//    setDragDropMode(QAbstractItemView::DragDrop);
+
+    setSelectionMode(QAbstractItemView::ExtendedSelection);
+    setDragDropMode(QAbstractItemView::InternalMove);
     setAcceptDrops(true);
-//    setDropIndicatorShown(true);
+    setDragEnabled(true);
+    setDropIndicatorShown(true);
+
     connect(this, &ProjectWidget::customContextMenuRequested, this, &ProjectWidget::context_menu);
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this , SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
 }
@@ -46,20 +51,8 @@ void ProjectWidget::add_project(QString project_name, QString project_path) {
     std::string _tmp_name = project_name.toStdString();
     std::string _tmp_path = project_path.toStdString();    
     m_proj = new Project(_tmp_name, _tmp_path);
-    create_default_tree();
     _tmp_path.append(_tmp_name);
     emit proj_path(m_proj->getDir());
-}
-
-/**
- * @brief ProjectWidget::create_default_tree
- * Creates and adds the default tree structure
- */
-void ProjectWidget::create_default_tree() {
-    m_videos = new FolderItem(FOLDER_ITEM);
-    m_videos->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
-    m_videos->setText(0, tr("Videos"));
-    addTopLevelItem(m_videos);
 }
 
 /**
@@ -89,16 +82,13 @@ void ProjectWidget::add_video() {
  */
 void ProjectWidget::start_analysis(VideoProject* vid_proj) {
     AnalysisItem* ana = new AnalysisItem(ANALYSIS_ITEM);
-    for (int i = 0; i < m_videos->childCount(); i++) {
-        VideoItem* vid_item = dynamic_cast<VideoItem*>(m_videos->child(i));
-        if (vid_item->get_video_project() == vid_proj) {
-            m_videos->child(i)->addChild(ana);
-            ana->setText(0, "Loading");
-            m_videos->child(i)->setExpanded(true);
-            QTreeWidgetItem* item = dynamic_cast<QTreeWidgetItem*>(ana);
-            emit begin_analysis(m_proj->getDir(), vid_proj->get_video()->file_path, item);
-        }
-    }
+    VideoItem* v_item = get_video_item(vid_proj);
+    if (vid_proj == nullptr) return;
+    v_item->addChild(ana);
+    ana->setText(0, "Loading");
+    v_item->setExpanded(true);
+    QTreeWidgetItem* item = dynamic_cast<QTreeWidgetItem*>(ana);
+    emit begin_analysis(m_proj->getDir(), vid_proj->get_video()->file_path, item);
 }
 
 /**
@@ -119,17 +109,23 @@ void ProjectWidget::set_tree_item_name(QTreeWidgetItem* item, QString name) {
  * @param vid_name
  */
 void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_name) {
-    VideoItem* vid = new VideoItem(vid_proj, VIDEO_ITEM);
-    vid->setText(0, vid_name);
-    m_videos->addChild(vid);
+    insertTopLevelItem(topLevelItemCount(), new VideoItem(vid_proj, VIDEO_ITEM));
     emit set_status_bar("Video added: " + vid_name);
-    m_videos->setExpanded(true);
 }
 
+/**
+ * @brief ProjectWidget::mimeTypes
+ * @return Accepted mime types
+ */
 QStringList ProjectWidget::mimeTypes() const {
     return QStringList() << "application/x-qabstractitemmodeldatalist" << "text/uri-list";
 }
 
+/**
+ * @brief ProjectWidget::file_dropped
+ * Loads the video into the program if it is of accepted type
+ * @param path  : path to the video file
+ */
 void ProjectWidget::file_dropped(QString path) {
     std::set<std::string> exts {"mkv", "flv", "vob", "ogv", "ogg",
                                 "264", "263", "mjpeg", "avc", "m2ts",
@@ -148,11 +144,17 @@ void ProjectWidget::file_dropped(QString path) {
         // TODO Check if file is already added
         VideoProject* vid_proj = new VideoProject(new Video(path.toStdString()));
         m_proj->add_video_project(vid_proj);
-        tree_add_video(vid_proj, vid_name);
+        VideoItem* v_item = new VideoItem(vid_proj, VIDEO_ITEM);
+        insertTopLevelItem(topLevelItemCount(), v_item);
     }
 
 }
 
+/**
+ * @brief ProjectWidget::folder_dropped
+ * Searches the path for folders and files
+ * @param path  : path to the folder
+ */
 void ProjectWidget::folder_dropped(QString path) {
     QDirIterator d_iter(path);
     while (d_iter.hasNext()) {
@@ -164,23 +166,83 @@ void ProjectWidget::folder_dropped(QString path) {
     }
 }
 
-
-void ProjectWidget::dragEnterEvent(QDragEnterEvent *event) {
-    qDebug()  << "dragEnterEvent";
-    if (event->mimeData()->hasUrls() && m_proj != nullptr) event->acceptProposedAction();
+/**
+ * @brief ProjectWidget::get_video_item
+ * Searches the project tree for the VideoItem containing the VideoProjectt v_proj
+ * @param v_proj    :   target VideoProject
+ * @return VideoItem*   :   the correct VideoItem if found else nullptr
+ */
+VideoItem *ProjectWidget::get_video_item(VideoProject *v_proj) {
+    for (auto i = 0; i < topLevelItemCount(); ++i) {
+        auto item = topLevelItem(i);
+        if (item->type() == VIDEO_ITEM) {
+            VideoItem* v_item = dynamic_cast<VideoItem*>(item);
+            if (v_item->get_video_project() == v_proj) return v_item;
+        } else if (item->type() == FOLDER_ITEM) {
+            VideoItem* v_item = search_folder(dynamic_cast<FolderItem*>(item), v_proj);
+            if (v_item != nullptr) return v_item;
+        }
+    }
+    return nullptr;
 }
 
-void ProjectWidget::dropEvent(QDropEvent *event) {
-    qDebug()  << "dropEvent";
-    for (auto &url : event->mimeData()->urls()) {
-        QString video_path = url.toLocalFile();
-        QFileInfo f_info(video_path);
-        qDebug() << video_path;
-        if (f_info.isDir()) {
-            folder_dropped(video_path);
-        } else {
-            file_dropped(video_path);
+/**
+ * @brief ProjectWidget::search_folder
+ * Searches a FolderItem f_item for the VideoProject v_proj
+ * @param f_item    :   FolderItem where the search starts
+ * @param v_proj    :   Target VideoProject
+ * @return VideoItem*   :   VideoItem containing v_proj or nullptr
+ */
+VideoItem *ProjectWidget::search_folder(FolderItem* f_item, VideoProject *v_proj) {
+    for (auto i = 0; i < f_item->childCount(); ++i) {
+        QTreeWidgetItem* item = f_item->child(i);
+        if (item->type() == VIDEO_ITEM) {
+            VideoItem* v_item = dynamic_cast<VideoItem*>(item);
+            if (v_item->get_video_project() == v_proj) return v_item;
+        } else if (item->type() == FOLDER_ITEM) {
+            VideoItem* v_item = search_folder(dynamic_cast<FolderItem*>(item), v_proj);
+            if (v_item != nullptr) return v_item;
         }
+    }
+    return nullptr;
+}
+
+/**
+ * @brief ProjectWidget::dragEnterEvent
+ * Makes sure the ProjectWidget only accepts drops containing urls or objects of the correct mime type
+ * @param event
+ */
+void ProjectWidget::dragEnterEvent(QDragEnterEvent *event) {
+    if (event->mimeData()->hasUrls() && m_proj != nullptr) {
+        // Files
+        event->acceptProposedAction();
+    } else if (event->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist")){
+        // TreeItem
+        event->setDropAction(Qt::MoveAction);
+        event->accept();
+    }
+}
+
+/**
+ * @brief ProjectWidget::dropEvent
+ * Handels drop events. Will try to add files if they are dropped.
+ * Calls upon standard dropEvent for TreeItems.
+ * @param event
+ */
+void ProjectWidget::dropEvent(QDropEvent *event) {
+    if (event->mimeData()->hasUrls()) {
+        // Files
+        for (auto &url : event->mimeData()->urls()) {
+            QString video_path = url.toLocalFile();
+            QFileInfo f_info(video_path);
+            if (f_info.isDir()) {
+                folder_dropped(video_path);
+            } else {
+                file_dropped(video_path);
+            }
+        }
+    } else {
+        QTreeWidget::dropEvent(event);
     }
 }
 
@@ -234,7 +296,6 @@ void ProjectWidget::context_menu(const QPoint &point) {
         // Not clicking any item
 
     } else {
-        menu.addAction("Rename", this, SLOT(rename_item()));
         menu.addSeparator();
         menu.addAction("Remove", this, SLOT(remove_item()));
         switch (clicked_item->type()) {
@@ -243,12 +304,10 @@ void ProjectWidget::context_menu(const QPoint &point) {
             // remove
             break;
         case ANALYSIS_ITEM:
-            //rename
-            //remove
+            menu.addAction("Rename", this, SLOT(rename_item()));
             break;
         case FOLDER_ITEM:
-            //rename
-            //remove - should remove all children
+            menu.addAction("Rename", this, SLOT(rename_item()));
             break;
         default:
             break;
@@ -275,19 +334,20 @@ void ProjectWidget::create_folder_item() {
     item->setText(0, tr("New Folder"));
     if (clicked_item == nullptr) {
         // Click occured on background add to top level
-        insertTopLevelItem(0, item);
+        insertTopLevelItem(topLevelItemCount(), item);
     } else if (clicked_item->type() == FOLDER_ITEM) {
         // Clicked on folder item. Add new folder as child
         clicked_item->insertChild(0, item);
     } else if (clicked_item->type() == VIDEO_ITEM) {
         QTreeWidgetItem* p_item =  clicked_item->parent();
         if (p_item == nullptr) {
-            insertTopLevelItem(0, item);
+            insertTopLevelItem(indexOfTopLevelItem(clicked_item) + 1, item);
         } else {
             int index = p_item->indexOfChild(clicked_item);
             p_item->insertChild(index + 1, item);
         }
     }
+    editItem(item);
 }
 
 /**
@@ -296,6 +356,7 @@ void ProjectWidget::create_folder_item() {
  */
 void ProjectWidget::save_project() {
     m_proj->save_project();
+    ProjectTreeState().tree_to_json(this);
     emit set_status_bar("Project saved");
 }
 
@@ -309,7 +370,6 @@ void ProjectWidget::open_project() {
     if (!project_path.isEmpty()) {
         emit set_status_bar("Opening project");
         clear();
-        create_default_tree();
         m_proj = Project::fromFile(project_path.toStdString());
         emit proj_path(m_proj->getDir());
         for (auto vid_pair : m_proj->get_videos()) {
