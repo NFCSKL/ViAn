@@ -103,6 +103,7 @@ void VideoProject::read(const QJsonObject& json){
     QJsonObject json_overlay = json["overlay"].toObject();
     this->m_overlay->read(json_overlay);
     QJsonArray json_analyses = json["analyses"].toArray();
+
     // Read analyses from json
     for (int j = 0; j < json_analyses.size(); ++j) {
         QJsonObject json_analysis = json_analyses[j].toObject();

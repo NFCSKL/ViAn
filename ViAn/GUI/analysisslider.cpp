@@ -6,6 +6,7 @@
 #include <QStyleOptionSlider>
 #include <QDebug>
 
+
 AnalysisSlider::AnalysisSlider(Qt::Orientation orientation, QWidget * parent) : QSlider(parent) {
     setOrientation(orientation);
     setPageStep(10);
@@ -27,21 +28,28 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     painter.drawComplexControl(QStyle::CC_Slider, option);
     QRect groove_rect = style()->subControlRect(QStyle::CC_Slider, &option, QStyle::SC_SliderGroove, this);
 
-    if (m_show_pois) {
-        for (auto it = rects.begin(); it != rects.end(); ++it) {
-            QRect rect(groove_rect.left() + (double)(*it).first * groove_rect.width() / maximum(), groove_rect.top(),
-                       ((double)(*it).second - (*it).first) * groove_rect.width() / maximum(), groove_rect.height());
-            painter.fillRect(rect, QBrush(Qt::yellow));
+    if (m_show_tags || m_show_pois) {
+        QBrush brush;
+        if (m_show_tags) {
+            brush = Qt::red;
+        } else {
+            brush = Qt::yellow;
         }
-    }
 
-    if (m_show_tags) {
+        //Get one frames width on the slider
         double c = (double)(groove_rect.right()-groove_rect.left())/maximum();
-        for (auto it = frames.begin(); it != frames.end(); ++it) {
-            double frame = (double)(*it);
-            double first = (groove_rect.left()+frame*c);
-            QRect rect(first, groove_rect.top(), 1, groove_rect.height());
-            painter.fillRect(rect, QBrush(Qt::red));
+
+        for (auto it = rects.begin(); it != rects.end(); ++it) {
+            double first_frame = (double)(*it).first;
+            double second_frame = (double)(*it).second;
+
+            //Walk first/second_frame number of frames in on the slider
+            double first = (groove_rect.left()+first_frame*c);
+            double second = (groove_rect.left()+second_frame*c);
+
+            //Draw the rects, +1 so it's not too small
+            QRect rect(first, groove_rect.top(), 1+second-first, groove_rect.height());
+            painter.fillRect(rect, brush);
         }
     }
     option.subControls = QStyle::SC_SliderHandle;
@@ -54,8 +62,9 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
  * @param analysis
  */
 void AnalysisSlider::set_analysis(Analysis* analysis) {
-    for (POI p : analysis->POIs) {
-        add_slider_interval(p.start_frame, p.end_frame);
+    rects.clear();
+    for (auto p : analysis->POIs) {
+        add_slider_interval(p->start_frame, p->end_frame);
     }
 }
 
@@ -123,13 +132,7 @@ int AnalysisSlider::get_prev_poi_start(int curr_frame) {
                 break;
             } else new_frame = rect.first;
         }
-    }/* else if (!frames.empty()) {
-        for (int frame : frames) {
-            if (frame >= curr_frame) {
-                break;
-            } else new_frame = frame;
-        }
-    }*/
+    }
     return new_frame;
 }
 
@@ -165,25 +168,12 @@ void AnalysisSlider::set_show_tags(bool show_tags) {
     repaint();
 }
 
-void AnalysisSlider::set_tag(Analysis* tag) {
-    for (POI p : tag->POIs) {
-        add_slider_interval(p.start_frame, p.end_frame);
-        for (int i = p.start_frame; i <= p.end_frame; ++i) {
-            frames.insert(i);
-        }
-    }
-}
-
 /**
  * @brief AnalysisSlider::clear_slider
  * Clear the rects vector.
  */
 void AnalysisSlider::clear_slider() {
     rects.clear();
-}
-
-void AnalysisSlider::clear_tags() {
-    frames.clear();
 }
 
 void AnalysisSlider::set_blocked(bool value) {

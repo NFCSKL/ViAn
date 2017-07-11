@@ -35,8 +35,6 @@ public slots:
     void set_show_pois(bool);
     void set_show_tags(bool);
     void clear_slider();
-    void clear_tags();
-    void set_tag(Analysis *);
 
 private:
     std::set<int> frames;

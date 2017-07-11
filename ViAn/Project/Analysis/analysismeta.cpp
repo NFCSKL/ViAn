@@ -6,16 +6,18 @@
  * @brief AnalysisMeta::AnalysisMeta
  * @param analysis
  */
-AnalysisMeta::AnalysisMeta(const Analysis &analysis)
-{
+AnalysisMeta::AnalysisMeta(const Analysis &analysis) {
     m_name = analysis.name;
     file_analysis = analysis.full_path();
-    std::vector<POI> pois = analysis.POIs;
+    std::set<POI*> pois;
+    for (auto poi : analysis.POIs) {
+        pois.insert(poi);
+    }
     std::pair<int,int> pair;
-    POI poi;
+    POI* poi;
     for (auto it = pois.begin(); it != pois.end(); ++it) {
         poi = *it;
-        pair = std::make_pair(poi.start_frame, poi.end_frame);
+        pair = std::make_pair(poi->start_frame, poi->end_frame);
         m_poi_intervals.push_back(pair);
     }
 }
@@ -23,16 +25,14 @@ AnalysisMeta::AnalysisMeta(const Analysis &analysis)
 /**
  * @brief AnalysisMeta::AnalysisMeta
  */
-AnalysisMeta::AnalysisMeta()
-{
+AnalysisMeta::AnalysisMeta() {
 }
 
 /**
  * @brief AnalysisMeta::get_analysis
  * @return
  */
-Analysis AnalysisMeta::get_analysis()
-{
+Analysis AnalysisMeta::get_analysis() {
     Analysis analysis;
     analysis.load_saveable(file_analysis);
     return analysis;
@@ -70,13 +70,9 @@ void AnalysisMeta::read(const QJsonObject &json) {
  * @param json
  */
 void AnalysisMeta::write(QJsonObject &json) {
-    std::cout << "1" << std::endl;
     json["name"] = QString::fromStdString(m_name);
-    std::cout << "2" << std::endl;
     json["full_path"] = QString::fromStdString(file_analysis);
-    std::cout << "3" << std::endl;
     QJsonArray intervals;
-    std::cout << "size: " << std::to_string(m_poi_intervals.size()) << std::endl;
     for (auto it = m_poi_intervals.begin(); it != m_poi_intervals.end(); ++it) {
         QJsonObject interval;
         std::pair<int,int> pair = *it;

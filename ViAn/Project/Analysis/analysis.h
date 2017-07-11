@@ -6,6 +6,7 @@
 #include <QObject>
 #include <vector>
 #include <map>
+#include <set>
 #include "Filehandler/saveable.h"
 #include "opencv2/core/core.hpp"
 #include "poi.h"
@@ -25,17 +26,23 @@ public:
     ANALYSIS_TYPE type;
     Analysis();
     Analysis(const Analysis &obj);
-    ~Analysis();    
+    ~Analysis();
 
-    void add_POI(POI POI);
+    struct poi_cmp {
+        bool operator()(const POI* lhs, const POI* rhs) const {
+            return lhs->start_frame < rhs->start_frame;
+        }
+    };
+
+    void add_POI(POI *POI);
     void add_frame(int frame);
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
 
-    std::vector<POI> POIs;
+    std::set<POI*, poi_cmp> POIs;
     std::vector<cv::Rect> get_detections_on_frame(int frame_num);
     void set_name(const std::string &name);
-    std::string getName() const;
+    std::string get_name() const;
 };
 
 #endif // ANALYSIS_H

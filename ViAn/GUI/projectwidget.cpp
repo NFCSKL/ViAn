@@ -86,13 +86,20 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj) {
     }
 }
 
+/**
+ * @brief ProjectWidget::add_tag
+ * @param vid_proj
+ * @param tag
+ * Adds a tag 'tag' under vid_proj
+ */
 void ProjectWidget::add_tag(VideoProject* vid_proj, Analysis tag) {
     TagItem* tag_item = new TagItem(tag, TAG_ITEM);
+    vid_proj->add_analysis(tag_item->get_tag());
     for (int i = 0; i < m_videos->childCount(); i++) {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(m_videos->child(i));
         if (vid_item->get_video_project() == vid_proj) {
             m_videos->child(i)->addChild(tag_item);
-            tag_item->setText(0, QString::fromStdString(tag_item->get_tag()->getName()));
+            tag_item->setText(0, QString::fromStdString(tag_item->get_tag()->get_name()));
             m_videos->child(i)->setExpanded(true);
         }
     }
@@ -121,11 +128,18 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
     emit set_status_bar("Video added");
     m_videos->setExpanded(true);
     for (std::pair<int,Analysis*> ana : vid_proj->get_analyses()){
-        AnalysisItem* ana_item = new AnalysisItem(ANALYSIS_ITEM);
-        ana_item->set_analysis(*ana.second);
-        ana_item->setText(0, QString::fromStdString(ana.second->getName()));
-        vid->addChild(ana_item);
-        vid->setExpanded(true);
+        if (ana.second->type == TAG) {
+            TagItem* tag_item = new TagItem(*ana.second, TAG_ITEM);
+            tag_item->setText(0, QString::fromStdString(ana.second->get_name()));
+            vid->addChild(tag_item);
+            vid->setExpanded(true);
+        } else {
+            AnalysisItem* ana_item = new AnalysisItem(ANALYSIS_ITEM);
+            ana_item->set_analysis(*ana.second);
+            ana_item->setText(0, QString::fromStdString(ana.second->get_name()));
+            vid->addChild(ana_item);
+            vid->setExpanded(true);
+        }
 
     }
 }
@@ -144,6 +158,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit marked_video(vid_item->get_video_project());
         emit set_detections(false);
         emit set_poi_slider(false);
+        emit set_tag_slider(false);
         emit enable_poi_btns(false,false);
         break;
     } case ANALYSIS_ITEM: {
@@ -162,9 +177,6 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit marked_tag(tag_item->get_tag());
         emit set_tag_slider(true);
         emit enable_poi_btns(true, false);
-        /*if (!tag_item->get_tag()->frames.empty()) {
-
-        }*/
         break;
     } case FOLDER_ITEM: {
         break;

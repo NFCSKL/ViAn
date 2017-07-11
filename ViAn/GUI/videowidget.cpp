@@ -179,6 +179,8 @@ void VideoWidget::set_btn_size() {
  * Set the tab order for the buttons
  */
 void VideoWidget::set_btn_tab_order() {
+    // TODO update
+
     setTabOrder(prev_frame_btn, play_btn);
     setTabOrder(play_btn, next_frame_btn);
     setTabOrder(next_frame_btn, stop_btn);
@@ -218,6 +220,7 @@ void VideoWidget::init_speed_slider() {
     speed_slider->setMaximumWidth(120);
     speed_slider->setPageStep(1);
     speed_slider->setTickPosition(QSlider::TicksBelow);
+    speed_slider->setEnabled(false);
     speed_slider->setToolTip(tr("Adjust playback speed"));
     QLabel *label1 = new QLabel("1/16x", this);
     QLabel *label2 = new QLabel("1x", this);
@@ -312,7 +315,6 @@ void VideoWidget::connect_btns() {
 
     //connect(speed_slider, &QSlider::valueChanged, this, &VideoWidget::speed_slider_changed);
 
-    //
     connect(fit_btn, &QPushButton::clicked, m_video_player, &video_player::fit_screen);
 }
 
@@ -323,10 +325,18 @@ void VideoWidget::init_playback_slider() {
     QHBoxLayout* progress_area = new QHBoxLayout();
     current_time = new QLabel("--:--");
     total_time = new QLabel("--:--");
+    frame_line_edit = new QLineEdit();
+
+    frame_line_edit->setFixedWidth(50);
+
     playback_slider = new AnalysisSlider(Qt::Horizontal);
+
+    frame_line_edit->setEnabled(false);
+    playback_slider->setEnabled(false);
     progress_area->addWidget(current_time);
     progress_area->addWidget(playback_slider);
     progress_area->addWidget(total_time);
+    progress_area->addWidget(frame_line_edit);
     vertical_layout->addLayout(progress_area);
 
     // Signal/slot connect
@@ -338,6 +348,8 @@ void VideoWidget::init_playback_slider() {
     connect(playback_slider, &QSlider::sliderReleased, this, &VideoWidget::on_playback_slider_released);
     connect(playback_slider, &QSlider::valueChanged, this, &VideoWidget::on_playback_slider_value_changed);
     connect(playback_slider, &QSlider::sliderMoved, this, &VideoWidget::on_playback_slider_moved);
+
+    connect(frame_line_edit, &QLineEdit::editingFinished, this, &VideoWidget::frame_line_edit_finished);
 }
 
 /**
@@ -371,7 +383,6 @@ void VideoWidget::set_total_time(int time) {
 
 void VideoWidget::on_bookmark_clicked() {
     cv::Mat bookmark_frame = frame_wgt->get_mat();
-
     emit new_bookmark(current_frame, bookmark_frame);
 }
 
@@ -460,13 +471,13 @@ void VideoWidget::tag_frame() {
 void VideoWidget::new_tag_clicked() {
     TagDialog* tag_dialog = new TagDialog();
     connect(tag_dialog, SIGNAL(tag_name(QString)), this, SLOT(new_tag(QString)));
+    tag_dialog->exec();
 }
 
 void VideoWidget::new_tag(QString name) {
-    Analysis tag;
+    Analysis tag;       //TODO pointer
     tag.set_name(name.toStdString());
     tag.type = TAG;
-    m_vid_proj->add_analysis(&tag);
     emit add_tag(m_vid_proj, tag);
 }
 
@@ -543,6 +554,7 @@ void VideoWidget::on_new_frame(int frame_num) {
     }
     current_frame = frame_num;
     set_current_time(frame_num / m_video_player->get_frame_rate());
+    frame_line_edit->setText(QString::number(current_frame));
     emit set_detections_on_frame(frame_num);
 }
 
@@ -621,6 +633,9 @@ void VideoWidget::enable_video_btns() {
     for (QPushButton* btn : btns) {
         btn->setEnabled(true);
     }
+    playback_slider->setEnabled(true);
+    frame_line_edit->setEnabled(true);
+    speed_slider->setEnabled(true);
 }
 
 void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
@@ -640,5 +655,26 @@ void VideoWidget::update_bar_pos(int change_x, int change_y) {
 
 void VideoWidget::set_current_frame_size(QSize size) {
     current_frame_size = size;
+}
+
+/**
+ * @brief VideoWidget::frame_line_edit_finished
+ * Slot function for when the frame_line_edit is finished edited och enter is pressed
+ * Checks if input is a legal frame and then set that as current frame.
+ */
+void VideoWidget::frame_line_edit_finished() {
+    std::string text = frame_line_edit->text().toStdString();
+    char* p;
+    long converted = strtol(text.c_str(), &p, 10);
+    if (*p != 0){
+        emit set_status_bar("Error! Input is not a number!");
+    } else if (converted > playback_slider->maximum()) {
+        QString num_frames = QString::number(playback_slider->maximum());
+        emit set_status_bar("Error! Input is too large. " + num_frames + " is max frame number.");
+    } else if (converted < 0) {
+        emit set_status_bar("Error! Input is negative!");
+    } else {
+        emit set_playback_frame(converted, true);
+    }
 }
 

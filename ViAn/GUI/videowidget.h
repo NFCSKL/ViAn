@@ -91,6 +91,7 @@ public slots:
     void update_bar_pos(int change_x, int change_y);
     void set_current_frame_size(QSize size);
     void on_bookmark_clicked(void);
+    void frame_line_edit_finished();
 
 private:
     const QSize BTN_SIZE = QSize(30, 30);
@@ -100,6 +101,7 @@ private:
     QSlider* speed_slider;
     QLabel* current_time;
     QLabel* total_time;
+    QLineEdit* frame_line_edit;
 
 
     //Buttons

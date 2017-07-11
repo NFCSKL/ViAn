@@ -22,7 +22,6 @@ TagDialog::TagDialog(QWidget *parent) : QDialog(parent) {
     connect(btn_box->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &TagDialog::cancel_btn_clicked);
 
     setLayout(vertical_layout);
-    show();
 }
 
 void TagDialog::ok_btn_clicked() {
