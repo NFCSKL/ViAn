@@ -206,6 +206,7 @@ void VideoWidget::set_btn_shortcuts() {
     prev_frame_sc = new QShortcut(Qt::Key_Left, this);
     zoom_in_sc = new QShortcut(Qt::Key_Z, this);
     tag_sc = new QShortcut(Qt::Key_T, this);
+
     next_poi_sc = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Right), this);
     prev_poi_sc = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Left), this);
 }
@@ -248,6 +249,7 @@ void VideoWidget::add_btns_to_layouts() {
     video_btns->addWidget(next_frame_btn);
     video_btns->addWidget(stop_btn);
     video_btns->addLayout(speed_slider_layout);
+
     control_row->addLayout(video_btns);
 
     analysis_btns->addWidget(prev_poi_btn);
@@ -289,7 +291,8 @@ void VideoWidget::connect_btns() {
     connect(prev_frame_sc, &QShortcut::activated, this, &VideoWidget::prev_frame_clicked);
 
     connect(analysis_btn, &QPushButton::clicked, this, &VideoWidget::analysis_btn_clicked);
-    connect(analysis_play_btn, &QPushButton::clicked, this, &VideoWidget::analysis_play_btn_clicked);
+
+    connect(analysis_play_btn, &QPushButton::toggled, this, &VideoWidget::analysis_play_btn_toggled);
 
     connect(next_poi_btn, &QPushButton::clicked, this, &VideoWidget::next_poi_btn_clicked);
     connect(next_poi_sc, &QShortcut::activated, this, &VideoWidget::next_poi_btn_clicked);
@@ -383,7 +386,7 @@ void VideoWidget::set_total_time(int time) {
 
 void VideoWidget::on_bookmark_clicked() {
     cv::Mat bookmark_frame = frame_wgt->get_mat();
-    emit new_bookmark(current_frame, bookmark_frame);
+    emit new_bookmark(m_vid_proj, current_frame, bookmark_frame);
 }
 
 /**
@@ -489,8 +492,8 @@ void VideoWidget::clear_tag() {
     m_tag = nullptr;
 }
 
-void VideoWidget::analysis_play_btn_clicked() {
-    analysis_only = !analysis_only;
+void VideoWidget::analysis_play_btn_toggled(bool value) {
+    analysis_only = value;
 }
 
 void VideoWidget::next_poi_btn_clicked() {
@@ -538,7 +541,7 @@ void VideoWidget::on_new_frame(int frame_num) {
     if (analysis_only) {
         if (!playback_slider->is_in_POI(frame_num)) {
             if (frame_num == playback_slider->last_poi_end) {
-                analysis_play_btn_clicked();
+                analysis_play_btn_toggled(false);
                 analysis_play_btn->setChecked(false);
                 stop_clicked();
             } else {
@@ -601,7 +604,7 @@ void VideoWidget::fit_clicked() {
  * Slot function for loading a new video
  * @param vid_proj
  */
-void VideoWidget::load_marked_video(VideoProject* vid_proj) {
+void VideoWidget::load_marked_video(VideoProject* vid_proj, int frame) {
     if (m_vid_proj != vid_proj) {
         if (m_video_player->is_paused()) {
             // Playback thread sleeping, wake it
@@ -624,6 +627,7 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj) {
         m_video_player->start();
     }
 
+    emit set_playback_frame(frame, true);
     if (!video_btns_enabled) {
         enable_video_btns();
     }

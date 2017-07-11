@@ -47,11 +47,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     // Initialize bookmark widget
     bookmark_wgt = new BookmarkWidget();
+    bookmark_wgt->setWindowFlag(Qt::Window);
     addDockWidget(Qt::RightDockWidgetArea, bookmark_dock);
-    std::vector<std::string> tags = {"one", "two"};
-    bookmark_wgt->add_bookmark("bookmark description", tags);
-    connect(video_wgt, SIGNAL(new_bookmark(int,cv::Mat)), bookmark_wgt, SLOT(create_bookmark(int,cv::Mat)));
-    bookmark_dock->setWidget(bookmark_wgt);
+
+    connect(video_wgt, SIGNAL(new_bookmark(VideoProject*,int,cv::Mat)), bookmark_wgt, SLOT(create_bookmark(VideoProject*,int,cv::Mat)));
+    connect(project_wgt, SIGNAL(proj_path(std::string)), bookmark_wgt, SLOT(set_path(std::string)));
+    connect(project_wgt, SIGNAL(load_bookmarks(VideoProject*)), bookmark_wgt, SLOT(load_bookmarks(VideoProject*)));
+    connect(bookmark_wgt, SIGNAL(play_bookmark_video(VideoProject*,int)), video_wgt, SLOT(load_marked_video(VideoProject*,int)));
+    connect(project_wgt, &ProjectWidget::project_closed, bookmark_wgt, &BookmarkWidget::clear_bookmarks);
+    bookmark_dock->setWidget(bookmark_wgt);    
 
     //Initialize menu bar
     init_file_menu();
@@ -64,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     // Main toolbar
     MainToolbar* main_toolbar = new MainToolbar();
     main_toolbar->setWindowTitle(tr("Main toolbar"));
-    QAction* toggle_toolbar = main_toolbar->toggleViewAction();
+    //TODO REMOVE? QAction* toggle_toolbar = main_toolbar->toggleViewAction();
     addToolBar(main_toolbar);
     connect(main_toolbar->add_video_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
 
@@ -85,7 +89,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(analysis_wgt, &AnalysisWidget::add_analysis_bar, status_bar, &StatusBar::add_analysis_bar);
     connect(analysis_wgt, &AnalysisWidget::remove_analysis_bar, status_bar, &StatusBar::remove_analysis_bar);
     connect(analysis_wgt, SIGNAL(show_progress(int)), status_bar, SLOT(update_analysis_bar(int)));
-    connect(analysis_wgt, SIGNAL(save_analysis(Analysis*)), video_wgt, SLOT(save_analysis(Analysis*)));
 
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt->frame_wgt, &FrameWidget::clear_analysis);
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt->playback_slider, &AnalysisSlider::clear_slider);
@@ -97,6 +100,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, SIGNAL(marked_analysis(Analysis*)), video_wgt->frame_wgt, SLOT(set_analysis(Analysis*)));
     connect(project_wgt, SIGNAL(marked_analysis(Analysis*)), video_wgt->playback_slider, SLOT(set_analysis(Analysis*)));
     connect(project_wgt, SIGNAL(set_detections(bool)), video_wgt->frame_wgt, SLOT(set_detections(bool)));
+
     connect(project_wgt, SIGNAL(enable_poi_btns(bool,bool)), video_wgt, SLOT(enable_poi_btns(bool,bool)));
 
     connect(project_wgt, SIGNAL(set_poi_slider(bool)), video_wgt->playback_slider, SLOT(set_show_pois(bool)));

@@ -5,7 +5,6 @@
 #include <QSlider>
 #include <vector>
 #include <set>
-#include "Project/Analysis/tag.h"
 #include "Project/Analysis/analysis.h"
 
 
@@ -15,10 +14,12 @@ class AnalysisSlider : public QSlider {
     bool m_was_paused = false;
     bool m_show_pois = false;
     bool m_show_tags = false;
+
 public:
     explicit AnalysisSlider(Qt::Orientation orientation, QWidget *parent = 0);
 
-    int last_poi_end;
+    int last_poi_end = -1;
+
     void set_blocked(bool value);
     bool is_blocked();
     bool get_was_paused();

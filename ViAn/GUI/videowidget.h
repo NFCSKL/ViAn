@@ -25,13 +25,13 @@
 class VideoWidget : public QWidget
 {
     Q_OBJECT
-
+private:
     QScrollBar* v_bar;
     QScrollBar* h_bar;
     QSize current_frame_size;
     QTime timer;
     double h_step_size, v_step_size;
-    int current_frame;
+    int current_frame = 0;
     int prev_frame_idx;
     int POI_end;
 public:
@@ -55,9 +55,8 @@ signals:
     void prev_video_frame(void);
     void ret_first_frame(void);
     void set_playback_frame(int, bool);
-    void new_bookmark(int, cv::Mat);
+    void new_bookmark(VideoProject*, int, cv::Mat);
     void set_detections_on_frame(int);
-    
     void start_analysis(VideoProject*);
     void add_tag(VideoProject*, Analysis);
     void new_frame_tagged(Analysis*);
@@ -76,9 +75,9 @@ public slots:
     void set_tag(Analysis *);
     void clear_tag(void);
     void zoom_out_clicked(void);
-    void analysis_play_btn_clicked(void);
     void next_poi_btn_clicked(void);
     void prev_poi_btn_clicked(void);
+    void analysis_play_btn_toggled(bool value);
     void set_slider_max(int value);
     void on_new_frame(int frame_num);
     void on_playback_slider_pressed(void);
@@ -86,12 +85,12 @@ public slots:
     void on_playback_slider_value_changed(void);
     void on_playback_slider_moved(void);
     void fit_clicked(void);
-    void load_marked_video(VideoProject* vid_proj);
-    void enable_poi_btns(bool, bool ana_play_btn);
+    void load_marked_video(VideoProject* vid_proj, int frame = 0);
     void update_bar_pos(int change_x, int change_y);
     void set_current_frame_size(QSize size);
     void on_bookmark_clicked(void);
     void frame_line_edit_finished();
+    void enable_poi_btns(bool, bool);
 
 private:
     const QSize BTN_SIZE = QSize(30, 30);
