@@ -58,7 +58,7 @@ signals:
     void new_bookmark(VideoProject*, int, cv::Mat);
     void set_detections_on_frame(int);
     void start_analysis(VideoProject*);
-    void add_tag(VideoProject*, Analysis);
+    void add_tag(VideoProject*, Analysis*);
     void tag_updated(Analysis*);
     void set_status_bar(QString);
 public slots:

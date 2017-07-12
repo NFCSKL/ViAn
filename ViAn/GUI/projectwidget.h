@@ -35,7 +35,7 @@ public slots:
     void add_project(const QString project_name, const QString project_path);
     void add_video();
     void start_analysis(VideoProject*);
-    void add_tag(VideoProject*, Analysis tag);
+    void add_tag(VideoProject*, Analysis *tag);
     void set_tree_item_name(QTreeWidgetItem *item, QString);
     void save_project();
     void open_project();

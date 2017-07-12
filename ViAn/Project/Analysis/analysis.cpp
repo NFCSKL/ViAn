@@ -67,11 +67,18 @@ void Analysis::read(const QJsonObject &json){
     this->type = (ANALYSIS_TYPE)json["type"].toInt();
     this->name = json["name"].toString().toStdString();
     QJsonArray json_pois = json["POI:s"].toArray();
-    for (int i = 0; i < json_pois.size(); ++i) {
-        QJsonObject json_poi = json_pois[i].toObject();
-        POI* poi = new POI();
-        poi->read(json_poi);
-        this->add_POI(poi);
+    if (type == TAG) {
+        for (int i = 0; i < json_pois.size(); ++i) {
+            QJsonObject json_tag = json_pois[i].toObject();
+            frames.insert(json_tag["Frame"].toInt());
+        }
+    } else {
+        for (int i = 0; i < json_pois.size(); ++i) {
+            QJsonObject json_poi = json_pois[i].toObject();
+            POI* poi = new POI();
+            poi->read(json_poi);
+            this->add_POI(poi);
+        }
     }
 }
 
@@ -84,11 +91,20 @@ void Analysis::write(QJsonObject &json){
     json["type"] = this->type;
     json["name"] = QString::fromStdString(this->name);
     QJsonArray json_POIs;
-    for(auto it = this->POIs.begin(); it != this->POIs.end(); it++){
-        QJsonObject json_POI;
-        POI* p = *it;
-        p->write(json_POI);
-        json_POIs.append(json_POI);
+    if (!frames.empty()) {
+        for(auto it = this->frames.begin(); it != this->frames.end(); it++){
+            QJsonObject json_tag;
+            json_tag["Frame"] = *it;
+            json_POIs.append(json_tag);
+        }
+
+    } else {
+        for(auto it = this->POIs.begin(); it != this->POIs.end(); it++){
+            QJsonObject json_POI;
+            POI* p = *it;
+            p->write(json_POI);
+            json_POIs.append(json_POI);
+        }
     }
     json["POI:s"] = json_POIs;
 }

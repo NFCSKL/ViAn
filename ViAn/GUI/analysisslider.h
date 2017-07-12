@@ -15,6 +15,9 @@ class AnalysisSlider : public QSlider {
     bool m_show_pois = false;
     bool m_show_tags = false;
 
+    //Change this to set how many frames the POI buttons should ignore
+    const int JUMP_INTERVAL = 0;
+
 public:
     explicit AnalysisSlider(Qt::Orientation orientation, QWidget *parent = 0);
 
@@ -39,7 +42,7 @@ public slots:
     void clear_slider();
 
 private:
-    std::set<int> frames;
+    std::vector<int> frames;
     std::vector<std::pair<int, int>> rects;
 };
 

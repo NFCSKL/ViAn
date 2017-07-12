@@ -104,7 +104,7 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj) {
  * @param tag
  * Adds a tag 'tag' under vid_proj
  */
-void ProjectWidget::add_tag(VideoProject* vid_proj, Analysis tag) {
+void ProjectWidget::add_tag(VideoProject* vid_proj, Analysis* tag) {
     TagItem* tag_item = new TagItem(tag, TAG_ITEM);
     vid_proj->add_analysis(tag_item->get_tag());
     for (int i = 0; i < m_videos->childCount(); i++) {
@@ -142,7 +142,7 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
     m_videos->setExpanded(true);
     for (std::pair<int,Analysis*> ana : vid_proj->get_analyses()){
         if (ana.second->type == TAG) {
-            TagItem* tag_item = new TagItem(*ana.second, TAG_ITEM);
+            TagItem* tag_item = new TagItem(ana.second, TAG_ITEM);
             tag_item->setText(0, QString::fromStdString(ana.second->get_name()));
             vid->addChild(tag_item);
             vid->setExpanded(true);

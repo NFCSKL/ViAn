@@ -385,7 +385,15 @@ void VideoWidget::set_total_time(int time) {
 
 void VideoWidget::on_bookmark_clicked() {
     cv::Mat bookmark_frame = frame_wgt->get_mat();
+
+
+    for (int frame : m_tag->frames) {
+        std::cout << frame << std::endl;
+    }
+
+
     emit new_bookmark(m_vid_proj, current_frame, bookmark_frame);
+
 }
 
 /**
@@ -480,9 +488,9 @@ void VideoWidget::new_tag_clicked() {
 }
 
 void VideoWidget::new_tag(QString name) {
-    Analysis tag;       //TODO pointer
-    tag.set_name(name.toStdString());
-    tag.type = TAG;
+    Analysis* tag = new Analysis();       //TODO pointer
+    tag->set_name(name.toStdString());
+    tag->type = TAG;
     emit add_tag(m_vid_proj, tag);
 }
 
@@ -503,9 +511,9 @@ void VideoWidget::next_poi_btn_clicked() {
     if (new_frame == current_frame) {
         emit set_status_bar("Already at last POI");
     } else {
+        emit set_playback_frame(new_frame, true);
         emit set_status_bar("Jumped to next POI");
     }
-    emit set_playback_frame(new_frame, true);
 }
 
 void VideoWidget::prev_poi_btn_clicked() {
@@ -513,9 +521,10 @@ void VideoWidget::prev_poi_btn_clicked() {
     if (new_frame == current_frame) {
         emit set_status_bar("Already at first POI");
     } else {
+        emit set_playback_frame(new_frame, true);
         emit set_status_bar("Jumped to previous POI");
     }
-    emit set_playback_frame(new_frame, true);
+
 }
 
 /**
