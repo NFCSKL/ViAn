@@ -6,9 +6,13 @@
 #include <QDebug>
 #include <QShortcut>
 #include <QScrollBar>
+#include <QProgressDialog>
 
+#include "GUI/frameexporterdialog.h"
 #include "Video/video_player.h"
 #include "Analysis/AnalysisController.h"
+#include "imageexporter.h"
+
 #include <opencv2/videoio.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
@@ -118,6 +122,8 @@ void VideoWidget::set_btn_icons() {
     zoom_out_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_out.png"), "", this);
     fit_btn = new QPushButton(QIcon("../ViAn/Icons/fit_screen.png"), "", this);
     move_btn = new QPushButton(QIcon("../ViAn/Icons/move.png"), "", this);
+    set_start_interval_btn = new QPushButton(QIcon("../ViAn/Icons/start_interval.png"), "", this);
+    set_end_interval_btn = new QPushButton(QIcon("../ViAn/Icons/end_interval.png"), "", this);
     zoom_in_btn->setCheckable(true);
     move_btn->setCheckable(true);
     analysis_play_btn->setCheckable(true);
@@ -142,6 +148,7 @@ void VideoWidget::set_btn_tool_tip() {
     zoom_out_btn->setToolTip(tr("Zoom out"));
     fit_btn->setToolTip(tr("Scale the video to screen"));
     move_btn->setToolTip(tr("Panning tool"));
+    set_start_interval_btn->setToolTip("Set interval point");
 }
 
 /**
@@ -160,6 +167,8 @@ void VideoWidget::set_btn_size() {
     btns.push_back(zoom_out_btn);
     btns.push_back(fit_btn);
     btns.push_back(move_btn);
+    btns.push_back(set_start_interval_btn);
+    btns.push_back(set_end_interval_btn);
     
     for (QPushButton* btn : btns) {
         btn->setFixedSize(BTN_SIZE);
@@ -260,6 +269,8 @@ void VideoWidget::add_btns_to_layouts() {
     zoom_btns->addWidget(fit_btn);
     zoom_btns->addWidget(move_btn);
     control_row->addLayout(zoom_btns);
+    control_row->addWidget(set_start_interval_btn);
+    control_row->addWidget(set_end_interval_btn);
 
     vertical_layout->addLayout(control_row);
 }
@@ -306,6 +317,8 @@ void VideoWidget::connect_btns() {
 
     //
     connect(fit_btn, &QPushButton::clicked, m_video_player, &video_player::fit_screen);
+    connect(set_start_interval_btn, &QPushButton::clicked, this, &VideoWidget::set_interval_start_clicked);
+    connect(set_end_interval_btn, &QPushButton::clicked, this, &VideoWidget::set_interval_end_clicked);
 }
 
 /**
@@ -366,6 +379,67 @@ void VideoWidget::on_bookmark_clicked()
     cv::Mat bookmark_frame = frame_wgt->get_mat();
 
     emit new_bookmark(m_vid_proj, current_frame, bookmark_frame);
+}
+
+void VideoWidget::set_interval_start_clicked() {
+    if (current_frame < m_interval.second) {
+        m_interval.first = current_frame;
+    } else if (current_frame > m_interval.second){
+        m_interval.first = m_interval.second;
+        m_interval.second = current_frame;
+    }
+    set_status_bar("Frame interval updated: " +
+                   QString().number(m_interval.first) + "-" + QString().number(m_interval.second));
+
+}
+
+void VideoWidget::set_interval_end_clicked() {
+    if (current_frame > m_interval.first){
+        m_interval.second = current_frame;
+    } else if (current_frame < m_interval.first) {
+        m_interval.second = m_interval.first;
+        m_interval.first = current_frame;
+    }
+    set_status_bar("Frame interval updated: " +
+                   QString().number(m_interval.first) + "-" + QString().number(m_interval.second));
+}
+
+/**
+ * @brief VideoWidget::export_images_clicked
+ * Opens the frame exporter dialog.
+ * If the dialog is accepted a new thread is created
+ * where the exporting takes place.
+ * QObjects deleteLater will take care of the QThread
+ * and ImageExporter pointers.
+ */
+void VideoWidget::export_images_clicked(){
+    if (m_vid_proj == nullptr){
+        set_status_bar("A video needs to be selected");
+        return;
+    }
+    ImageExporter* im_exp = new ImageExporter();
+    FrameExporterDialog exporter_dialog(im_exp, m_vid_proj->get_video(),
+                                        m_video_player->get_num_frames() - 1,
+                                        m_interval);
+    if (!exporter_dialog.exec()){
+        delete im_exp;
+        return;
+    }
+    std::pair<int, int> interval = im_exp->get_interval();
+    QProgressDialog* progress = new QProgressDialog(
+                "Exporting images...", "Abort", 0, abs(interval.first - interval.second), this, Qt::WindowMinimizeButtonHint);
+
+    connect(progress, &QProgressDialog::canceled, im_exp, ImageExporter::abort);
+    connect (im_exp, &ImageExporter::update_progress, progress, &QProgressDialog::setValue);
+
+    QThread* exporter_thread = new QThread;
+    im_exp->moveToThread(exporter_thread);
+    connect(exporter_thread, &QThread::started, im_exp, &ImageExporter::export_images);
+    connect(im_exp, &ImageExporter::finished, exporter_thread, &QThread::quit);
+    connect(im_exp, &ImageExporter::finished, im_exp, &ImageExporter::deleteLater);
+    connect(exporter_thread, &QThread::finished, exporter_thread, &QThread::deleteLater);
+    exporter_thread->start();
+    progress->show();
 }
 
 /**

@@ -32,6 +32,8 @@ private:
     int current_frame = 0;
     int prev_frame_idx;
     int POI_end;
+
+    std::pair<int, int> m_interval = std::make_pair(0, 1);
 public:
     explicit VideoWidget(QWidget *parent = nullptr);
 
@@ -85,6 +87,9 @@ public slots:
     void on_bookmark_clicked(void);
     //void next_poi_clicked(void);
     //void prev_poi_clicked(void);
+    void set_interval_start_clicked();
+    void set_interval_end_clicked();
+    void export_images_clicked();
 
 private:
     const QSize BTN_SIZE = QSize(30, 30);
@@ -111,6 +116,8 @@ private:
     QPushButton* zoom_out_btn;
     QPushButton* fit_btn;
     QPushButton* move_btn;
+    QPushButton* set_start_interval_btn;
+    QPushButton* set_end_interval_btn;
 
     //Layouts
     QHBoxLayout* control_row;     // Container for all button areas

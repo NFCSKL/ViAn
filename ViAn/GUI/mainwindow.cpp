@@ -8,6 +8,7 @@
 #include <QMenuBar>
 #include <QTime>
 #include <QDebug>
+#include <QProgressDialog>
 #include <chrono>
 #include <thread>
 #include "Video/shapes/shape.h"
@@ -16,6 +17,7 @@
 #include "Toolbars/maintoolbar.h"
 #include "Toolbars/drawingtoolbar.h"
 #include "manipulatordialog.h"
+#include "GUI/frameexporterdialog.h"
 
 /**
  * @brief MainWindow::MainWindow
@@ -47,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     // Initialize bookmark widget
     bookmark_wgt = new BookmarkWidget();
-    bookmark_wgt->setWindowFlag(Qt::Window);
+    bookmark_wgt->setWindowFlags(Qt::Window);
     addDockWidget(Qt::RightDockWidgetArea, bookmark_dock);
 
     connect(video_wgt, SIGNAL(new_bookmark(VideoProject*,int,cv::Mat)), bookmark_wgt, SLOT(create_bookmark(VideoProject*,int,cv::Mat)));
@@ -273,6 +275,11 @@ void MainWindow::init_tools_menu() {
     QAction* pen_act = new QAction(tr("&Pen"), this);
     QAction* text_act = new QAction(tr("&Text"), this);
 
+
+    QAction* export_act  =new QAction(tr("&Frames"));
+
+
+
     color_act->setIcon(QIcon("../ViAn/Icons/color.png"));
     undo_act->setIcon(QIcon("../ViAn/Icons/undo.png"));
     clear_act->setIcon(QIcon("../ViAn/Icons/clear.png"));
@@ -286,6 +293,11 @@ void MainWindow::init_tools_menu() {
     arrow_act->setIcon(QIcon("../ViAn/Icons/arrow.png"));
     pen_act->setIcon(QIcon("../ViAn/Icons/pen.png"));
     text_act->setIcon(QIcon("../ViAn/Icons/text.png"));
+
+    // Export submenu
+    QMenu* export_menu = tool_menu->addMenu(tr("&Export"));
+    export_menu->addAction(export_act);
+
 
     tool_menu->addAction(color_act);
     QMenu* drawing_tools = tool_menu->addMenu(tr("&Shapes"));
@@ -321,6 +333,8 @@ void MainWindow::init_tools_menu() {
     text_act->setStatusTip(tr("Text tool"));
 
     //Connect
+    connect(export_act, &QAction::triggered, video_wgt, &VideoWidget::export_images_clicked);
+
 }
 
 /**
