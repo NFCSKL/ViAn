@@ -50,16 +50,12 @@ void Analysis::add_POI(POI* poi){
  * Adds the newly tagged frame as a new poi
  * unless it's at the edge of a current poi or that frame already is tagged
  */
-void Analysis::add_frame(int frame) {
-    //for (auto it = POIs.begin(); it != POIs.end(); ++it) {
-    for (auto p : POIs) {
-        if (p->is_in_POI(frame)) return;
-        if (p->at_edge(frame)) return;
-    }
-    POI* poi = new POI();
-    poi->start_frame = frame;
-    poi->end_frame = frame;
-    add_POI(poi);
+bool Analysis::add_frame(int frame) {
+    return frames.insert(frame).second;
+}
+
+void Analysis::remove_frame(int frame) {
+    frames.erase(frame);
 }
 
 /**

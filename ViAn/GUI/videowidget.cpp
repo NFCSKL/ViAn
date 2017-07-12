@@ -42,7 +42,6 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
 
     qRegisterMetaType<cv::Mat>("cv::Mat");
     connect(m_video_player, SIGNAL(processed_image(cv::Mat)), frame_wgt, SLOT(draw_from_playback(cv::Mat)));
-    connect(speed_slider, SIGNAL(valueChanged(int)), m_video_player, SLOT(set_playback_speed(int)));
 
     connect(frame_wgt, SIGNAL(zoom_points(QPoint, QPoint)), m_video_player, SLOT(set_zoom_rect(QPoint, QPoint)));
     connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(update_bar_pos(int,int)));
@@ -460,11 +459,14 @@ void VideoWidget::analysis_btn_clicked() {
 }
 
 void VideoWidget::tag_frame() {
-    if (m_tag != nullptr){
-        if (m_tag->type == TAG) {
-            m_tag->add_frame(current_frame);
+    if (m_tag->type == TAG){
+        if (m_tag->add_frame(current_frame)) {
+            emit tag_updated(m_tag);
             emit set_status_bar("Tagged frame number: " + QString::number(current_frame));
-            emit new_frame_tagged(m_tag);
+        } else {
+            m_tag->remove_frame(current_frame);
+            emit tag_updated(m_tag);
+            emit set_status_bar("Frame untagged");
         }
     } else {
         emit set_status_bar("Select a tag");
@@ -605,6 +607,10 @@ void VideoWidget::fit_clicked() {
  * @param vid_proj
  */
 void VideoWidget::load_marked_video(VideoProject* vid_proj, int frame) {
+    if (!video_btns_enabled) {
+        enable_video_btns();
+    }
+
     if (m_vid_proj != vid_proj) {
         if (m_video_player->is_paused()) {
             // Playback thread sleeping, wake it
@@ -622,15 +628,14 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int frame) {
         }
         m_vid_proj = vid_proj;
         m_video_player->load_video(m_vid_proj->get_video()->file_path, nullptr);
+        m_video_player->set_playback_speed(speed_slider->value());
         emit set_status_bar("Video loaded");
         play_btn->setIcon(QIcon("../ViAn/Icons/play.png"));
         m_video_player->start();
     }
+    if (frame == -1) return;
 
     emit set_playback_frame(frame, true);
-    if (!video_btns_enabled) {
-        enable_video_btns();
-    }
 }
 
 void VideoWidget::enable_video_btns() {

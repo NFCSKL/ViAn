@@ -220,14 +220,14 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     switch(item->type()){
     case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
-        emit marked_video(vid_item->get_video_project());
+        emit marked_video(vid_item->get_video_project(), -1);
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(false);
         emit enable_poi_btns(false,false);
         break;
     } case ANALYSIS_ITEM: {
-        tree_item_clicked(item->parent(), 0);
+        tree_item_clicked(item->parent());
         AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
         emit marked_analysis(ana_item->get_analysis());
         emit set_detections(true);
@@ -237,7 +237,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         }
         break;
     } case TAG_ITEM: {
-        tree_item_clicked(item->parent(), 0);
+        tree_item_clicked(item->parent());
         TagItem* tag_item = dynamic_cast<TagItem*>(item);
         emit marked_tag(tag_item->get_tag());
         emit set_tag_slider(true);

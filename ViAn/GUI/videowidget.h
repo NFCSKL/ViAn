@@ -59,7 +59,7 @@ signals:
     void set_detections_on_frame(int);
     void start_analysis(VideoProject*);
     void add_tag(VideoProject*, Analysis);
-    void new_frame_tagged(Analysis*);
+    void tag_updated(Analysis*);
     void set_status_bar(QString);
 public slots:
     void set_current_time(int time);
@@ -85,7 +85,7 @@ public slots:
     void on_playback_slider_value_changed(void);
     void on_playback_slider_moved(void);
     void fit_clicked(void);
-    void load_marked_video(VideoProject* vid_proj, int frame = 0);
+    void load_marked_video(VideoProject* vid_proj, int frame);
     void update_bar_pos(int change_x, int change_y);
     void set_current_frame_size(QSize size);
     void on_bookmark_clicked(void);

@@ -35,10 +35,12 @@ public:
     };
 
     void add_POI(POI *POI);
-    void add_frame(int frame);
+    bool add_frame(int frame);
+    void remove_frame(int frame);
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
 
+    std::set<int> frames;
     std::set<POI*, poi_cmp> POIs;
     std::vector<cv::Rect> get_detections_on_frame(int frame_num);
     void set_name(const std::string &name);

@@ -33,6 +33,7 @@ protected:
     void paintEvent(QPaintEvent *ev);
 public slots:
     void set_analysis(Analysis* analysis);
+    void set_tag(Analysis* analysis);
     void set_show_pois(bool);
     void set_show_tags(bool);
     void clear_slider();
