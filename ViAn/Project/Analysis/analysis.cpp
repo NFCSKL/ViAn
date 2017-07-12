@@ -53,8 +53,7 @@ void Analysis::add_POI(POI* poi){
 void Analysis::add_frame(int frame) {
     //for (auto it = POIs.begin(); it != POIs.end(); ++it) {
     for (auto p : POIs) {
-        if (p->is_in_POI(frame)) return;
-        if (p->at_edge(frame)) return;
+        if (p->is_in_POI(frame) || p->at_edge(frame)) return;
     }
     POI* poi = new POI();
     poi->start_frame = frame;

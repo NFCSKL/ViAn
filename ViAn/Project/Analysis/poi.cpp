@@ -27,8 +27,7 @@ void POI::set_end_frame(int frame_num) {
 }
 
 bool POI::is_in_POI(int frame_num) {
-    if (frame_num >= start_frame && frame_num <= end_frame) return true;
-    return false;
+    return frame_num >= start_frame && frame_num <= end_frame;
 }
 
 /**

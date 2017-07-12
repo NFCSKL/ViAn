@@ -605,6 +605,9 @@ void VideoWidget::fit_clicked() {
  * @param vid_proj
  */
 void VideoWidget::load_marked_video(VideoProject* vid_proj, int frame) {
+    if (!video_btns_enabled) {
+        enable_video_btns();
+    }
     if (m_vid_proj != vid_proj) {
         if (m_video_player->is_paused()) {
             // Playback thread sleeping, wake it
@@ -626,11 +629,8 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int frame) {
         play_btn->setIcon(QIcon("../ViAn/Icons/play.png"));
         m_video_player->start();
     }
-
+    if (frame == -1) return;
     emit set_playback_frame(frame, true);
-    if (!video_btns_enabled) {
-        enable_video_btns();
-    }
 }
 
 void VideoWidget::enable_video_btns() {

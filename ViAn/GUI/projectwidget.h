@@ -7,7 +7,6 @@
 #include <QDropEvent>
 #include <QMimeData>
 #include "Project/project.h"
-#include "Project/Analysis/tag.h"
 class ProjectWidget : public QTreeWidget
 {
     Q_OBJECT
@@ -44,7 +43,7 @@ public slots:
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
 private slots:
-    void tree_item_clicked(QTreeWidgetItem *item, const int& col);
+    void tree_item_clicked(QTreeWidgetItem *item, const int& col = -1);
 private:
     void create_default_tree();
     void tree_add_video();

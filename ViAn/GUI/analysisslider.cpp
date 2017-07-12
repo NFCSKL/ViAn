@@ -29,12 +29,7 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     QRect groove_rect = style()->subControlRect(QStyle::CC_Slider, &option, QStyle::SC_SliderGroove, this);
 
     if (m_show_tags || m_show_pois) {
-        QBrush brush;
-        if (m_show_tags) {
-            brush = Qt::red;
-        } else {
-            brush = Qt::yellow;
-        }
+        QBrush brush = (m_show_tags) ? Qt::red : Qt::yellow;
 
         //Get one frames width on the slider
         double c = (double)(groove_rect.right()-groove_rect.left())/maximum();
