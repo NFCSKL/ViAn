@@ -111,6 +111,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, SIGNAL(marked_tag(Analysis*)), video_wgt->playback_slider, SLOT(set_tag(Analysis*)));
     connect(video_wgt, SIGNAL(add_tag(VideoProject*, Analysis*)), project_wgt, SLOT(add_tag(VideoProject*, Analysis*)));
     connect(video_wgt, SIGNAL(tag_updated(Analysis*)), video_wgt->playback_slider, SLOT(set_tag(Analysis*)));
+    connect(video_wgt, SIGNAL(set_interval(int)), video_wgt->playback_slider, SLOT(set_interval(int)));
 }
 
 

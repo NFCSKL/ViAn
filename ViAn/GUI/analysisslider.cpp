@@ -54,6 +54,12 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
             painter.fillRect(rect, Qt::red);
         }
     }
+    if (interval != -1) {
+        double c = (double)(groove_rect.right()-groove_rect.left())/maximum();
+        double first = (groove_rect.left()+(double)interval*c);
+        QRect rect(first, groove_rect.top(), 1, groove_rect.height());
+        painter.fillRect(rect, Qt::black);
+    }
     option.subControls = QStyle::SC_SliderHandle;
     painter.drawComplexControl(QStyle::CC_Slider, option);
 }
@@ -78,6 +84,11 @@ void AnalysisSlider::set_tag(Analysis *analysis) {
         this->frames.push_back(frame);
     }
 
+    repaint();
+}
+
+void AnalysisSlider::set_interval(int frame) {
+    interval = frame;
     repaint();
 }
 

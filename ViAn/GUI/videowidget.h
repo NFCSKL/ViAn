@@ -57,6 +57,7 @@ signals:
     void start_analysis(VideoProject*);
     void add_tag(VideoProject*, Analysis*);
     void tag_updated(Analysis*);
+    void set_interval(int);
     void set_status_bar(QString);
 public slots:
     void set_current_time(int time);
@@ -71,6 +72,7 @@ public slots:
     void new_tag(QString name);
     void set_tag(Analysis *);
     void clear_tag(void);
+    void interval_clicked(void);
     void zoom_out_clicked(void);
     void next_poi_btn_clicked(void);
     void prev_poi_btn_clicked(void);
@@ -112,6 +114,7 @@ private:
     QPushButton* bookmark_btn;    
     QPushButton* tag_btn;
     QPushButton* new_tag_btn;
+    QPushButton* interval_btn;
     QPushButton* zoom_in_btn;
     QPushButton* zoom_out_btn;
     QPushButton* fit_btn;
@@ -124,10 +127,6 @@ private:
     QHBoxLayout* other_btns;      // Bookmark, tag
     QHBoxLayout* zoom_btns;       // Zoom buttons
     QGridLayout* speed_slider_layout;
-
-    //Shortcuts
-    QShortcut* zoom_in_sc;
-    QShortcut* tag_sc;
     
     std::vector<QPushButton*> btns;
 

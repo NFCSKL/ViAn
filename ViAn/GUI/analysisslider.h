@@ -22,6 +22,7 @@ public:
     explicit AnalysisSlider(Qt::Orientation orientation, QWidget *parent = 0);
 
     int last_poi_end = -1;
+    int interval = -1;
 
     void set_blocked(bool value);
     bool is_blocked();
@@ -37,6 +38,7 @@ protected:
 public slots:
     void set_analysis(Analysis* analysis);
     void set_tag(Analysis* analysis);
+    void set_interval(int frame);
     void set_show_pois(bool);
     void set_show_tags(bool);
     void clear_slider();
