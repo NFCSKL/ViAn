@@ -381,10 +381,15 @@ void VideoWidget::on_bookmark_clicked()
     emit new_bookmark(m_vid_proj, current_frame, bookmark_frame);
 }
 
+/**
+ * @brief VideoWidget::set_interval_start_clicked
+ * Sets the start point of the frame interval
+ */
 void VideoWidget::set_interval_start_clicked() {
     if (current_frame < m_interval.second) {
         m_interval.first = current_frame;
     } else if (current_frame > m_interval.second){
+        // Trying to set start after end, flip
         m_interval.first = m_interval.second;
         m_interval.second = current_frame;
     }
@@ -393,10 +398,15 @@ void VideoWidget::set_interval_start_clicked() {
 
 }
 
+/**
+ * @brief VideoWidget::set_interval_end_clicked
+ * Sets the end of the frame interval
+*/
 void VideoWidget::set_interval_end_clicked() {
     if (current_frame > m_interval.first){
         m_interval.second = current_frame;
     } else if (current_frame < m_interval.first) {
+        // Trying to set end before start, flip
         m_interval.second = m_interval.first;
         m_interval.first = current_frame;
     }

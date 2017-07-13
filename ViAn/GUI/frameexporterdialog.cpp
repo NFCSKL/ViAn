@@ -93,6 +93,10 @@ void FrameExporterDialog::to_value_changed() {
     update_total();
 }
 
+/**
+ * @brief FrameExporterDialog::open_path_dialog
+ * Sets the export path from the file dialog
+ */
 void FrameExporterDialog::open_path_dialog() {
     QString export_path = QFileDialog::getExistingDirectory(
                 this, "Select export path", m_path_edit->text(), QFileDialog::ShowDirsOnly);
@@ -101,6 +105,12 @@ void FrameExporterDialog::open_path_dialog() {
     }
 }
 
+/**
+ * @brief FrameExporterDialog::save_values
+ * Called when acceptrole button is clicked.
+ * Does a path check and saves the entered values in
+ * the ImageExporter pointer
+ */
 void FrameExporterDialog::save_values() {
     if (!check_path()) reject();
     QString e_path = m_path_edit->text() + "/" + m_video_name + "_";
@@ -110,6 +120,11 @@ void FrameExporterDialog::save_values() {
     accept();
 }
 
+/**
+ * @brief FrameExporterDialog::path_text_edited
+ * Disables the export button if the export path is empty
+ * @param text
+ */
 void FrameExporterDialog::path_text_edited(const QString& text) {
     if (text.isEmpty())
         m_export_btn->setEnabled(false);
@@ -119,6 +134,12 @@ void FrameExporterDialog::path_text_edited(const QString& text) {
 
 }
 
+/**
+ * @brief FrameExporterDialog::check_path
+ * Asks the user if the export path should be created
+ * given that it does not already exist
+ * @return true if the path exists or has been created
+ */
 bool FrameExporterDialog::check_path() {
     if (QDir(m_path_edit->text()).exists()) return true;
     QMessageBox msg_box;

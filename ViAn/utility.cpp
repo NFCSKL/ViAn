@@ -28,6 +28,13 @@ int Utility::number_of_digits(int n) {
     return number_of_digits;
 }
 
+/**
+ * @brief Utility::zfill
+ * Fills the given number string with zeros
+ * @param number    :    number to be zero padded
+ * @param length    :   specifies how long the return string should be
+ * @return
+ */
 std::string Utility::zfill(std::string number, int length){
     length -= number.length();
     if (length)

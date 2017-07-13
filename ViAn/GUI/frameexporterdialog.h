@@ -31,6 +31,8 @@ class FrameExporterDialog : public QDialog {
     QPushButton* m_export_btn;
     QDialogButtonBox* m_btn_box;
 
+    // The ImageExporter should only be set from a constructor parameter
+    // and as such deleted outside of this class
     ImageExporter* m_exporter = nullptr;
     QString m_video_name;
     QString m_old_path_text = "C:/";
