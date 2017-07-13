@@ -2,7 +2,6 @@
 #define ITEMTYPES_H
 
 #include "Project/videoproject.h"
-#include "Project/Analysis/tag.h"
 #include <QTreeWidgetItem>
 
 enum ITEM_TYPE {VIDEO_ITEM, ANALYSIS_ITEM, FOLDER_ITEM, TAG_ITEM};

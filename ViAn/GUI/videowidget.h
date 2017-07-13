@@ -19,9 +19,6 @@
 #include "Project/videoproject.h"
 #include "drawscrollarea.h"
 
-#include "Project/Analysis/tag.h" //TODO remove
-
-
 class VideoWidget : public QWidget
 {
     Q_OBJECT
@@ -130,6 +127,7 @@ private:
 
     //Shortcuts
     QShortcut* zoom_in_sc;
+    QShortcut* tag_sc;
     
     std::vector<QPushButton*> btns;
 

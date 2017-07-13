@@ -64,6 +64,7 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
  * @param analysis
  */
 void AnalysisSlider::set_analysis(Analysis* analysis) {
+    rects.clear();
     if (analysis != nullptr) {
         for (auto p : analysis->POIs) {
             add_slider_interval(p->start_frame, p->end_frame);

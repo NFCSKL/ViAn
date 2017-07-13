@@ -285,6 +285,7 @@ void VideoWidget::connect_btns() {
     connect(prev_frame_btn, &QPushButton::clicked, this, &VideoWidget::prev_frame_clicked);
 
     connect(analysis_btn, &QPushButton::clicked, this, &VideoWidget::analysis_btn_clicked);
+
     connect(analysis_play_btn, &QPushButton::toggled, this, &VideoWidget::analysis_play_btn_toggled);
 
     connect(next_poi_btn, &QPushButton::clicked, this, &VideoWidget::next_poi_btn_clicked);
@@ -369,15 +370,7 @@ void VideoWidget::set_total_time(int time) {
 
 void VideoWidget::on_bookmark_clicked() {
     cv::Mat bookmark_frame = frame_wgt->get_mat();
-
-
-    for (int frame : m_tag->frames) {       //TODO remove
-        std::cout << frame << std::endl;
-    }
-
-
     emit new_bookmark(m_vid_proj, current_frame, bookmark_frame);
-
 }
 
 /**
@@ -508,7 +501,6 @@ void VideoWidget::prev_poi_btn_clicked() {
         emit set_playback_frame(new_frame, true);
         emit set_status_bar("Jumped to previous POI");
     }
-
 }
 
 /**
