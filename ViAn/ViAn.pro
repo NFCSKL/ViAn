@@ -34,6 +34,7 @@ SOURCES += main.cpp \
     GUI/analysiswidget.cpp \
     GUI/manipulatordialog.cpp \
     Video/frameprocessor.cpp \
+    GUI/tagdialog.cpp \
     imageexporter.cpp \
     GUI/frameexporterdialog.cpp
 
@@ -63,6 +64,7 @@ HEADERS += Test/test_video_player.h \
     GUI/analysiswidget.h \
     GUI/manipulatordialog.h \
     Video/frameprocessor.h \
+    GUI/tagdialog.h \
     imageexporter.h \
     GUI/frameexporterdialog.h
 

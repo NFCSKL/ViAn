@@ -6,7 +6,7 @@ VideoItem::VideoItem(VideoProject* video_project, int type): QTreeWidgetItem(typ
 }
 
 VideoItem::~VideoItem(){
-    delete m_vid_proj;
+    // VideoProject should be deleted by the Project
 }
 
 VideoProject* VideoItem::get_video_project() {
@@ -26,6 +26,14 @@ void AnalysisItem::set_analysis(Analysis analysis) {
 
 Analysis* AnalysisItem::get_analysis() {
     return &m_analysis;
+}
+
+TagItem::TagItem(Analysis tag, int type) : QTreeWidgetItem(type) {
+    m_tag = tag;
+}
+
+Analysis* TagItem::get_tag() {
+    return &m_tag;
 }
 
 FolderItem::FolderItem(int type) : QTreeWidgetItem(type) {

@@ -112,7 +112,10 @@ void FrameExporterDialog::open_path_dialog() {
  * the ImageExporter pointer
  */
 void FrameExporterDialog::save_values() {
-    if (!check_path()) reject();
+    if (!check_path()) {
+        reject();
+        return;
+    }
     QString e_path = m_path_edit->text() + "/" + m_video_name + "_";
     m_exporter->set_interval(std::make_pair(m_from_box->value(), m_to_box->value()));
     m_exporter->set_export_path(e_path.toStdString());
@@ -147,6 +150,6 @@ bool FrameExporterDialog::check_path() {
     msg_box.setText("Path '" + m_path_edit->text() + "' doesn't exist");
     msg_box.setInformativeText("Do you wish to create it?");
     msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    if (!msg_box.exec()) return false;
+    if (msg_box.exec() == QMessageBox::No) return false;
     return QDir().mkpath(m_path_edit->text());
 }
