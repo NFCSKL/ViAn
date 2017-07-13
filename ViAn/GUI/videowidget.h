@@ -124,10 +124,6 @@ private:
     QHBoxLayout* other_btns;      // Bookmark, tag
     QHBoxLayout* zoom_btns;       // Zoom buttons
     QGridLayout* speed_slider_layout;
-
-    //Shortcuts
-    QShortcut* zoom_in_sc;
-    QShortcut* tag_sc;
     
     std::vector<QPushButton*> btns;
 
