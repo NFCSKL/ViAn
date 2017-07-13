@@ -23,13 +23,8 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
  * Creates a create project dialog
  */
 void ProjectWidget::new_project() {
-    if (m_proj == nullptr) {
-        ProjectDialog* proj_dialog = new ProjectDialog();
-        QObject::connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(add_project(QString, QString)));
-    } else {
-        close_project();
-        new_project();
-    }
+    ProjectDialog* proj_dialog = new ProjectDialog();
+    QObject::connect(proj_dialog, SIGNAL(project_path(QString, QString)), this, SLOT(add_project(QString, QString)));
 }
 
 /**
@@ -40,6 +35,7 @@ void ProjectWidget::new_project() {
  * @param project_path
  */
 void ProjectWidget::add_project(QString project_name, QString project_path) {
+    close_project();
     std::string _tmp_name = project_name.toStdString();
     std::string _tmp_path = project_path.toStdString();
     parentWidget()->parentWidget()->setWindowTitle(project_name);
@@ -265,13 +261,14 @@ void ProjectWidget::save_project() {
  * Slot function to open a previously created project
  */
 void ProjectWidget::open_project() {
-    if (m_proj != nullptr) close_project();
     QString project_path = QFileDialog().getOpenFileName(this, tr("Open project"), QDir::homePath());
     if (!project_path.isEmpty()) {
+        if (m_proj != nullptr) close_project();
         emit set_status_bar("Opening project");
         clear();
         create_default_tree();
         m_proj = Project::fromFile(project_path.toStdString());
+        parentWidget()->parentWidget()->setWindowTitle(QString::fromStdString(m_proj->getName()));
         emit proj_path(m_proj->getDir());
         for (auto vid_pair : m_proj->get_videos()) {
             VideoProject* vid_proj = vid_pair.second;
