@@ -131,7 +131,7 @@ private:
     std::vector<QPushButton*> btns;
 
     QString convert_time(int time);
-    VideoProject* m_vid_proj;
+    VideoProject* m_vid_proj = nullptr;
     Analysis* m_tag = nullptr;
 
     bool tag_clicked = false;

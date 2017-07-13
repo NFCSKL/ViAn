@@ -252,8 +252,10 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
  * Slot function to save the open project
  */
 void ProjectWidget::save_project() {
-    m_proj->save_project();
-    emit set_status_bar("Project saved");
+    if (m_proj != nullptr) {
+        m_proj->save_project();
+        emit set_status_bar("Project saved");
+    }
 }
 
 /**

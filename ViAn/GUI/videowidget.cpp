@@ -373,6 +373,7 @@ void VideoWidget::set_total_time(int time) {
 void VideoWidget::on_bookmark_clicked() {
     cv::Mat bookmark_frame = frame_wgt->get_mat();
 
+    //TODO remove
     for (int frame : m_tag->frames) {
         std::cout << frame << std::endl;
     }
