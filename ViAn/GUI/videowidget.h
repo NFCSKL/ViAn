@@ -129,14 +129,7 @@ private:
     QGridLayout* speed_slider_layout;
 
     //Shortcuts
-    QShortcut* play_sc;
-    QShortcut* stop_sc;
-    QShortcut* next_frame_sc;
-    QShortcut* prev_frame_sc;
-    QShortcut* next_poi_sc;
-    QShortcut* prev_poi_sc;
     QShortcut* zoom_in_sc;
-    QShortcut* tag_sc;
     
     std::vector<QPushButton*> btns;
 
