@@ -221,6 +221,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit set_poi_slider(false);
         emit set_tag_slider(false);
         emit enable_poi_btns(false,false);
+        emit enable_tag_btn(false);
         break;
     } case ANALYSIS_ITEM: {
         tree_item_clicked(item->parent());
@@ -238,6 +239,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
         emit marked_tag(tag_item->get_tag());
         emit set_tag_slider(true);
         emit enable_poi_btns(true, false);
+        emit enable_tag_btn(true);
         break;
     } case FOLDER_ITEM: {
         break;

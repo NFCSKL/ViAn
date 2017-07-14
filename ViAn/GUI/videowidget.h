@@ -90,6 +90,7 @@ public slots:
     void on_bookmark_clicked(void);
     void frame_line_edit_finished();
     void enable_poi_btns(bool, bool);
+    void enable_tag_btn(bool);
 
 private:
     const QSize BTN_SIZE = QSize(30, 30);

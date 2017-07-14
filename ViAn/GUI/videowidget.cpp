@@ -158,7 +158,6 @@ void VideoWidget::set_btn_size() {
     btns.push_back(prev_frame_btn);
     btns.push_back(bookmark_btn);
     btns.push_back(analysis_btn);
-    btns.push_back(tag_btn);
     btns.push_back(interval_btn);
     btns.push_back(new_tag_btn);
     btns.push_back(zoom_in_btn);
@@ -172,8 +171,10 @@ void VideoWidget::set_btn_size() {
     }
     next_poi_btn->setFixedSize(BTN_SIZE);
     prev_poi_btn->setFixedSize(BTN_SIZE);
+    tag_btn->setFixedSize(BTN_SIZE);
     analysis_play_btn->setFixedSize(BTN_SIZE);
     enable_poi_btns(false,false);
+    enable_tag_btn(false);
 }
 
 /**
@@ -372,12 +373,6 @@ void VideoWidget::set_total_time(int time) {
 
 void VideoWidget::on_bookmark_clicked() {
     cv::Mat bookmark_frame = frame_wgt->get_mat();
-
-    //TODO remove
-    for (int frame : m_tag->frames) {
-        std::cout << frame << std::endl;
-    }
-
     emit new_bookmark(m_vid_proj, current_frame, bookmark_frame);
 }
 
@@ -666,11 +661,16 @@ void VideoWidget::enable_video_btns() {
 void VideoWidget::enable_poi_btns(bool b, bool ana_play_btn) {
     next_poi_btn->setEnabled(b);
     prev_poi_btn->setEnabled(b);
+
     analysis_play_btn->setEnabled(ana_play_btn);
     if (!b) {
         analysis_play_btn->setChecked(b);
         analysis_only = b;
     }
+}
+
+void VideoWidget::enable_tag_btn(bool b) {
+    tag_btn->setEnabled(b);
 }
 
 void VideoWidget::update_bar_pos(int change_x, int change_y) {
