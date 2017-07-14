@@ -16,6 +16,7 @@
 #include "video.h"
 #include "Filehandler/saveable.h"
 #include "Project/Analysis/analysismeta.h"
+#include "Project/projecttreestate.h"
 
 using ID = int;
 /**

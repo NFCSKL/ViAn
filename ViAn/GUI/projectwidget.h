@@ -8,6 +8,9 @@
 #include <QMimeData>
 #include "Project/project.h"
 #include "TreeItems/itemtypes.h"
+#include <stack>
+
+class Project;
 class ProjectWidget : public QTreeWidget
 {
     Q_OBJECT
@@ -54,8 +57,11 @@ private:
     void file_dropped(QString path);
     void folder_dropped(QString path);
     void insert_dropped(VideoItem* item);
+    std::stack<int> get_index_path(QTreeWidgetItem* item);
     VideoItem* get_video_item(VideoProject* v_proj);
     VideoItem* search_folder(FolderItem* f_item, VideoProject* v_proj);
+    void insert_to_path_index(VideoProject* vid_proj);
+    void update_index_paths(QTreeWidgetItem* item = nullptr);
 signals:
     void project_closed();
 

@@ -9,6 +9,7 @@
 #include <QDirIterator>
 #include <iostream>
 #include <algorithm>
+#include <sstream>
 
 #include "Project/projecttreestate.h"
 
@@ -109,7 +110,9 @@ void ProjectWidget::set_tree_item_name(QTreeWidgetItem* item, QString name) {
  * @param vid_name
  */
 void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_name) {
-    insertTopLevelItem(topLevelItemCount(), new VideoItem(vid_proj, VIDEO_ITEM));
+    VideoItem* vid_item = new VideoItem(vid_proj, VIDEO_ITEM);
+    insertTopLevelItem(topLevelItemCount(), vid_item);
+    vid_proj->set_tree_index(get_index_path(dynamic_cast<QTreeWidgetItem*>(vid_item)));
     emit set_status_bar("Video added: " + vid_name);
 }
 
@@ -146,6 +149,7 @@ void ProjectWidget::file_dropped(QString path) {
         m_proj->add_video_project(vid_proj);
         VideoItem* v_item = new VideoItem(vid_proj, VIDEO_ITEM);
         insertTopLevelItem(topLevelItemCount(), v_item);
+        vid_proj->set_tree_index(get_index_path(v_item));
     }
 
 }
@@ -164,6 +168,24 @@ void ProjectWidget::folder_dropped(QString path) {
         else
             file_dropped(tmp.absoluteFilePath());
     }
+}
+
+/**
+ * @brief ProjectWidget::get_index_path
+ * Returns the index path for the item.
+ * For a item two folders down the path could be 011 or 051.
+ * @param item
+ * @return index path
+ */
+std::stack<int> ProjectWidget::get_index_path(QTreeWidgetItem *item){
+    std::stack<int> index_path;
+    QTreeWidgetItem* p = &*item;
+    while (p->parent() != nullptr) {
+        index_path.push(p->parent()->indexOfChild(p));
+        p = p->parent();
+    }
+    index_path.push(indexOfTopLevelItem(p));
+    return index_path;
 }
 
 /**
@@ -207,6 +229,44 @@ VideoItem *ProjectWidget::search_folder(FolderItem* f_item, VideoProject *v_proj
     return nullptr;
 }
 
+void ProjectWidget::insert_to_path_index(VideoProject *vid_proj) {
+    // Index path is on form x:x:x:x..
+    // Split at delimiter ':' to get index
+    std::stringstream ss(vid_proj->get_index_path());
+    std::string item;
+    std::vector<std::string> elems;
+    while (std::getline(ss, item, ':')) {
+       elems.push_back(std::move(item)); // if C++11 (based on comment from @mchiasson)
+    }
+
+    // Get item at index path and set video project
+    if (elems.size() > 0) {
+        QTreeWidgetItem* item = topLevelItem(std::stoi(elems[0]));
+        for (auto i = 1; i < elems.size(); ++i) {
+            qDebug() << elems.size();
+            if (item->child(std::stoi(elems[i]))) item = item->child(std::stoi(elems[i]));
+        }
+        if (item != nullptr && item->type() == VIDEO_ITEM) {
+            qDebug() << item->text(0);
+            VideoItem* v_item = dynamic_cast<VideoItem*>(item);
+            v_item->set_video_project(vid_proj);
+        }
+    }
+}
+
+void ProjectWidget::update_index_paths(QTreeWidgetItem* item) {
+    if (item == nullptr) item = invisibleRootItem();
+    for (auto i = 0; i < item->childCount(); ++i){
+        auto child = item->child(i);
+        if (child->type() == VIDEO_ITEM) {
+            VideoItem* v_item = dynamic_cast<VideoItem*>(child);
+            v_item->get_video_project()->set_tree_index(get_index_path(item->child(i)));
+        } else if (child->type() == FOLDER_ITEM) {
+            update_index_paths(child);
+        }
+    }
+}
+
 /**
  * @brief ProjectWidget::dragEnterEvent
  * Makes sure the ProjectWidget only accepts drops containing urls or objects of the correct mime type
@@ -242,7 +302,16 @@ void ProjectWidget::dropEvent(QDropEvent *event) {
             }
         }
     } else {
+        QList<QTreeWidgetItem*> items = selectedItems();
         QTreeWidget::dropEvent(event);
+        // Update index paths
+        for (auto item : items) {
+            if (item->type() == VIDEO_ITEM) {
+                auto vid_item = dynamic_cast<VideoItem*>(item);
+                vid_item->get_video_project()->set_tree_index(get_index_path(item));
+            }
+        }
+        update_index_paths();
     }
 }
 
@@ -254,6 +323,7 @@ void ProjectWidget::dropEvent(QDropEvent *event) {
  * @param col
  */
 void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
+    get_index_path(item);
     switch(item->type()){
     case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
@@ -356,7 +426,9 @@ void ProjectWidget::create_folder_item() {
  */
 void ProjectWidget::save_project() {
     m_proj->save_project();
-    ProjectTreeState().tree_to_json(this);
+    ProjectTreeState tree_state;
+    tree_state.set_tree(this);
+    tree_state.save_state();
     emit set_status_bar("Project saved");
 }
 
@@ -365,20 +437,26 @@ void ProjectWidget::save_project() {
  * Slot function to open a previously created project
  */
 void ProjectWidget::open_project() {
+
+
     if (m_proj != nullptr) close_project();
     QString project_path = QFileDialog().getOpenFileName(this, tr("Open project"), QDir::homePath());
     if (!project_path.isEmpty()) {
         emit set_status_bar("Opening project");
-        clear();
+        ProjectTreeState tree_state;
+        tree_state.set_tree(this);
+        tree_state.load_state();
+//        clear();
         m_proj = Project::fromFile(project_path.toStdString());
         emit proj_path(m_proj->getDir());
         for (auto vid_pair : m_proj->get_videos()) {
             VideoProject* vid_proj = vid_pair.second;
+            insert_to_path_index(vid_proj);
             emit load_bookmarks(vid_proj);
-            QString video_path = QString::fromStdString(vid_proj->get_video()->file_path);
-            int index = video_path.lastIndexOf('/') + 1;
-            QString vid_name = video_path.right(video_path.length() - index);
-            tree_add_video(vid_proj, vid_name);
+//            QString video_path = QString::fromStdString(vid_proj->get_video()->file_path);
+//            int index = video_path.lastIndexOf('/') + 1;
+//            QString vid_name = video_path.right(video_path.length() - index);
+//            tree_add_video(vid_proj, vid_name);
         }
     }
 }

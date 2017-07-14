@@ -29,7 +29,9 @@ class VideoItem : public QTreeWidgetItem
 
 public:
     VideoItem(VideoProject* video_project, int type);
+    VideoItem(int type);
     VideoProject* get_video_project();
+    void set_video_project(VideoProject* vid_proj);
     ~VideoItem();
 signals:
 

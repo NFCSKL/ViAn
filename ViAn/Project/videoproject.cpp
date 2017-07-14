@@ -92,6 +92,7 @@ std::map<ID, AnalysisMeta *> VideoProject::get_analyses() {
  * Read videoproject parameters from json object.
  */
 void VideoProject::read(const QJsonObject& json){
+    m_tree_index = json["tree_index"].toString().toStdString();
     this->video->read(json);
     QJsonArray json_bookmarks = json["bookmarks"].toArray();
     // Read bookmarks from json
@@ -119,6 +120,7 @@ void VideoProject::read(const QJsonObject& json){
  * Write videoproject parameters to json object.
  */
 void VideoProject::write(QJsonObject& json){
+    json["tree_index"] = QString::fromStdString(m_tree_index);
     this->video->write(json);
     QJsonArray json_bookmarks;
     for(auto it = m_bookmarks.begin(); it != m_bookmarks.end(); it++){
@@ -154,6 +156,15 @@ ID VideoProject::add_bookmark(Bookmark *bookmark){
     return m_bm_cnt++;
 }
 
+void VideoProject::set_tree_index(std::stack<int> tree_index) {
+    m_tree_index.clear();
+    while (!tree_index.empty()) {
+        m_tree_index.append(std::to_string(tree_index.top()));
+        tree_index.pop();
+        m_tree_index.append(":");
+    }
+}
+
 /**
  * @brief VideoProject::add_analysis
  * @param analysis to be added
@@ -179,4 +190,8 @@ void VideoProject::delete_artifacts(){
         temp->delete_saveable();
 
     }
+}
+
+string VideoProject::get_index_path() {
+    return m_tree_index;
 }

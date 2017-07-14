@@ -11,6 +11,7 @@
 #include "video.h"
 #include "Project/Analysis/analysismeta.h"
 #include "Project/report.h"
+#include <stack>
 
 /**
  * @brief The VideoProject class
@@ -22,6 +23,7 @@ class VideoProject : public Saveable{
     friend class VideoProjectTest;
     std::map<ID,Bookmark*> m_bookmarks;
     std::map<ID,AnalysisMeta*> m_analyses;
+    std::string m_tree_index = "";
     Overlay* m_overlay = new Overlay();
     Video* video = nullptr;
     ID m_bm_cnt = 0;  // Bookmark id counter
@@ -38,10 +40,13 @@ public:
     ID add_analysis(AnalysisMeta* analysis);
     ID add_bookmark(Bookmark* bookmark);
 
+    void set_tree_index(std::stack<int> tree_index);
+
     void delete_analysis(const int& id);
     void delete_bookmark(const int& id);
     void delete_artifacts();
 
+    std::string get_index_path();
     Video* get_video();
     Overlay* get_overlay();
     std::map<ID,Bookmark*> get_bookmarks();
