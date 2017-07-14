@@ -1,16 +1,19 @@
 #include "frameexporterdialog.h"
 
 #include <QDebug>
-FrameExporterDialog::FrameExporterDialog(ImageExporter* im_exp, Video* video,
+FrameExporterDialog::FrameExporterDialog(ImageExporter* im_exp, Video* video, std::string proj_path,
                                          const int& max_frame, const std::pair<int, int>& interval,
                                          QWidget* parent) : QDialog(parent){
     m_exporter = im_exp;
-    m_video_name = QString().fromStdString(video->get_name());
+    m_video_name = QString::fromStdString(video->get_name());
+    m_old_path_text = QString::fromStdString(proj_path);
     setWindowTitle("ViAn - Image exporter");
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+
     m_from_box = new QSpinBox(this);
-    m_from_box->setRange(0, max_frame - 1);
+    m_from_box->setRange(0, max_frame);
     m_to_box = new QSpinBox(this);
-    m_to_box->setRange(1, max_frame);
+    m_to_box->setRange(0, max_frame);
     m_total = new QLabel(this);
 
     m_from_box->setValue(interval.first);
@@ -29,14 +32,12 @@ FrameExporterDialog::FrameExporterDialog(ImageExporter* im_exp, Video* video,
     m_frame_input_layout->addWidget(m_total);
     // End frame layout
 
-    m_path_edit = new QLineEdit(m_old_path_text, this);
+    m_path_label = new QLabel(m_old_path_text, this);
     m_browse_btn = new QPushButton("Browse", this);
-
-    connect(m_path_edit, &QLineEdit::textEdited, this, &FrameExporterDialog::path_text_edited);
     connect(m_browse_btn, &QPushButton::clicked, this, &FrameExporterDialog::open_path_dialog);
     // Path layout
     m_path_input_layout = new QHBoxLayout();
-    m_path_input_layout->addWidget(m_path_edit);
+    m_path_input_layout->addWidget(m_path_label);
     m_path_input_layout->addWidget(m_browse_btn);
     // End path layour
 
@@ -74,7 +75,7 @@ void FrameExporterDialog::from_value_changed() {
     else if (m_from_box->value() < m_from_box->minimum())
         m_from_box->setValue((m_from_box->minimum()));
 
-    if (m_from_box->value() >= m_to_box->value()) m_to_box->setValue(m_from_box->value() + 1);
+    if (m_from_box->value() >= m_to_box->value()) m_to_box->setValue(m_from_box->value());
     update_total();
 }
 
@@ -89,7 +90,7 @@ void FrameExporterDialog::to_value_changed() {
     else if (m_from_box->value() < m_from_box->minimum())
         m_to_box->setValue(m_to_box->minimum());
 
-    if (m_to_box->value() <= m_from_box->value()) m_from_box->setValue(m_to_box->value() - 1);
+    if (m_to_box->value() <= m_from_box->value()) m_from_box->setValue(m_to_box->value());
     update_total();
 }
 
@@ -99,9 +100,9 @@ void FrameExporterDialog::to_value_changed() {
  */
 void FrameExporterDialog::open_path_dialog() {
     QString export_path = QFileDialog::getExistingDirectory(
-                this, "Select export path", m_path_edit->text(), QFileDialog::ShowDirsOnly);
+                this, "Select export path", m_path_label->text(), QFileDialog::ShowDirsOnly);
     if (!export_path.isEmpty()) {
-        m_path_edit->setText(export_path);
+        m_path_label->setText(export_path);
     }
 }
 
@@ -113,28 +114,13 @@ void FrameExporterDialog::open_path_dialog() {
  */
 void FrameExporterDialog::save_values() {
     if (!check_path()) {
-        reject();
         return;
     }
-    QString e_path = m_path_edit->text() + "/" + m_video_name + "_";
+    QString e_path = m_path_label->text() + "/" + m_video_name + "_";
     m_exporter->set_interval(std::make_pair(m_from_box->value(), m_to_box->value()));
     m_exporter->set_export_path(e_path.toStdString());
-    m_exporter->set_file_path(m_video_path->text().toStdString()); // TODO read from combobox
+    m_exporter->set_file_path(m_video_path->text().toStdString());
     accept();
-}
-
-/**
- * @brief FrameExporterDialog::path_text_edited
- * Disables the export button if the export path is empty
- * @param text
- */
-void FrameExporterDialog::path_text_edited(const QString& text) {
-    if (text.isEmpty())
-        m_export_btn->setEnabled(false);
-    else
-        m_export_btn->setEnabled(true);
-
-
 }
 
 /**
@@ -144,12 +130,12 @@ void FrameExporterDialog::path_text_edited(const QString& text) {
  * @return true if the path exists or has been created
  */
 bool FrameExporterDialog::check_path() {
-    if (QDir(m_path_edit->text()).exists()) return true;
+    if (QDir(m_path_label->text()).exists()) return true;
     QMessageBox msg_box;
     msg_box.setIcon(QMessageBox::Warning);
-    msg_box.setText("Path '" + m_path_edit->text() + "' doesn't exist");
+    msg_box.setText("Path '" + m_path_label->text() + "' doesn't exist");
     msg_box.setInformativeText("Do you wish to create it?");
     msg_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     if (msg_box.exec() == QMessageBox::No) return false;
-    return QDir().mkpath(m_path_edit->text());
+    return QDir().mkpath(m_path_label->text());
 }

@@ -29,6 +29,7 @@ public slots:
     void abort();
 signals:
     void finished();
+    void finished_msg(QString msg);
     void update_progress(int progress);
 };
 

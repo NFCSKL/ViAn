@@ -66,6 +66,14 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
     connect(this, SIGNAL(set_detections_on_frame(int)), frame_wgt, SLOT(set_detections_on_frame(int)));
 }
 
+VideoProject *VideoWidget::get_current_video_project(){
+    return m_vid_proj;
+}
+
+std::pair<int, int> VideoWidget::get_frame_interval(){
+    return m_interval;
+}
+
 /**
  * @brief VideoWidget::init_btn_layout
  * Set up the button layouts
@@ -150,7 +158,8 @@ void VideoWidget::set_btn_tool_tip() {
     zoom_out_btn->setToolTip(tr("Zoom out"));
     fit_btn->setToolTip(tr("Scale the video to screen"));
     move_btn->setToolTip(tr("Panning tool"));
-    set_start_interval_btn->setToolTip("Set interval point");
+    set_start_interval_btn->setToolTip("Set left interval point");
+    set_end_interval_btn->setToolTip("Set right interval point");
 }
 
 /**
@@ -218,6 +227,9 @@ void VideoWidget::set_btn_shortcuts() {
 
     next_poi_sc = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Right), this);
     prev_poi_sc = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Left), this);
+
+    set_start_interval_btn->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Left));
+    set_end_interval_btn->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Right));
 }
 
 /**
@@ -407,13 +419,14 @@ void VideoWidget::on_bookmark_clicked() {
  * Sets the start point of the frame interval
  */
 void VideoWidget::set_interval_start_clicked() {
-    if (current_frame < m_interval.second) {
-        m_interval.first = current_frame;
-    } else if (current_frame > m_interval.second){
-        // Trying to set start after end, flip
-        m_interval.first = m_interval.second;
-        m_interval.second = current_frame;
-    }
+    m_interval.first = current_frame;
+//    if (current_frame < m_interval.second) {
+//        m_interval.first = current_frame;
+//    } else if (current_frame > m_interval.second){
+//        // Trying to set start after end, flip
+//        m_interval.first = m_interval.second;
+//        m_interval.second = current_frame;
+//    }
     set_status_bar("Frame interval updated: " +
                    QString().number(m_interval.first) + "-" + QString().number(m_interval.second));
 
@@ -424,53 +437,16 @@ void VideoWidget::set_interval_start_clicked() {
  * Sets the end of the frame interval
 */
 void VideoWidget::set_interval_end_clicked() {
-    if (current_frame > m_interval.first){
+    m_interval.second = current_frame;
+    /*if (current_frame > m_interval.first){
         m_interval.second = current_frame;
-    } else if (current_frame < m_interval.first) {
+    } *//*else if (current_frame < m_interval.first) {
         // Trying to set end before start, flip
         m_interval.second = m_interval.first;
         m_interval.first = current_frame;
-    }
+    }*/
     set_status_bar("Frame interval updated: " +
                    QString().number(m_interval.first) + "-" + QString().number(m_interval.second));
-}
-
-/**
- * @brief VideoWidget::export_images_clicked
- * Opens the frame exporter dialog.
- * If the dialog is accepted a new thread is created
- * where the exporting takes place.
- * QObjects deleteLater will take care of the QThread
- * and ImageExporter pointers.
- */
-void VideoWidget::export_images_clicked(){
-    if (m_vid_proj == nullptr){
-        set_status_bar("A video needs to be selected");
-        return;
-    }
-    ImageExporter* im_exp = new ImageExporter();
-    FrameExporterDialog exporter_dialog(im_exp, m_vid_proj->get_video(),
-                                        m_video_player->get_num_frames() - 1,
-                                        m_interval);
-    if (!exporter_dialog.exec()){
-        delete im_exp;
-        return;
-    }
-    std::pair<int, int> interval = im_exp->get_interval();
-    QProgressDialog* progress = new QProgressDialog(
-                "Exporting images...", "Abort", 0, abs(interval.first - interval.second), this, Qt::WindowMinimizeButtonHint);
-
-    connect(progress, &QProgressDialog::canceled, im_exp, ImageExporter::abort);
-    connect (im_exp, &ImageExporter::update_progress, progress, &QProgressDialog::setValue);
-
-    QThread* exporter_thread = new QThread;
-    im_exp->moveToThread(exporter_thread);
-    connect(exporter_thread, &QThread::started, im_exp, &ImageExporter::export_images);
-    connect(im_exp, &ImageExporter::finished, exporter_thread, &QThread::quit);
-    connect(im_exp, &ImageExporter::finished, im_exp, &ImageExporter::deleteLater);
-    connect(exporter_thread, &QThread::finished, exporter_thread, &QThread::deleteLater);
-    exporter_thread->start();
-    progress->show();
 }
 
 /**
@@ -693,6 +669,7 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int frame) {
         enable_video_btns();
     }
     if (m_vid_proj != vid_proj) {
+        m_interval = make_pair(0,0);
         if (m_video_player->is_paused()) {
             // Playback thread sleeping, wake it
             emit set_stop_video();

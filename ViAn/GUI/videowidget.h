@@ -44,6 +44,9 @@ public:
     FrameWidget* frame_wgt;
     AnalysisSlider* playback_slider;
 
+    VideoProject* get_current_video_project();
+    std::pair<int, int> get_frame_interval();
+
 signals:
     void first_frame(cv::Mat frame);
     void zoom_out(double zoom_factor);
@@ -93,7 +96,6 @@ public slots:
     //void prev_poi_clicked(void);
     void set_interval_start_clicked();
     void set_interval_end_clicked();
-    void export_images_clicked();
     void frame_line_edit_finished();
     void enable_poi_btns(bool, bool);
 

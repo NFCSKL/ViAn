@@ -44,7 +44,6 @@ std::pair<int, int> ImageExporter::get_interval(){
 void ImageExporter::export_images() {
     cv::VideoCapture capture(m_file_path);
     if (!capture.isOpened()) {
-        qDebug() << "Could not open file";
         return;
     }
 
@@ -60,15 +59,16 @@ void ImageExporter::export_images() {
         padded_number = Utility().zfill(std::to_string(current_frame), max_digits);
         cv::imwrite(m_export_path + padded_number + ".tiff", frame);
         current_frame++;
-        emit update_progress(progress++);
+        emit update_progress(++progress);
         QCoreApplication::processEvents(); // Process thread event loop. Needed for abort flag to update
     }
 
     // According to the qt docs the progressdialog should be set to max when done.
-    emit update_progress(m_export_interval.second - m_export_interval.first);
+    emit update_progress(m_export_interval.second - m_export_interval.first + 1);
 
     frame.release();
     capture.release();
+    emit finished_msg("Exported " + QString::number(progress) + " images");
     emit finished();
 }
 

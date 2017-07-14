@@ -25,7 +25,7 @@ class FrameExporterDialog : public QDialog {
     QLabel* m_video_path;
     QSpinBox* m_from_box;
     QSpinBox* m_to_box;
-    QLineEdit* m_path_edit;
+    QLabel* m_path_label;
     QLabel* m_total;
     QPushButton* m_browse_btn;
     QPushButton* m_export_btn;
@@ -37,7 +37,7 @@ class FrameExporterDialog : public QDialog {
     QString m_video_name;
     QString m_old_path_text = "C:/";
 public:
-    FrameExporterDialog(ImageExporter* im_exp, Video* video,
+    FrameExporterDialog(ImageExporter* im_exp, Video* video, std::string proj_path,
                         const int& max_frame, const std::pair<int, int>& interval, QWidget* parent = nullptr);
 private:
     void update_total();
@@ -47,7 +47,6 @@ private slots:
     void to_value_changed();
     void open_path_dialog();
     void save_values();
-    void path_text_edited(const QString& text);
 };
 
 #endif // FRAMEEXPORTERDIALOG_H
