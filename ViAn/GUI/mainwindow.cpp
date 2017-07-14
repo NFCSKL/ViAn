@@ -71,6 +71,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     //TODO REMOVE? QAction* toggle_toolbar = main_toolbar->toggleViewAction();
     addToolBar(main_toolbar);
     connect(main_toolbar->add_video_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
+    connect(main_toolbar->save_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
+    connect(main_toolbar->open_act, &QAction::triggered, project_wgt, &ProjectWidget::open_project);
 
     // Draw toolbar
     DrawingToolbar* draw_toolbar = new DrawingToolbar();
@@ -100,11 +102,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, SIGNAL(marked_analysis(Analysis*)), video_wgt->frame_wgt, SLOT(set_analysis(Analysis*)));
     connect(project_wgt, SIGNAL(marked_analysis(Analysis*)), video_wgt->playback_slider, SLOT(set_analysis(Analysis*)));
     connect(project_wgt, SIGNAL(set_detections(bool)), video_wgt->frame_wgt, SLOT(set_detections(bool)));
+    connect(project_wgt, SIGNAL(set_detections(bool)), this, SLOT(set_detections(bool)));
 
     connect(project_wgt, SIGNAL(enable_poi_btns(bool,bool)), video_wgt, SLOT(enable_poi_btns(bool,bool)));
 
     connect(project_wgt, SIGNAL(set_poi_slider(bool)), video_wgt->playback_slider, SLOT(set_show_pois(bool)));
     connect(project_wgt, SIGNAL(set_tag_slider(bool)), video_wgt->playback_slider, SLOT(set_show_tags(bool)));
+
+    connect(project_wgt, SIGNAL(set_poi_slider(bool)), this, SLOT(set_annotations(bool)));
+    connect(project_wgt, SIGNAL(set_tag_slider(bool)), this, SLOT(set_annotations(bool)));
 
     connect(project_wgt, SIGNAL(marked_tag(Analysis*)), video_wgt, SLOT(set_tag(Analysis*)));
     connect(project_wgt, SIGNAL(marked_tag(Analysis*)), video_wgt->playback_slider, SLOT(set_analysis(Analysis*)));
@@ -231,8 +237,8 @@ void MainWindow::init_edit_menu() {
 void MainWindow::init_view_menu() {
     QMenu* view_menu = menuBar()->addMenu(tr("&View"));
 
-    QAction* annotation_act = new QAction(tr("Annotations"), this);
-    QAction* detection_act = new QAction(tr("Detections"), this);
+    annotation_act = new QAction(tr("Annotations"), this);
+    detection_act = new QAction(tr("Detections"), this);
 
     annotation_act->setCheckable(true);
     detection_act->setCheckable(true);
@@ -247,6 +253,10 @@ void MainWindow::init_view_menu() {
     toggle_bookmark_wgt->setStatusTip(tr("Show/hide bookmark widget"));
     annotation_act->setStatusTip(tr("Toggle annotations on/off"));
     detection_act->setStatusTip(tr("Toggle detections on/off"));
+
+    connect(detection_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_detections);
+    connect(annotation_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_pois);
+    connect(annotation_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_tags);
 }
 
 /**
@@ -367,6 +377,14 @@ void MainWindow::cont_bri() {
     ManipulatorDialog* man_dialog = new ManipulatorDialog(this);
     connect(man_dialog, SIGNAL(values(int,double)), video_wgt->m_video_player, SLOT(set_bright_cont(int,double)));
     man_dialog->exec();
+}
+
+void MainWindow::set_detections(bool b) {
+    detection_act->setChecked(b);
+}
+
+void MainWindow::set_annotations(bool b) {
+    annotation_act->setChecked(b);
 }
 
 /**
