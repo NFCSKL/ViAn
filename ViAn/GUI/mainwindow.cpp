@@ -8,6 +8,7 @@
 #include <QMenuBar>
 #include <QTime>
 #include <QDebug>
+#include <QProgressDialog>
 #include <chrono>
 #include <thread>
 #include "Video/shapes/shape.h"
@@ -16,6 +17,7 @@
 #include "Toolbars/maintoolbar.h"
 #include "Toolbars/drawingtoolbar.h"
 #include "manipulatordialog.h"
+#include "GUI/frameexporterdialog.h"
 
 /**
  * @brief MainWindow::MainWindow
@@ -49,6 +51,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     bookmark_wgt = new BookmarkWidget();
     bookmark_wgt->setWindowFlags(Qt::Window);
     addDockWidget(Qt::RightDockWidgetArea, bookmark_dock);
+    bookmark_dock->close();
 
     connect(video_wgt, SIGNAL(new_bookmark(VideoProject*,int,cv::Mat)), bookmark_wgt, SLOT(create_bookmark(VideoProject*,int,cv::Mat)));
     connect(project_wgt, SIGNAL(proj_path(std::string)), bookmark_wgt, SLOT(set_path(std::string)));
@@ -68,7 +71,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     // Main toolbar
     MainToolbar* main_toolbar = new MainToolbar();
     main_toolbar->setWindowTitle(tr("Main toolbar"));
-    //TODO REMOVE? QAction* toggle_toolbar = main_toolbar->toggleViewAction();
     addToolBar(main_toolbar);
     connect(main_toolbar->add_video_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
     connect(main_toolbar->save_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
@@ -102,20 +104,21 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, SIGNAL(marked_analysis(Analysis*)), video_wgt->frame_wgt, SLOT(set_analysis(Analysis*)));
     connect(project_wgt, SIGNAL(marked_analysis(Analysis*)), video_wgt->playback_slider, SLOT(set_analysis(Analysis*)));
     connect(project_wgt, SIGNAL(set_detections(bool)), video_wgt->frame_wgt, SLOT(set_detections(bool)));
-    connect(project_wgt, SIGNAL(set_detections(bool)), this, SLOT(set_detections(bool)));
 
     connect(project_wgt, SIGNAL(enable_poi_btns(bool,bool)), video_wgt, SLOT(enable_poi_btns(bool,bool)));
+    connect(project_wgt, SIGNAL(enable_tag_btn(bool)), video_wgt, SLOT(enable_tag_btn(bool)));
 
     connect(project_wgt, SIGNAL(set_poi_slider(bool)), video_wgt->playback_slider, SLOT(set_show_pois(bool)));
     connect(project_wgt, SIGNAL(set_tag_slider(bool)), video_wgt->playback_slider, SLOT(set_show_tags(bool)));
 
-    connect(project_wgt, SIGNAL(set_poi_slider(bool)), this, SLOT(set_annotations(bool)));
-    connect(project_wgt, SIGNAL(set_tag_slider(bool)), this, SLOT(set_annotations(bool)));
+    connect(project_wgt, &ProjectWidget::update_frame, video_wgt->playback_slider, &AnalysisSlider::update);
+    connect(project_wgt, &ProjectWidget::update_frame, video_wgt->frame_wgt, &FrameWidget::update);
 
     connect(project_wgt, SIGNAL(marked_tag(Analysis*)), video_wgt, SLOT(set_tag(Analysis*)));
-    connect(project_wgt, SIGNAL(marked_tag(Analysis*)), video_wgt->playback_slider, SLOT(set_analysis(Analysis*)));
-    connect(video_wgt, SIGNAL(add_tag(VideoProject*, Analysis)), project_wgt, SLOT(add_tag(VideoProject*, Analysis)));
-    connect(video_wgt, SIGNAL(new_frame_tagged(Analysis*)), video_wgt->playback_slider, SLOT(set_analysis(Analysis*)));
+    connect(project_wgt, SIGNAL(marked_tag(Analysis*)), video_wgt->playback_slider, SLOT(set_tag(Analysis*)));
+    connect(video_wgt, SIGNAL(add_tag(VideoProject*, Analysis*)), project_wgt, SLOT(add_tag(VideoProject*, Analysis*)));
+    connect(video_wgt, SIGNAL(tag_updated(Analysis*)), video_wgt->playback_slider, SLOT(set_tag(Analysis*)));
+    connect(video_wgt, SIGNAL(set_interval(int)), video_wgt->playback_slider, SLOT(set_interval(int)));
 }
 
 
@@ -237,26 +240,30 @@ void MainWindow::init_edit_menu() {
 void MainWindow::init_view_menu() {
     QMenu* view_menu = menuBar()->addMenu(tr("&View"));
 
-    annotation_act = new QAction(tr("Annotations"), this);
-    detection_act = new QAction(tr("Detections"), this);
+    detect_intv_act = new QAction(tr("&Detection intervals"), this);      //Slider pois
+    bound_box_act = new QAction(tr("&Bounding boxes"), this);        //Video oois
 
-    annotation_act->setCheckable(true);
-    detection_act->setCheckable(true);
+    detect_intv_act->setCheckable(true);
+    bound_box_act->setCheckable(true);
+
+    detect_intv_act->setChecked(true);
+    bound_box_act->setChecked(true);
 
     view_menu->addAction(toggle_project_wgt);
     view_menu->addAction(toggle_bookmark_wgt);
     view_menu->addSeparator();
-    view_menu->addAction(annotation_act);
-    view_menu->addAction(detection_act);
+    view_menu->addAction(detect_intv_act);
+    view_menu->addAction(bound_box_act);
 
     toggle_project_wgt->setStatusTip(tr("Show/hide project widget"));
     toggle_bookmark_wgt->setStatusTip(tr("Show/hide bookmark widget"));
-    annotation_act->setStatusTip(tr("Toggle annotations on/off"));
-    detection_act->setStatusTip(tr("Toggle detections on/off"));
+    detect_intv_act->setStatusTip(tr("Toggle annotations on/off"));
+    bound_box_act->setStatusTip(tr("Toggle detections on/off"));
 
-    connect(detection_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_detections);
-    connect(annotation_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_pois);
-    connect(annotation_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_tags);
+    connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_show_detections);
+    connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::update);
+    connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_on_slider);
+    connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
 }
 
 /**
@@ -294,6 +301,11 @@ void MainWindow::init_tools_menu() {
     QAction* pen_act = new QAction(tr("&Pen"), this);
     QAction* text_act = new QAction(tr("&Text"), this);
 
+
+    QAction* export_act  =new QAction(tr("&Frames"));
+
+
+
     color_act->setIcon(QIcon("../ViAn/Icons/color.png"));
     undo_act->setIcon(QIcon("../ViAn/Icons/undo.png"));
     clear_act->setIcon(QIcon("../ViAn/Icons/clear.png"));
@@ -307,6 +319,11 @@ void MainWindow::init_tools_menu() {
     arrow_act->setIcon(QIcon("../ViAn/Icons/arrow.png"));
     pen_act->setIcon(QIcon("../ViAn/Icons/pen.png"));
     text_act->setIcon(QIcon("../ViAn/Icons/text.png"));
+
+    // Export submenu
+    QMenu* export_menu = tool_menu->addMenu(tr("&Export"));
+    export_menu->addAction(export_act);
+
 
     tool_menu->addAction(color_act);
     QMenu* drawing_tools = tool_menu->addMenu(tr("&Shapes"));
@@ -342,6 +359,8 @@ void MainWindow::init_tools_menu() {
     text_act->setStatusTip(tr("Text tool"));
 
     //Connect
+    connect(export_act, &QAction::triggered, this, &MainWindow::export_images);
+
 }
 
 /**
@@ -379,12 +398,44 @@ void MainWindow::cont_bri() {
     man_dialog->exec();
 }
 
-void MainWindow::set_detections(bool b) {
-    detection_act->setChecked(b);
-}
+void MainWindow::export_images(){
+    std::pair<int, int> interval = video_wgt->get_frame_interval();
+    VideoProject* vid_proj = video_wgt->get_current_video_project();
+    if (vid_proj == nullptr){
+        set_status_bar("A video needs to be selected");
+        return;
+    }
 
-void MainWindow::set_annotations(bool b) {
-    annotation_act->setChecked(b);
+    if (interval.first > interval.second) {
+        int tmp = interval.second;
+        interval.second = interval.first;
+        interval.first = tmp;
+    }
+    ImageExporter* im_exp = new ImageExporter();
+    FrameExporterDialog exporter_dialog(im_exp, vid_proj->get_video(), project_wgt->m_proj->getDir(),
+                                        video_wgt->m_video_player->get_num_frames() - 1,
+                                        interval);
+    if (!exporter_dialog.exec()){
+        delete im_exp;
+        return;
+    }
+
+    interval = im_exp->get_interval();
+    QProgressDialog* progress = new QProgressDialog(
+                "Exporting images...", "Abort", 0, abs(interval.first - interval.second) + 1, this, Qt::WindowMinimizeButtonHint);
+
+    connect(im_exp, &ImageExporter::finished_msg, this, &MainWindow::set_status_bar);
+    connect(progress, &QProgressDialog::canceled, im_exp, ImageExporter::abort);
+    connect (im_exp, &ImageExporter::update_progress, progress, &QProgressDialog::setValue);
+
+    QThread* exporter_thread = new QThread;
+    im_exp->moveToThread(exporter_thread);
+    connect(exporter_thread, &QThread::started, im_exp, &ImageExporter::export_images);
+    connect(im_exp, &ImageExporter::finished, exporter_thread, &QThread::quit);
+    connect(im_exp, &ImageExporter::finished, im_exp, &ImageExporter::deleteLater);
+    connect(exporter_thread, &QThread::finished, exporter_thread, &QThread::deleteLater);
+    progress->show();
+    exporter_thread->start();
 }
 
 /**

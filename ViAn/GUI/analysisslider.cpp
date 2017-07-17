@@ -28,8 +28,8 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     painter.drawComplexControl(QStyle::CC_Slider, option);
     QRect groove_rect = style()->subControlRect(QStyle::CC_Slider, &option, QStyle::SC_SliderGroove, this);
 
-    if (m_show_tags || m_show_pois) {
-        QBrush brush = (m_show_tags) ? Qt::red : Qt::yellow;
+    if (m_show_pois && show_on_slider) {
+        QBrush brush = Qt::yellow;
 
         //Get one frames width on the slider
         double c = (double)(groove_rect.right()-groove_rect.left())/maximum();
@@ -46,9 +46,26 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
             QRect rect(first, groove_rect.top(), 1+second-first, groove_rect.height());
             painter.fillRect(rect, brush);
         }
+    } else if (m_show_tags && show_on_slider) {
+        double c = (double)(groove_rect.right()-groove_rect.left())/maximum();
+        for (auto frame : frames) {
+            double first = (groove_rect.left()+(double)frame*c);
+            QRect rect(first, groove_rect.top(), 1, groove_rect.height());
+            painter.fillRect(rect, Qt::red);
+        }
+    }
+    if (interval != -1) {
+        double c = (double)(groove_rect.right()-groove_rect.left())/maximum();
+        double first = (groove_rect.left()+(double)interval*c);
+        QRect rect(first, groove_rect.top(), 1, groove_rect.height());
+        painter.fillRect(rect, Qt::black);
     }
     option.subControls = QStyle::SC_SliderHandle;
     painter.drawComplexControl(QStyle::CC_Slider, option);
+}
+
+void AnalysisSlider::update() {
+    repaint();
 }
 
 /**
@@ -63,6 +80,17 @@ void AnalysisSlider::set_analysis(Analysis* analysis) {
             add_slider_interval(p->start_frame, p->end_frame);
         }
     }
+}
+
+void AnalysisSlider::set_tag(Analysis *analysis) {
+    this->frames.clear();
+    for (auto frame : analysis->frames) {
+        this->frames.push_back(frame);
+    }
+}
+
+void AnalysisSlider::set_interval(int frame) {
+    interval = frame;
 }
 
 /**
@@ -94,6 +122,15 @@ int AnalysisSlider::get_next_poi_start(int curr_frame) {
         for (std::pair<int, int> rect : rects) {
             if ( rect.first > curr_frame) {
                 return rect.first;
+            }
+        }
+    } else if (!frames.empty()) {
+        int edge_frame = curr_frame;
+        for (int frame : frames) {
+            if (frame > edge_frame+JUMP_INTERVAL+1) {
+                return frame;
+            } else if (frame > edge_frame+JUMP_INTERVAL){
+                edge_frame = frame;
             }
         }
     }
@@ -129,6 +166,16 @@ int AnalysisSlider::get_prev_poi_start(int curr_frame) {
                 break;
             } else new_frame = rect.first;
         }
+    } else if (!frames.empty()) {
+        int edge_frame = curr_frame;
+        for (int i = frames.size()-1; i >= 0; i--) {
+            int frame = frames[i];
+            if (frame < edge_frame-JUMP_INTERVAL-1) {
+                return frame;
+            } else if (frame < edge_frame-JUMP_INTERVAL){
+                edge_frame = frame;
+            }
+        }
     }
     return new_frame;
 }
@@ -153,7 +200,6 @@ bool AnalysisSlider::is_in_POI(int frame) {
  */
 void AnalysisSlider::set_show_pois(bool show_pois) {
     m_show_pois = show_pois;
-    repaint();
 }
 
 /**
@@ -162,7 +208,10 @@ void AnalysisSlider::set_show_pois(bool show_pois) {
  */
 void AnalysisSlider::set_show_tags(bool show_tags) {
     m_show_tags = show_tags;
-    repaint();
+}
+
+void AnalysisSlider::set_show_on_slider(bool show) {
+    show_on_slider = show;
 }
 
 /**
@@ -171,6 +220,7 @@ void AnalysisSlider::set_show_tags(bool show_tags) {
  */
 void AnalysisSlider::clear_slider() {
     rects.clear();
+    frames.clear();
 }
 
 void AnalysisSlider::set_blocked(bool value) {

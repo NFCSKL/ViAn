@@ -39,16 +39,15 @@ public:
     ~MainWindow();
 
     StatusBar* status_bar;
-    QAction* annotation_act;
-    QAction* detection_act;
+    QAction* detect_intv_act;
+    QAction* bound_box_act;
 private slots:
     void gen_report(void);
     void cont_bri(void);
+    void export_images();
 
 public slots:
     void options(void);
-    void set_detections(bool b);
-    void set_annotations(bool b);
 
 signals:
     void set_status_bar(QString);

@@ -14,11 +14,16 @@ class AnalysisSlider : public QSlider {
     bool m_was_paused = false;
     bool m_show_pois = false;
     bool m_show_tags = false;
+    bool show_on_slider = true;
+
+    //Change this to set how many frames the POI buttons should ignore
+    const int JUMP_INTERVAL = 0;
 
 public:
     explicit AnalysisSlider(Qt::Orientation orientation, QWidget *parent = 0);
 
     int last_poi_end = -1;
+    int interval = -1;
 
     void set_blocked(bool value);
     bool is_blocked();
@@ -32,13 +37,17 @@ public:
 protected:
     void paintEvent(QPaintEvent *ev);
 public slots:
+    void update();
     void set_analysis(Analysis* analysis);
+    void set_tag(Analysis* analysis);
+    void set_interval(int frame);
     void set_show_pois(bool);
     void set_show_tags(bool);
+    void set_show_on_slider(bool);
     void clear_slider();
 
 private:
-    std::set<int> frames;
+    std::vector<int> frames;
     std::vector<std::pair<int, int>> rects;
 };
 
