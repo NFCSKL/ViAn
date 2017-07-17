@@ -11,11 +11,11 @@
 #include "ooi.h"
 #include "analysisinterval.h"
 class POI : public AnalysisInterval{
-    std::map<int,std::vector<OOI>> OOIs = {};
+    std::map<int,std::vector<OOI>> OOIs;
 public:
     POI();    
-    virtual void read(const QJsonObject& json);
-    virtual void write(QJsonObject& json);
+    void read(const QJsonObject& json);
+    void write(QJsonObject& json);
     void add_detections(int frame_num, std::vector<OOI> detections);
     void set_end_frame(int frame_num);
     bool is_in_POI(int frame_num);

@@ -110,10 +110,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, SIGNAL(set_poi_slider(bool)), video_wgt->playback_slider, SLOT(set_show_pois(bool)));
     connect(project_wgt, SIGNAL(set_tag_slider(bool)), video_wgt->playback_slider, SLOT(set_show_tags(bool)));
 
-    connect(project_wgt, SIGNAL(marked_tag(Analysis*)), video_wgt, SLOT(set_tag(Analysis*)));
-    connect(project_wgt, SIGNAL(marked_tag(Analysis*)), video_wgt->playback_slider, SLOT(set_tag(Analysis*)));
-    connect(video_wgt, SIGNAL(add_tag(VideoProject*, Analysis*)), project_wgt, SLOT(add_tag(VideoProject*, Analysis*)));
-    connect(video_wgt, SIGNAL(tag_updated(Analysis*)), video_wgt->playback_slider, SLOT(set_tag(Analysis*)));
+    connect(project_wgt, SIGNAL(marked_tag(Tag*)), video_wgt, SLOT(set_tag(Tag*)));
+    connect(project_wgt, SIGNAL(marked_tag(Tag*)), video_wgt->playback_slider, SLOT(set_tag(Tag*)));
+    connect(video_wgt, SIGNAL(add_tag(VideoProject*, Tag*)), project_wgt, SLOT(add_tag(VideoProject*, Tag*)));
+    connect(video_wgt, SIGNAL(tag_updated(Analysis*)), video_wgt->playback_slider, SLOT(set_analysis(Analysis*)));
     connect(video_wgt, SIGNAL(set_interval(int)), video_wgt->playback_slider, SLOT(set_interval(int)));
 }
 

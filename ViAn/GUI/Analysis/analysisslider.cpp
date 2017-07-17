@@ -72,15 +72,19 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
 void AnalysisSlider::set_analysis(Analysis* analysis) {
     rects.clear();
     if (analysis != nullptr) {
-        for (auto p : analysis->getIntervals()) {
-            add_slider_interval(p->getStart_frame(), p->getEnd_frame());
+        for (auto p : analysis->POIs) {
+            add_slider_interval(p->start_frame, p->end_frame);
         }
     }
 }
 
-void AnalysisSlider::set_tag(Tag *tag)
-{
-    set_analysis(static_cast<Analysis*>(tag));
+void AnalysisSlider::set_tag(Analysis *analysis) {
+    this->frames.clear();
+    for (auto frame : analysis->frames) {
+        this->frames.push_back(frame);
+    }
+
+    repaint();
 }
 
 void AnalysisSlider::set_interval(int frame) {

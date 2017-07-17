@@ -507,7 +507,7 @@ void VideoWidget::analysis_btn_clicked() {
 
 void VideoWidget::tag_frame() {
     if (m_tag->type == TAG){
-        if (m_tag->add_frame(current_frame)) {
+        if (static_cast<Tag*>(m_tag)->add_frame(current_frame)) {
             emit tag_updated(m_tag);
             emit set_status_bar("Tagged frame number: " + QString::number(current_frame));
         } else {
@@ -527,13 +527,13 @@ void VideoWidget::new_tag_clicked() {
 }
 
 void VideoWidget::new_tag(QString name) {
-    Analysis* tag = new Analysis();
+    Tag* tag = new Tag();
     tag->set_name(name.toStdString());
     tag->type = TAG;
     emit add_tag(m_vid_proj, tag);
 }
 
-void VideoWidget::set_tag(Analysis* tag) {
+void VideoWidget::set_tag(Tag* tag) {
     m_tag = tag;
 }
 

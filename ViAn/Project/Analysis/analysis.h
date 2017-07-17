@@ -20,7 +20,16 @@ const std::map<std::string, ANALYSIS_TYPE> ANALYSIS_NAMES_TYPE_MAP = {std::make_
                                                                      std::make_pair("Tag",TAG)};
 class Analysis : public Saveable {
     friend class AnalysisMeta;
+
+protected:
     std::string name;
+    struct poi_cmp {
+        bool operator()(const AnalysisInterval* lhs, const AnalysisInterval* rhs) const {
+            return lhs->getEnd_frame() < rhs->getStart_frame();
+        }
+    };
+    std::set<AnalysisInterval*, poi_cmp> m_intervals;
+
 
 public:
     ANALYSIS_TYPE type;
@@ -28,23 +37,14 @@ public:
     Analysis(const Analysis &obj);
     ~Analysis();
 
-    struct poi_cmp {
-        bool operator()(const POI* lhs, const POI* rhs) const {
-            return lhs->start_frame < rhs->start_frame;
-        }
-    };
+    virtual void add_interval(AnalysisInterval *POI);
 
-    void add_POI(POI *POI);
-    bool add_frame(int frame);
-    void remove_frame(int frame);
-    void read(const QJsonObject& json);
-    void write(QJsonObject& json);
-
-    std::set<int> frames;
-    std::set<POI*, poi_cmp> POIs;
+    virtual void read(const QJsonObject& json);
+    virtual void write(QJsonObject& json);
     std::vector<cv::Rect> get_detections_on_frame(int frame_num);
     void set_name(const std::string &name);
     std::string get_name() const;
+    std::set<AnalysisInterval*, poi_cmp> getIntervals() const;
 };
 
 #endif // ANALYSIS_H

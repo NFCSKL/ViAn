@@ -3,7 +3,7 @@
 
 #include "Project/videoproject.h"
 #include <QTreeWidgetItem>
-
+#include "Project/Analysis/tag.h"
 enum ITEM_TYPE {VIDEO_ITEM, ANALYSIS_ITEM, FOLDER_ITEM, TAG_ITEM};
 
 class AnalysisItem : public QTreeWidgetItem {
@@ -17,10 +17,10 @@ public:
 };
 
 class TagItem : public QTreeWidgetItem {
-    Analysis* m_tag;
+    Tag* m_tag;
 public:
-    TagItem(Analysis *tag, int type);
-    Analysis *get_tag();
+    TagItem(Tag *tag, int type);
+    Tag *get_tag();
 };
 
 class VideoItem : public QTreeWidgetItem {

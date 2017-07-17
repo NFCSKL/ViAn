@@ -9,15 +9,15 @@
 AnalysisMeta::AnalysisMeta(const Analysis &analysis) {
     m_name = analysis.name;
     file_analysis = analysis.full_path();
-    std::set<POI*> pois;
-    for (auto poi : analysis.POIs) {
+    std::set<AnalysisInterval*> pois;
+    for (auto poi : analysis.m_intervals) {
         pois.insert(poi);
     }
     std::pair<int,int> pair;
-    POI* poi;
+    AnalysisInterval* poi;
     for (auto it = pois.begin(); it != pois.end(); ++it) {
         poi = *it;
-        pair = std::make_pair(poi->start_frame, poi->end_frame);
+        pair = std::make_pair(poi->getStart_frame(), poi->getEnd_frame());
         m_poi_intervals.push_back(pair);
     }
 }
