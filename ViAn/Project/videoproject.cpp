@@ -17,6 +17,11 @@ VideoProject::VideoProject(){
     this->video = new Video();
 }
 
+VideoProject::~VideoProject(){
+    delete m_overlay;
+    delete video;
+}
+
 /**
  * @brief VideoProject::get_video
  * @return video
@@ -165,6 +170,10 @@ void VideoProject::set_tree_index(std::stack<int> tree_index) {
     }
 }
 
+void VideoProject::set_project(Project *proj){
+    m_project = proj;
+}
+
 /**
  * @brief VideoProject::add_analysis
  * @param analysis to be added
@@ -190,6 +199,11 @@ void VideoProject::delete_artifacts(){
         temp->delete_saveable();
 
     }
+}
+
+void VideoProject::remove_from_project()
+{
+    m_project->remove_video_project(this);
 }
 
 string VideoProject::get_index_path() {

@@ -24,6 +24,7 @@ using ID = int;
  * incomplete class, will be added on
  * along with parser functionality
  */
+class Report;
 class Project : public Saveable{
     friend class ProjectTestsuite;
     std::string m_file = "";
@@ -31,7 +32,7 @@ class Project : public Saveable{
     std::string m_dir = "";
     std::string m_dir_bookmarks = "";
     std::string m_dir_videos = "";
-    std::map<ID, VideoProject*> m_videos;
+    std::vector<VideoProject*> m_videos;
     std::map<ID, Report*> m_reports;
     int m_vid_count = 0;
     int m_rp_count = 0;
@@ -41,11 +42,11 @@ public:
     ~Project();
 
     ID add_report(Report* report);
-    ID add_video_project(VideoProject *vid_proj);
+    void add_video_project(VideoProject *vid_proj);
     // TODO
     //ID add_drawing();
     // void remove_drawing();
-    void remove_video_project(const int &id);
+    void remove_video_project(VideoProject* vid_proj);
     void remove_report(const int& id);
 
     // read and write operator for Projects
@@ -57,8 +58,8 @@ public:
     bool save_project();
     bool load_project();
 
-    std::map<ID, VideoProject *>& get_videos();
-    VideoProject* get_video(ID m_id);
+    std::vector<VideoProject *>& get_videos();
+    VideoProject* get_video(const int& v_pos);
     std::string getDir_bookmarks() const;
     std::string getDir_videos() const;
     std::string getDir() const;

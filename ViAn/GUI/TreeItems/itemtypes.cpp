@@ -1,19 +1,28 @@
 #include "itemtypes.h"
 
-
-VideoItem::VideoItem(VideoProject* video_project, int type): QTreeWidgetItem(type) {
+TreeItem::TreeItem(int type) : QTreeWidgetItem(type) {
     setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);
+}
+
+VideoItem::VideoItem(VideoProject* video_project, int type): TreeItem(type) {
+
     m_vid_proj = video_project;
     setText(0, QString::fromStdString(video_project->get_video()->get_name()));
 }
 
-VideoItem::VideoItem(int type): QTreeWidgetItem(type) {
+VideoItem::VideoItem(int type): TreeItem(type) {
     setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);
     setText(0,"placeholder");
 }
 
 VideoItem::~VideoItem(){
+    m_vid_proj->remove_from_project();
     delete m_vid_proj;
+}
+
+void VideoItem::remove(){
+    qDebug() << "Remove VideoItem";
+
 }
 
 VideoProject* VideoItem::get_video_project() {
@@ -45,3 +54,5 @@ FolderItem::FolderItem(int type) : QTreeWidgetItem(type) {
     const QIcon folder_icon("../ViAn/Icons/folder.png");
     setIcon(0, folder_icon);
 }
+
+

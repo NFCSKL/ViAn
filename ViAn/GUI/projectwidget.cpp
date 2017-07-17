@@ -243,11 +243,9 @@ void ProjectWidget::insert_to_path_index(VideoProject *vid_proj) {
     if (elems.size() > 0) {
         QTreeWidgetItem* item = topLevelItem(std::stoi(elems[0]));
         for (auto i = 1; i < elems.size(); ++i) {
-            qDebug() << elems.size();
             if (item->child(std::stoi(elems[i]))) item = item->child(std::stoi(elems[i]));
         }
         if (item != nullptr && item->type() == VIDEO_ITEM) {
-            qDebug() << item->text(0);
             VideoItem* v_item = dynamic_cast<VideoItem*>(item);
             v_item->set_video_project(vid_proj);
         }
@@ -391,7 +389,9 @@ void ProjectWidget::context_menu(const QPoint &point) {
 
 void ProjectWidget::remove_item() {
     qDebug() << "Removing item: " << clicked_item->text(0);
-    delete clicked_item;
+    auto tree_item = dynamic_cast<TreeItem*>(clicked_item);
+    tree_item->remove();
+    delete tree_item;
 }
 
 void ProjectWidget::rename_item(){
@@ -427,8 +427,8 @@ void ProjectWidget::create_folder_item() {
 void ProjectWidget::save_project() {
     m_proj->save_project();
     ProjectTreeState tree_state;
-    tree_state.set_tree(this);
-    tree_state.save_state();
+    tree_state.set_tree(invisibleRootItem());
+    tree_state.save_state(m_proj->getDir() + "treestate");
     emit set_status_bar("Project saved");
 }
 
@@ -443,14 +443,14 @@ void ProjectWidget::open_project() {
     QString project_path = QFileDialog().getOpenFileName(this, tr("Open project"), QDir::homePath());
     if (!project_path.isEmpty()) {
         emit set_status_bar("Opening project");
-        ProjectTreeState tree_state;
-        tree_state.set_tree(this);
-        tree_state.load_state();
-//        clear();
         m_proj = Project::fromFile(project_path.toStdString());
+        // Load project tree structure
+        ProjectTreeState tree_state;
+        tree_state.set_tree(invisibleRootItem());
+        tree_state.load_state(m_proj->getDir() + "treestate.json");
+
         emit proj_path(m_proj->getDir());
-        for (auto vid_pair : m_proj->get_videos()) {
-            VideoProject* vid_proj = vid_pair.second;
+        for (auto vid_proj : m_proj->get_videos()) {
             insert_to_path_index(vid_proj);
             emit load_bookmarks(vid_proj);
 //            QString video_path = QString::fromStdString(vid_proj->get_video()->file_path);

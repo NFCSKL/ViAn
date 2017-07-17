@@ -6,8 +6,15 @@
 
 enum ITEM_TYPE {VIDEO_ITEM, ANALYSIS_ITEM, FOLDER_ITEM};
 
-class AnalysisItem : public QTreeWidgetItem
-{
+class VideoProject;
+class TreeItem : public QTreeWidgetItem {
+public:
+    TreeItem(int type);
+
+    virtual void remove() = 0;
+};
+
+class AnalysisItem : public QTreeWidgetItem{
     Analysis m_analysis;
 
 public:
@@ -23,8 +30,7 @@ public:
     FolderItem(int type);
 };
 
-class VideoItem : public QTreeWidgetItem
-{
+class VideoItem : public TreeItem {
     VideoProject* m_vid_proj;
 
 public:
@@ -33,6 +39,8 @@ public:
     VideoProject* get_video_project();
     void set_video_project(VideoProject* vid_proj);
     ~VideoItem();
+
+    void remove();
 signals:
 
 public slots:

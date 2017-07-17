@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     MainWindow w;
     qRegisterMetaType<AnalysisMeta>();
-    bool unit_testing = false;
+    bool unit_testing = true;
     if(unit_testing){
         QTest::qExec(new ProjectTestsuite());
 

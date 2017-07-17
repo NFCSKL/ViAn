@@ -11,6 +11,8 @@
 #include <stack>
 
 class Project;
+class VideoItem;
+class FolderItem;
 class ProjectWidget : public QTreeWidget
 {
     Q_OBJECT
