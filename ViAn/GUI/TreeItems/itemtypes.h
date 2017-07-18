@@ -24,10 +24,11 @@ public:
     Analysis *get_analysis();
 };
 
-class FolderItem : public QTreeWidgetItem
+class FolderItem : public TreeItem
 {
 public:
     FolderItem(int type);
+    void remove();
 };
 
 class VideoItem : public TreeItem {

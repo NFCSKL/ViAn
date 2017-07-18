@@ -7,6 +7,7 @@
 #include <QMenu>
 #include <QFileInfo>
 #include <QDirIterator>
+#include <QShortcut>
 #include <iostream>
 #include <algorithm>
 #include <sstream>
@@ -25,6 +26,11 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
 
     connect(this, &ProjectWidget::customContextMenuRequested, this, &ProjectWidget::context_menu);
     connect(this, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this , SLOT(tree_item_clicked(QTreeWidgetItem*,int)));
+
+    QShortcut* new_folder_sc = new QShortcut(this);
+    new_folder_sc->setContext(Qt::WidgetWithChildrenShortcut);
+    new_folder_sc->setKey(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_N));
+    connect(new_folder_sc, &QShortcut::activated, this, &ProjectWidget::create_folder_item);
 }
 
 /**
@@ -252,6 +258,11 @@ void ProjectWidget::insert_to_path_index(VideoProject *vid_proj) {
     }
 }
 
+/**
+ * @brief ProjectWidget::update_index_paths
+ * Updates the position index for each VideoProject
+ * @param item
+ */
 void ProjectWidget::update_index_paths(QTreeWidgetItem* item) {
     if (item == nullptr) item = invisibleRootItem();
     for (auto i = 0; i < item->childCount(); ++i){
@@ -356,42 +367,55 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
  * @param point :   click position
  */
 void ProjectWidget::context_menu(const QPoint &point) {
+    qDebug() << selectedItems().count();
     if (m_proj == nullptr) return;
     clicked_item = itemAt(point);
     QMenu menu(this);
-    menu.addAction("New Folder", this, SLOT(create_folder_item()));
-    if (clicked_item == nullptr) {
-        // Not clicking any item
-
-    } else {
+    const int item_count = selectedItems().count();
+    if (item_count == 0) {
+        // Clicked on root tree
+        menu.addAction("New Folder", this, SLOT(create_folder_item()));
+    } else if (item_count == 1) {
+        // Clicked on item
+        menu.addAction("New Folder", this, SLOT(create_folder_item()));
         menu.addSeparator();
-        menu.addAction("Remove", this, SLOT(remove_item()));
-        switch (clicked_item->type()) {
-        case VIDEO_ITEM:
-            //rename
-            // remove
-            break;
+        switch (selectedItems().front()->type()) {
         case ANALYSIS_ITEM:
             menu.addAction("Rename", this, SLOT(rename_item()));
             break;
         case FOLDER_ITEM:
             menu.addAction("Rename", this, SLOT(rename_item()));
+            menu.addAction("Remove", this, SLOT(remove_item()));
             break;
+        case VIDEO_ITEM:
+            menu.addAction("Remove", this, SLOT(remove_item()));
         default:
+            // VIDEO_ITEM
             break;
         }
+    } else if (item_count > 1) {
+        // Clicked with selected items
+        menu.addAction("Remove", this, SLOT(remove_item()));
     }
     menu.exec(mapToGlobal(point));
     clicked_item = nullptr;
-//    delete clicked_point;
-//    if (clicked_point ==  nullptr) qDebug() << "NULLPTR";
+
 }
 
 void ProjectWidget::remove_item() {
-    qDebug() << "Removing item: " << clicked_item->text(0);
-    auto tree_item = dynamic_cast<TreeItem*>(clicked_item);
-    tree_item->remove();
-    delete tree_item;
+    QMessageBox delete_box(this);
+    delete_box.setIcon(QMessageBox::Warning);
+    delete_box.setText("Deleting item(s)\n"
+                       "(Unselected items within selected folders will be deleted as well)");
+    delete_box.setInformativeText("Do you wish to continue?");
+    delete_box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    delete_box.setDefaultButton(QMessageBox::No);
+    if (delete_box.exec() == QMessageBox::Yes) {
+        for (auto item : selectedItems()) {
+            delete item;
+        }
+    }
+
 }
 
 void ProjectWidget::rename_item(){
@@ -400,24 +424,29 @@ void ProjectWidget::rename_item(){
 }
 
 void ProjectWidget::create_folder_item() {
+    if (m_proj == nullptr) return;
     FolderItem* item = new FolderItem(FOLDER_ITEM);
     item->setText(0, tr("New Folder"));
-    if (clicked_item == nullptr) {
+    QTreeWidgetItem* s_item = (!selectedItems().count()) ? invisibleRootItem() : selectedItems().front();
+    if (s_item == invisibleRootItem()) {
         // Click occured on background add to top level
         insertTopLevelItem(topLevelItemCount(), item);
-    } else if (clicked_item->type() == FOLDER_ITEM) {
+    } else if (s_item->type() == FOLDER_ITEM) {
         // Clicked on folder item. Add new folder as child
-        clicked_item->insertChild(0, item);
-    } else if (clicked_item->type() == VIDEO_ITEM) {
-        QTreeWidgetItem* p_item =  clicked_item->parent();
+        s_item->insertChild(0, item);
+        s_item->setExpanded(true);
+    } else if (s_item->type() == VIDEO_ITEM) {
+        QTreeWidgetItem* p_item =  s_item->parent();
         if (p_item == nullptr) {
-            insertTopLevelItem(indexOfTopLevelItem(clicked_item) + 1, item);
+            insertTopLevelItem(indexOfTopLevelItem(s_item) + 1, item);
         } else {
-            int index = p_item->indexOfChild(clicked_item);
+            int index = p_item->indexOfChild(s_item);
             p_item->insertChild(index + 1, item);
         }
     }
     editItem(item);
+    clearSelection();
+    item->setSelected(true);
 }
 
 /**
@@ -425,6 +454,7 @@ void ProjectWidget::create_folder_item() {
  * Slot function to save the open project
  */
 void ProjectWidget::save_project() {
+    update_index_paths();
     m_proj->save_project();
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
