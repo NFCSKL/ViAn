@@ -3,7 +3,8 @@
 /**
  * @brief POI::POI
  */
-POI::POI(){}
+POI::POI(){
+}
 
 /**
  * @brief POI::add_detections
@@ -11,7 +12,7 @@ POI::POI(){}
  * @param frame_num
  * @param detections
  */
-void POI::add_detections(int frame_num, std::vector<OOI> detections) {
+void POI::add_detections(int frame_num, std::vector<OOI> detections) {    
     if (m_start_frame == -1)
         m_start_frame = frame_num;
     OOIs[frame_num] = detections;
@@ -108,3 +109,32 @@ std::vector<cv::Rect> POI::get_detections_on_frame(int frame_num) {
     }
     return rects;
 }
+
+#include "analysisinterval.h"
+POI::POI(int start_frame, int end_frame)
+{
+    m_start_frame = start_frame;
+    m_end_frame = end_frame;
+}
+
+bool POI::in_interval(int frame)
+{
+   return frame >= m_start_frame && frame <= m_end_frame;
+}
+
+int POI::getStart() const
+{
+    return m_start_frame;
+}
+
+int POI::getEnd() const
+{
+    return m_end_frame;
+}
+
+std::pair<int, int> POI::getInterval()
+{
+    return std::make_pair(m_start_frame, m_end_frame);
+}
+
+

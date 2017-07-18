@@ -37,7 +37,6 @@ SOURCES += main.cpp \
     GUI/tagdialog.cpp \
     imageexporter.cpp \
     GUI/frameexporterdialog.cpp \
-    Project/Analysis/analysisinterval.cpp \
     Project/Analysis/tag.cpp
 
 
@@ -69,7 +68,6 @@ HEADERS += Test/test_video_player.h \
     GUI/tagdialog.h \
     imageexporter.h \
     GUI/frameexporterdialog.h \
-    Project/Analysis/analysisinterval.h \
     Project/Analysis/tag.h
 
 #

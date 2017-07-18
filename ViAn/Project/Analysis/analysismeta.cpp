@@ -9,17 +9,8 @@
 AnalysisMeta::AnalysisMeta(const Analysis &analysis) {
     m_name = analysis.name;
     file_analysis = analysis.full_path();
-    std::set<AnalysisInterval*> pois;
-    for (auto poi : analysis.m_intervals) {
-        pois.insert(poi);
-    }
-    std::pair<int,int> pair;
-    AnalysisInterval* poi;
-    for (auto it = pois.begin(); it != pois.end(); ++it) {
-        poi = *it;
-        pair = std::make_pair(poi->getStart_frame(), poi->getEnd_frame());
-        m_poi_intervals.push_back(pair);
-    }
+    std::vector<POI*> v(analysis.m_intervals.begin(), analysis.m_intervals.end());
+    m_poi_intervals = v;
 }
 
 /**
@@ -32,9 +23,17 @@ AnalysisMeta::AnalysisMeta() {
  * @brief AnalysisMeta::get_analysis
  * @return
  */
-Analysis AnalysisMeta::get_analysis() {
-    Analysis analysis;
-    analysis.load_saveable(file_analysis);
+Analysis* AnalysisMeta::get_analysis() {
+    Analysis* analysis;
+    switch(type){
+    case TAG:
+        analysis = new Tag();
+        break;
+    case MOTION_DETECTION:
+        analysis = new Analysis();
+        break;
+    }
+    analysis->load_saveable(file_analysis);
     return analysis;
 }
 
@@ -61,7 +60,7 @@ void AnalysisMeta::read(const QJsonObject &json) {
         std::pair<int,int> pair;
         pair.first = json_pair["start"].toInt();
         pair.second = json_pair["end"].toInt();
-        m_poi_intervals.push_back(pair);
+        m_poi_intervals.push_back(new POI(pair.first, pair.second));
     }
 }
 
@@ -75,15 +74,15 @@ void AnalysisMeta::write(QJsonObject &json) {
     QJsonArray intervals;
     for (auto it = m_poi_intervals.begin(); it != m_poi_intervals.end(); ++it) {
         QJsonObject interval;
-        std::pair<int,int> pair = *it;
-        interval["start"] = pair.first;
-        interval["end"] = pair.second;
+        POI* pair = *it;
+        interval["start"] = pair->getStart();
+        interval["end"] = pair->getEnd();
         intervals.push_back(interval);
     }
     json["intervals"] = intervals;
 }
 
-std::vector<std::pair<int, int> > AnalysisMeta::getIntervals() const
+std::vector<POI*> AnalysisMeta::getIntervals() const
 {
     return m_poi_intervals;
 }

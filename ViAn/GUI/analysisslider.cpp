@@ -73,7 +73,7 @@ void AnalysisSlider::set_analysis(AnalysisMeta* analysis) {
     rects.clear();
     if (analysis != nullptr) {
         for (auto p : analysis->getIntervals()) {
-            add_slider_interval(p.first, p.second);
+            add_slider_interval(p->getStart(), p->getEnd());
         }
     }
 }

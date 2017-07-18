@@ -15,7 +15,7 @@ Analysis::Analysis() {
  * Copy constructor. Needed for signals and slots.
  * @param obj
  */
-Analysis::Analysis(const Analysis &obj) (type = obj.type){
+Analysis::Analysis(const Analysis &obj) : type(obj.type) {
     m_intervals = obj.m_intervals;
     name = obj.name;
 }
@@ -39,7 +39,7 @@ Analysis::~Analysis() {
  * Adds a POI to the analysis.
  * @param poi
  */
-void Analysis::add_interval(AnalysisInterval *poi){
+void Analysis::add_interval(POI *poi){
     m_intervals.insert(poi);
 }
 
@@ -55,7 +55,7 @@ void Analysis::read(const QJsonObject &json){
     QJsonArray json_pois = json["POI:s"].toArray();
     for (int i = 0; i < json_pois.size(); ++i) {
         QJsonObject json_poi = json_pois[i].toObject();
-        AnalysisInterval* poi = new AnalysisInterval();
+        POI* poi = new POI();
         poi->read(json_poi);
         this->add_interval(poi);
     }
@@ -72,7 +72,7 @@ void Analysis::write(QJsonObject &json){
     QJsonArray json_POIs;
     for(auto it = this->m_intervals.begin(); it != this->m_intervals.end(); it++){
         QJsonObject json_POI;
-        AnalysisInterval* p = *it;
+        POI* p = *it;
         p->write(json_POI);
         json_POIs.append(json_POI);
     }
@@ -87,8 +87,3 @@ std::vector<cv::Rect> Analysis::get_detections_on_frame(int frame_num)
     }
 }
 
-
-std::set<AnalysisInterval *, Analysis::poi_cmp> Analysis::getIntervals() const
-{
-    return m_intervals;
-}

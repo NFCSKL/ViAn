@@ -2,7 +2,6 @@
 
 Tag::Tag()
 {
-
 }
 
 /**
@@ -17,7 +16,7 @@ bool Tag::add_frame(int frame) {
 
 void Tag::remove_frame(int frame) {
 }
-void Tag::add_interval(AnalysisInterval *an_interval){
+void Tag::add_interval(POI *an_interval){
     Analysis::add_interval(an_interval);
     merge_intervals();
 }
@@ -26,16 +25,17 @@ void Tag::add_interval(AnalysisInterval *an_interval){
  * This function assumes m_intervals is sorted
  */
 void Tag::merge_intervals(){
-    std::set<AnalysisInterval*, poi_cmp> intervals = m_intervals;
-    std::set<AnalysisInterval*, poi_cmp> res;
+    std::set<POI*, poi_cmp> intervals = m_intervals;
+    std::set<POI*, poi_cmp> res;
     auto it = intervals.begin();    
-    AnalysisInterval* current = *it;
+    POI* current = *it;
     it++;
     while (it != intervals.end()){
        if (current->getInterval().second >= (*it)->getInterval().first){ // you might want to change it to >=
-           AnalysisInterval* merged = new AnalysisInterval(current->getInterval().first, (*it)->getInterval().second);
-           merged = current;
-           delete current;
+           POI* merged = new POI(current->getInterval().first, (*it)->getInterval().second);
+           POI* temp = current;
+           current = merged;
+           delete temp;
        } else {
            res.insert(current);
            current = *(it);

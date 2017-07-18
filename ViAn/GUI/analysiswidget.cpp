@@ -66,8 +66,7 @@ void AnalysisWidget::analysis_done(AnalysisMeta analysis) {
     VideoItem* vid = dynamic_cast<VideoItem*>(current_analysis->parent());
     vid->get_video_project()->add_analysis(am);
     current_analysis = nullptr;
-    duration = 0;
-
+    duration = 0;   
     if (!analysis_queue.empty()) {
         current_analysis = get<2>(analysis_queue.front());
         move_queue();

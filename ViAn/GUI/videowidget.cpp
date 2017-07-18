@@ -507,11 +507,12 @@ void VideoWidget::analysis_btn_clicked() {
 
 void VideoWidget::tag_frame() {
     if (m_tag->type == TAG){
-        if (static_cast<Tag*>(m_tag)->add_frame(current_frame)) {
+        Tag* tag = static_cast<Tag*>(m_tag->get_analysis());
+        if (tag->add_frame(current_frame)) {
             emit tag_updated(m_tag);
             emit set_status_bar("Tagged frame number: " + QString::number(current_frame));
         } else {
-            m_tag->remove_frame(current_frame);
+            tag->remove_frame(current_frame);
             emit tag_updated(m_tag);
             emit set_status_bar("Frame untagged");
         }
@@ -529,10 +530,10 @@ void VideoWidget::new_tag_clicked() {
 void VideoWidget::new_tag(QString name) {
     Tag* tag = new Tag();
     tag->set_name(name.toStdString());
-    emit add_tag(m_vid_proj, tag);
+    emit add_tag(m_vid_proj, new AnalysisMeta(*tag));
 }
 
-void VideoWidget::set_tag(Tag* tag) {
+void VideoWidget::set_tag(AnalysisMeta *tag) {
     m_tag = tag;
 }
 
@@ -543,23 +544,19 @@ void VideoWidget::clear_tag() {
 void VideoWidget::interval_clicked() {
     if (playback_slider->interval == -1) {
         emit set_interval(current_frame);
-    } else {
-        if (m_tag == nullptr) {
-            emit set_status_bar("Pick a tag");
-            return;
-        }
-        if (current_frame < playback_slider->interval) {
-            for (int i = current_frame; i <= playback_slider->interval; i++) {
-                m_tag->add_frame(i);
-            }
-        } else {
-            for (int i = playback_slider->interval; i <= current_frame; i++) {
-                m_tag->add_frame(i);
-            }
-        }
-        emit set_interval(-1);
-        emit tag_updated(m_tag);
+        return;
     }
+    if (m_tag == nullptr) {
+        emit set_status_bar("Pick a tag");
+        return;
+    }
+    int lower = std::min(current_frame, playback_slider->interval);
+    int upper = std::max(current_frame, playback_slider->interval);
+    for(int i = lower ; i != upper; i++ ){
+        static_cast<Tag*>(m_tag->get_analysis())->add_frame(i);
+    }
+    emit set_interval(-1);
+    emit tag_updated(m_tag);
 }
 
 void VideoWidget::analysis_play_btn_toggled(bool value) {

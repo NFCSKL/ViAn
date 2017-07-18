@@ -60,8 +60,8 @@ signals:
     void new_bookmark(VideoProject*, int, cv::Mat);
     void set_detections_on_frame(int);
     void start_analysis(VideoProject*);
-    void add_tag(VideoProject*, Tag*);
-    void tag_updated(Analysis*);
+    void add_tag(VideoProject*, AnalysisMeta*);
+    void tag_updated(AnalysisMeta*);
     void set_interval(int);
     void set_status_bar(QString);
 public slots:
@@ -75,7 +75,7 @@ public slots:
     void tag_frame(void);
     void new_tag_clicked();
     void new_tag(QString name);
-    void set_tag(Tag *);
+    void set_tag(AnalysisMeta *);
     void clear_tag(void);
     void interval_clicked(void);
     void zoom_out_clicked(void);
@@ -142,7 +142,7 @@ private:
 
     QString convert_time(int time);
     VideoProject* m_vid_proj = nullptr;
-    Tag* m_tag = nullptr;
+    AnalysisMeta* m_tag = nullptr;
 
     bool tag_clicked = false;
 
