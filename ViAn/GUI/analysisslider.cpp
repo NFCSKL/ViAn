@@ -63,11 +63,9 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
  * @param analysis
  */
 void AnalysisSlider::set_analysis(AnalysisMeta* analysis) {
-    int cnt = 0;
     rects.clear();
     if (analysis != nullptr) {
         for (auto p : analysis->getIntervals()) {
-            qDebug() << cnt++;
             add_slider_interval(p->getStart(), p->getEnd());
         }
     }
@@ -199,7 +197,6 @@ void AnalysisSlider::set_show_pois(bool show_pois) {
  * @param show_tags
  */
 void AnalysisSlider::set_show_tags(bool show_tags) {
-    qDebug() << "show tags";
     m_show_tags = show_tags;
     repaint();
 }
