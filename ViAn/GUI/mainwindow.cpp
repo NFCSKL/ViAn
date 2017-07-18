@@ -71,9 +71,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     // Main toolbar
     MainToolbar* main_toolbar = new MainToolbar();
     main_toolbar->setWindowTitle(tr("Main toolbar"));
-    //TODO REMOVE? QAction* toggle_toolbar = main_toolbar->toggleViewAction();
     addToolBar(main_toolbar);
     connect(main_toolbar->add_video_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
+    connect(main_toolbar->save_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
+    connect(main_toolbar->open_act, &QAction::triggered, project_wgt, &ProjectWidget::open_project);
 
     // Draw toolbar
     DrawingToolbar* draw_toolbar = new DrawingToolbar();
@@ -114,6 +115,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, SIGNAL(marked_tag(Tag*)), video_wgt->playback_slider, SLOT(set_tag(Tag*)));
     connect(video_wgt, SIGNAL(add_tag(VideoProject*, Tag*)), project_wgt, SLOT(add_tag(VideoProject*, Tag*)));
     connect(video_wgt, SIGNAL(tag_updated(Tag*)), video_wgt->playback_slider, SLOT(set_tag(Tag*)));
+
+    connect(project_wgt, &ProjectWidget::update_frame, video_wgt->playback_slider, &AnalysisSlider::update);
+    connect(project_wgt, &ProjectWidget::update_frame, video_wgt->frame_wgt, &FrameWidget::update);
+
+
     connect(video_wgt, SIGNAL(set_interval(int)), video_wgt->playback_slider, SLOT(set_interval(int)));
 }
 
@@ -236,22 +242,30 @@ void MainWindow::init_edit_menu() {
 void MainWindow::init_view_menu() {
     QMenu* view_menu = menuBar()->addMenu(tr("&View"));
 
-    QAction* annotation_act = new QAction(tr("Annotations"), this);
-    QAction* detection_act = new QAction(tr("Detections"), this);
+    detect_intv_act = new QAction(tr("&Detection intervals"), this);      //Slider pois
+    bound_box_act = new QAction(tr("&Bounding boxes"), this);        //Video oois
 
-    annotation_act->setCheckable(true);
-    detection_act->setCheckable(true);
+    detect_intv_act->setCheckable(true);
+    bound_box_act->setCheckable(true);
+
+    detect_intv_act->setChecked(true);
+    bound_box_act->setChecked(true);
 
     view_menu->addAction(toggle_project_wgt);
     view_menu->addAction(toggle_bookmark_wgt);
     view_menu->addSeparator();
-    view_menu->addAction(annotation_act);
-    view_menu->addAction(detection_act);
+    view_menu->addAction(detect_intv_act);
+    view_menu->addAction(bound_box_act);
 
     toggle_project_wgt->setStatusTip(tr("Show/hide project widget"));
     toggle_bookmark_wgt->setStatusTip(tr("Show/hide bookmark widget"));
-    annotation_act->setStatusTip(tr("Toggle annotations on/off"));
-    detection_act->setStatusTip(tr("Toggle detections on/off"));
+    detect_intv_act->setStatusTip(tr("Toggle annotations on/off"));
+    bound_box_act->setStatusTip(tr("Toggle detections on/off"));
+
+    connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_show_detections);
+    connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::update);
+    connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_on_slider);
+    connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
 }
 
 /**

@@ -15,6 +15,7 @@ class AnalysisSlider : public QSlider {
     bool m_was_paused = false;
     bool m_show_pois = false;
     bool m_show_tags = false;
+    bool show_on_slider = true;
 
     //Change this to set how many frames the POI buttons should ignore
     const int JUMP_INTERVAL = 0;
@@ -37,11 +38,18 @@ public:
 protected:
     void paintEvent(QPaintEvent *ev);
 public slots:
+<<<<<<< HEAD
     void set_analysis(AnalysisMeta *analysis);
     void set_tag(Tag *tag);
+=======
+    void update();
+    void set_analysis(Analysis* analysis);
+    void set_tag(Analysis* analysis);
+>>>>>>> a7c6dc266d3301099491c3c1ecb8b87802bc4269
     void set_interval(int frame);
     void set_show_pois(bool);
     void set_show_tags(bool);
+    void set_show_on_slider(bool);
     void clear_slider();
 
 private:
