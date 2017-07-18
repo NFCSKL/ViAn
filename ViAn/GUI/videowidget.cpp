@@ -492,6 +492,7 @@ void VideoWidget::analysis_btn_clicked() {
 }
 
 void VideoWidget::tag_frame() {
+    Tag* tag =
     if (m_tag->getType() == TAG){
         if (m_tag->add_frame(current_frame)) {
             emit tag_updated(m_tag);
