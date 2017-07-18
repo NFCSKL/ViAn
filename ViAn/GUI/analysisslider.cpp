@@ -28,11 +28,7 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     painter.drawComplexControl(QStyle::CC_Slider, option);
     QRect groove_rect = style()->subControlRect(QStyle::CC_Slider, &option, QStyle::SC_SliderGroove, this);
 
-<<<<<<< HEAD
-    if (m_show_pois || m_show_tags) {
-=======
-    if (m_show_pois && show_on_slider) {
->>>>>>> a7c6dc266d3301099491c3c1ecb8b87802bc4269
+    if ((m_show_pois||m_show_tags)&& show_on_slider) {
         QBrush brush = Qt::yellow;
         if(m_show_tags) brush = Qt::red;
         //Get one frames width on the slider
@@ -50,16 +46,6 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
             QRect rect(first, groove_rect.top(), 1+second-first, groove_rect.height());
             painter.fillRect(rect, brush);
         }
-<<<<<<< HEAD
-=======
-    } else if (m_show_tags && show_on_slider) {
-        double c = (double)(groove_rect.right()-groove_rect.left())/maximum();
-        for (auto frame : frames) {
-            double first = (groove_rect.left()+(double)frame*c);
-            QRect rect(first, groove_rect.top(), 1, groove_rect.height());
-            painter.fillRect(rect, Qt::red);
-        }
->>>>>>> a7c6dc266d3301099491c3c1ecb8b87802bc4269
     }
     if (interval != -1) {
         double c = (double)(groove_rect.right()-groove_rect.left())/maximum();
@@ -71,7 +57,7 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     painter.drawComplexControl(QStyle::CC_Slider, option);
 }
 
-void AnalysisSlider::update() {
+void AnalysisSlider::update(){
     repaint();
 }
 
@@ -90,17 +76,9 @@ void AnalysisSlider::set_analysis(AnalysisMeta* analysis) {
     repaint();
 }
 
-<<<<<<< HEAD
 void AnalysisSlider::set_tag(Tag *tag)
 {
     set_analysis(new AnalysisMeta(static_cast<Analysis>(*tag)));
-=======
-void AnalysisSlider::set_tag(Analysis *analysis) {
-    this->frames.clear();
-    for (auto frame : analysis->frames) {
-        this->frames.push_back(frame);
-    }
->>>>>>> a7c6dc266d3301099491c3c1ecb8b87802bc4269
 }
 
 void AnalysisSlider::set_interval(int frame) {
