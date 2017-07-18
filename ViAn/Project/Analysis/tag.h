@@ -1,7 +1,7 @@
 #ifndef TAG_H
 #define TAG_H
 #include "analysis.h"
-class Tag : public Analysis
+class Tag : public BasicAnalysis
 {
 public:
     Tag();

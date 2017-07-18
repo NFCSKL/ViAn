@@ -21,7 +21,7 @@ private:
     void setup_analysis(std::string video_path, ANALYSIS_TYPE type);
     AnalysisMethod* method;
 signals:
-    void analysis_done(AnalysisMeta);
+    void analysis_done(AnalysisProxy);
     void progress_signal(int);
 
 private slots:

@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
-    qRegisterMetaType<AnalysisMeta>();
+    qRegisterMetaType<BasicAnalysis>();
     bool unit_testing = false;
     if(unit_testing){
         QTest::qExec(new ProjectTestsuite());

@@ -101,8 +101,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     connect(analysis_wgt, SIGNAL(name_in_tree(QTreeWidgetItem*,QString)), project_wgt, SLOT(set_tree_item_name(QTreeWidgetItem*,QString)));
 
-    connect(project_wgt, SIGNAL(marked_analysis(AnalysisMeta*)), video_wgt->frame_wgt, SLOT(set_analysis(AnalysisMeta*)));
-    connect(project_wgt, SIGNAL(marked_analysis(AnalysisMeta*)), video_wgt->playback_slider, SLOT(set_analysis(AnalysisMeta*)));
+    connect(project_wgt, SIGNAL(marked_analysis(BasicAnalysis*)), video_wgt->frame_wgt, SLOT(set_analysis(BasicAnalysis*)));
+    connect(project_wgt, SIGNAL(marked_analysis(BasicAnalysis*)), video_wgt->playback_slider, SLOT(set_analysis(BasicAnalysis*)));
     connect(project_wgt, SIGNAL(set_detections(bool)), video_wgt->frame_wgt, SLOT(set_detections(bool)));
 
     connect(project_wgt, SIGNAL(enable_poi_btns(bool,bool)), video_wgt, SLOT(enable_poi_btns(bool,bool)));
@@ -111,10 +111,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, SIGNAL(set_poi_slider(bool)), video_wgt->playback_slider, SLOT(set_show_pois(bool)));
     connect(project_wgt, SIGNAL(set_tag_slider(bool)), video_wgt->playback_slider, SLOT(set_show_tags(bool)));
 
-    connect(project_wgt, SIGNAL(marked_tag(Tag*)), video_wgt, SLOT(set_tag(Tag*)));
-    connect(project_wgt, SIGNAL(marked_tag(Tag*)), video_wgt->playback_slider, SLOT(set_tag(Tag*)));
-    connect(video_wgt, SIGNAL(add_tag(VideoProject*, Tag*)), project_wgt, SLOT(add_tag(VideoProject*, Tag*)));
-    connect(video_wgt, SIGNAL(tag_updated(Tag*)), video_wgt->playback_slider, SLOT(set_tag(Tag*)));
+    connect(project_wgt, SIGNAL(marked_tag(BasicAnalysis*)), video_wgt, SLOT(set_tag(BasicAnalysis*)));
+    connect(project_wgt, SIGNAL(marked_tag(BasicAnalysis*)), video_wgt->playback_slider, SLOT(set_tag(BasicAnalysis*)));
+    connect(video_wgt, SIGNAL(add_tag(VideoProject*, BasicAnalysis*)), project_wgt, SLOT(add_tag(VideoProject*, BasicAnalysis*)));
+    connect(video_wgt, SIGNAL(tag_updated(Tag*)), video_wgt->playback_slider, SLOT(set_tag(BasicAnalysis*)));
 
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->playback_slider, &AnalysisSlider::update);
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->frame_wgt, &FrameWidget::update);

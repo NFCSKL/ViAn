@@ -20,11 +20,11 @@ AnalysisItem::AnalysisItem(int type) : QTreeWidgetItem(type) {
 AnalysisItem::~AnalysisItem() {
 }
 
-void AnalysisItem::set_analysis(AnalysisMeta *analysis) {
+void AnalysisItem::set_analysis(AnalysisProxy *analysis) {
     m_analysis = analysis;
 }
 
-AnalysisMeta* AnalysisItem::get_analysis() {
+AnalysisProxy* AnalysisItem::get_analysis() {
     return m_analysis;
 }
 

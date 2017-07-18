@@ -38,8 +38,8 @@ public:
 protected:
     void paintEvent(QPaintEvent *ev);
 public slots:
-    void set_analysis(AnalysisMeta *analysis);
-    void set_tag(Tag *tag);
+    void set_analysis(BasicAnalysis *analysis);
+    void set_tag(BasicAnalysis *tag);
 
     void update();
 
