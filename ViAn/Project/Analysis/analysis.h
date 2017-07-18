@@ -19,8 +19,9 @@ const std::map<std::string, ANALYSIS_TYPE> ANALYSIS_NAMES_TYPE_MAP = {std::make_
                                                                      std::make_pair("Facial detection",FACIAL_DETECTION),
                                                                      std::make_pair("Tag",TAG)};
 class Analysis : public Saveable {
-    friend class AnalysisMeta;
-
+    friend class AnalysisMeta;    
+public:
+    const int type = MOTION_DETECTION;
 protected:
     std::string name;
     struct poi_cmp {
@@ -29,10 +30,7 @@ protected:
         }
     };
     std::set<AnalysisInterval*, poi_cmp> m_intervals;
-
-
 public:
-    ANALYSIS_TYPE type;
     Analysis();
     Analysis(const Analysis &obj);
     ~Analysis();
@@ -44,7 +42,7 @@ public:
     std::vector<cv::Rect> get_detections_on_frame(int frame_num);
     void set_name(const std::string &name);
     std::string get_name() const;
-    std::set<AnalysisInterval*, poi_cmp> getIntervals() const;
+
 };
 
 #endif // ANALYSIS_H

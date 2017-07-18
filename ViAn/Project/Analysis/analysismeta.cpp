@@ -82,3 +82,8 @@ void AnalysisMeta::write(QJsonObject &json) {
     }
     json["intervals"] = intervals;
 }
+
+std::vector<std::pair<int, int> > AnalysisMeta::getIntervals() const
+{
+    return m_poi_intervals;
+}

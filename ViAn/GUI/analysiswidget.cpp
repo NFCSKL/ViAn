@@ -61,9 +61,10 @@ void AnalysisWidget::analysis_done(AnalysisMeta analysis) {
     emit remove_analysis_bar();
     emit name_in_tree(current_analysis, "Analysis");
     AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(current_analysis);
-    ana_item->set_analysis(analysis.get_analysis());
+    AnalysisMeta* am = new AnalysisMeta(analysis);
+    ana_item->set_analysis(am);
     VideoItem* vid = dynamic_cast<VideoItem*>(current_analysis->parent());
-    vid->get_video_project()->add_analysis(ana_item->get_analysis());
+    vid->get_video_project()->add_analysis(am);
     current_analysis = nullptr;
     duration = 0;
 

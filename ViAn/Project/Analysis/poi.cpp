@@ -101,7 +101,7 @@ std::vector<cv::Rect> POI::get_detections_on_frame(int frame_num) {
         qDebug() << m_start_frame;
         qDebug() << m_end_frame;
         qDebug() << OOIs.size();
-        for(OOI ooi: OOIs.at(frame_num)){
+        for(OOI ooi: OOIs[frame_num]){
             qDebug() << "hej";
             rects.push_back(ooi.get_rect());
         }

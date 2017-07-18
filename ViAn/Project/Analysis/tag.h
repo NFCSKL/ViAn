@@ -4,11 +4,14 @@
 
 class Tag : public Analysis
 {
+
 public:
     Tag();
     bool add_frame(int frame);
     void remove_frame(int frame);
     virtual void add_interval(AnalysisInterval *an_interval);
+public:
+    const int type = TAG;
 private:
     void merge_intervals();
 };

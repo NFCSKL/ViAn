@@ -7,20 +7,19 @@
 enum ITEM_TYPE {VIDEO_ITEM, ANALYSIS_ITEM, FOLDER_ITEM, TAG_ITEM};
 
 class AnalysisItem : public QTreeWidgetItem {
-    Analysis m_analysis;
-
+    AnalysisMeta* m_analysis = nullptr;
 public:
     AnalysisItem(int type);
     ~AnalysisItem();
-    void set_analysis(Analysis analysis);
-    Analysis *get_analysis();
+    void set_analysis(AnalysisMeta* analysis);
+    AnalysisMeta *get_analysis();
 };
 
 class TagItem : public QTreeWidgetItem {
-    Tag* m_tag;
+    AnalysisMeta* m_tag;
 public:
-    TagItem(Tag *tag, int type);
-    Tag *get_tag();
+    TagItem(AnalysisMeta *tag, int type);
+    AnalysisMeta *get_tag();
 };
 
 class VideoItem : public QTreeWidgetItem {

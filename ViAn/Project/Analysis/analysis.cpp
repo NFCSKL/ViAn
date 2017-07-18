@@ -15,9 +15,8 @@ Analysis::Analysis() {
  * Copy constructor. Needed for signals and slots.
  * @param obj
  */
-Analysis::Analysis(const Analysis &obj) {
+Analysis::Analysis(const Analysis &obj) (type = obj.type){
     m_intervals = obj.m_intervals;
-    type = obj.type;
     name = obj.name;
 }
 
@@ -84,7 +83,7 @@ std::vector<cv::Rect> Analysis::get_detections_on_frame(int frame_num)
 {
     for (auto it = m_intervals.begin(); it != m_intervals.end(); it++) {
         POI* ai = static_cast<POI*>(*it);
-        if(ai->in_interval(frame_num)) return ai->get_detections_on_frame(frame_num);
+        return ai->get_detections_on_frame(frame_num);
     }
 }
 

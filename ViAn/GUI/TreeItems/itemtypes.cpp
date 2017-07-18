@@ -20,19 +20,19 @@ AnalysisItem::AnalysisItem(int type) : QTreeWidgetItem(type) {
 AnalysisItem::~AnalysisItem() {
 }
 
-void AnalysisItem::set_analysis(Analysis analysis) {
+void AnalysisItem::set_analysis(AnalysisMeta *analysis) {
     m_analysis = analysis;
 }
 
-Analysis* AnalysisItem::get_analysis() {
-    return &m_analysis;
+AnalysisMeta* AnalysisItem::get_analysis() {
+    return m_analysis;
 }
 
-TagItem::TagItem(Tag* tag, int type) : QTreeWidgetItem(type) {
+TagItem::TagItem(AnalysisMeta *tag, int type) : QTreeWidgetItem(type) {
     m_tag = tag;
 }
 
-Tag* TagItem::get_tag() {
+AnalysisMeta* TagItem::get_tag() {
     return m_tag;
 }
 

@@ -14,6 +14,7 @@ class AnalysisMeta : public Saveable
 {
 
 public:
+    ANALYSIS_TYPE type;
     std::string m_name;
     std::string file_analysis;
     std::vector<std::pair<int,int>> m_poi_intervals;
@@ -23,6 +24,7 @@ public:
     AnalysisMeta(const AnalysisMeta &other);
     virtual void read(const QJsonObject& json);
     virtual void write(QJsonObject& json);
+    std::vector<std::pair<int,int>> getIntervals() const;
 };
 Q_DECLARE_METATYPE(AnalysisMeta)
 #endif // ANALYSISMETA_H

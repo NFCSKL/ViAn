@@ -529,7 +529,6 @@ void VideoWidget::new_tag_clicked() {
 void VideoWidget::new_tag(QString name) {
     Tag* tag = new Tag();
     tag->set_name(name.toStdString());
-    tag->type = TAG;
     emit add_tag(m_vid_proj, tag);
 }
 

@@ -5,8 +5,9 @@
 #include <QSlider>
 #include <vector>
 #include <set>
-#include "Project/Analysis/analysis.h"
+#include "Project/Analysis/analysismeta.h"
 #include "Project/Analysis/tag.h"
+
 
 class AnalysisSlider : public QSlider {
     Q_OBJECT
@@ -36,8 +37,8 @@ public:
 protected:
     void paintEvent(QPaintEvent *ev);
 public slots:
-    void set_analysis(Analysis* analysis);
-    void set_tag(Tag* tag);
+    void set_analysis(AnalysisMeta *analysis);
+    void set_tag(AnalysisMeta *tag);
     void set_interval(int frame);
     void set_show_pois(bool);
     void set_show_tags(bool);
