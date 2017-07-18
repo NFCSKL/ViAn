@@ -38,7 +38,7 @@ protected:
     void paintEvent(QPaintEvent *ev);
 public slots:
     void set_analysis(AnalysisMeta *analysis);
-    void set_tag(AnalysisMeta *tag);
+    void set_tag(Tag *tag);
     void set_interval(int frame);
     void set_show_pois(bool);
     void set_show_tags(bool);

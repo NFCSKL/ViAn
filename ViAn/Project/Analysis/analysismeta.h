@@ -15,7 +15,7 @@ class AnalysisMeta : public Saveable
 {
 
 public:
-    ANALYSIS_TYPE type;
+    int type;
     std::string m_name;
     std::string file_analysis;
     std::vector<POI*> m_poi_intervals;

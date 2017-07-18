@@ -101,14 +101,14 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj) {
  * @param tag
  * Adds a tag 'tag' under vid_proj
  */
-void ProjectWidget::add_tag(VideoProject* vid_proj, AnalysisMeta *tag) {
+void ProjectWidget::add_tag(VideoProject* vid_proj, Tag *tag) {
     TagItem* tag_item = new TagItem(tag, TAG_ITEM);
-    vid_proj->add_analysis(tag);
+    vid_proj->add_analysis(new AnalysisMeta(static_cast<Analysis>(*tag)));
     for (int i = 0; i < m_videos->childCount(); i++) {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(m_videos->child(i));
         if (vid_item->get_video_project() == vid_proj) {
             m_videos->child(i)->addChild(tag_item);
-            tag_item->setText(0, QString::fromStdString(tag->m_name));
+            tag_item->setText(0, QString::fromStdString(tag->get_name()));
             m_videos->child(i)->setExpanded(true);
         }
     }
@@ -139,7 +139,7 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
     m_videos->setExpanded(true);
     for (std::pair<int,AnalysisMeta*> ana : vid_proj->get_analyses()){
         if (ana.second->type == TAG) {
-            TagItem* tag_item = new TagItem(ana.second, TAG_ITEM);
+            TagItem* tag_item = new TagItem(static_cast<Tag*>(ana.second->get_analysis()), TAG_ITEM);
             tag_item->setText(0, QString::fromStdString(ana.second->m_name));
             vid->addChild(tag_item);
             vid->setExpanded(true);

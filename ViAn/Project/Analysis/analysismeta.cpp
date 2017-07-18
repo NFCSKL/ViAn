@@ -7,6 +7,7 @@
  * @param analysis
  */
 AnalysisMeta::AnalysisMeta(const Analysis &analysis) {
+    type = analysis.type;
     m_name = analysis.name;
     file_analysis = analysis.full_path();
     std::vector<POI*> v(analysis.m_intervals.begin(), analysis.m_intervals.end());
@@ -24,15 +25,7 @@ AnalysisMeta::AnalysisMeta() {
  * @return
  */
 Analysis* AnalysisMeta::get_analysis() {
-    Analysis* analysis;
-    switch(type){
-    case TAG:
-        analysis = new Tag();
-        break;
-    case MOTION_DETECTION:
-        analysis = new Analysis();
-        break;
-    }
+    Analysis* analysis = new Analysis();
     analysis->load_saveable(file_analysis);
     return analysis;
 }

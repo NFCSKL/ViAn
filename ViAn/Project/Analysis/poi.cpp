@@ -98,19 +98,13 @@ void POI::write(QJsonObject& json) {
 std::vector<cv::Rect> POI::get_detections_on_frame(int frame_num) {
     std::vector<cv::Rect> rects = {};
     if(in_interval((frame_num))){
-        qDebug() << frame_num;
-        qDebug() << m_start_frame;
-        qDebug() << m_end_frame;
-        qDebug() << OOIs.size();
         for(OOI ooi: OOIs[frame_num]){
-            qDebug() << "hej";
             rects.push_back(ooi.get_rect());
         }
     }
     return rects;
 }
 
-#include "analysisinterval.h"
 POI::POI(int start_frame, int end_frame)
 {
     m_start_frame = start_frame;

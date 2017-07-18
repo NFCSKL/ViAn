@@ -16,10 +16,10 @@ public:
 };
 
 class TagItem : public QTreeWidgetItem {
-    AnalysisMeta* m_tag;
+    Tag* m_tag;
 public:
-    TagItem(AnalysisMeta *tag, int type);
-    AnalysisMeta *get_tag();
+    TagItem(Tag *tag, int type);
+    Tag *get_tag();
 };
 
 class VideoItem : public QTreeWidgetItem {

@@ -507,12 +507,11 @@ void VideoWidget::analysis_btn_clicked() {
 
 void VideoWidget::tag_frame() {
     if (m_tag->type == TAG){
-        Tag* tag = static_cast<Tag*>(m_tag->get_analysis());
-        if (tag->add_frame(current_frame)) {
+        if (m_tag->add_frame(current_frame)) {
             emit tag_updated(m_tag);
             emit set_status_bar("Tagged frame number: " + QString::number(current_frame));
         } else {
-            tag->remove_frame(current_frame);
+            m_tag->remove_frame(current_frame);
             emit tag_updated(m_tag);
             emit set_status_bar("Frame untagged");
         }
@@ -530,10 +529,10 @@ void VideoWidget::new_tag_clicked() {
 void VideoWidget::new_tag(QString name) {
     Tag* tag = new Tag();
     tag->set_name(name.toStdString());
-    emit add_tag(m_vid_proj, new AnalysisMeta(*tag));
+    emit add_tag(m_vid_proj, tag);
 }
 
-void VideoWidget::set_tag(AnalysisMeta *tag) {
+void VideoWidget::set_tag(Tag *tag) {
     m_tag = tag;
 }
 
@@ -552,9 +551,7 @@ void VideoWidget::interval_clicked() {
     }
     int lower = std::min(current_frame, playback_slider->interval);
     int upper = std::max(current_frame, playback_slider->interval);
-    for(int i = lower ; i != upper; i++ ){
-        static_cast<Tag*>(m_tag->get_analysis())->add_frame(i);
-    }
+    m_tag->add_interval(new POI(lower, upper));
     emit set_interval(-1);
     emit tag_updated(m_tag);
 }

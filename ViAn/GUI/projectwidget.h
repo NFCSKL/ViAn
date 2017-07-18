@@ -23,7 +23,7 @@ signals:
     void proj_path(std::string);
     void load_bookmarks(VideoProject* vid_proj);
     void marked_analysis(AnalysisMeta*);
-    void marked_tag(AnalysisMeta*);
+    void marked_tag(Tag*);
     void set_detections(bool);
     void enable_poi_btns(bool, bool);
     void enable_tag_btn(bool);
@@ -37,7 +37,7 @@ public slots:
     void add_project(const QString project_name, const QString project_path);
     void add_video();
     void start_analysis(VideoProject*);
-    void add_tag(VideoProject*, AnalysisMeta *tag);
+    void add_tag(VideoProject*, Tag *tag);
     void set_tree_item_name(QTreeWidgetItem *item, QString);
     void save_project();
     void open_project();

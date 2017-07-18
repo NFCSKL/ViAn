@@ -28,11 +28,11 @@ AnalysisMeta* AnalysisItem::get_analysis() {
     return m_analysis;
 }
 
-TagItem::TagItem(AnalysisMeta *tag, int type) : QTreeWidgetItem(type) {
+TagItem::TagItem(Tag *tag, int type) : QTreeWidgetItem(type) {
     m_tag = tag;
 }
 
-AnalysisMeta* TagItem::get_tag() {
+Tag *TagItem::get_tag() {
     return m_tag;
 }
 

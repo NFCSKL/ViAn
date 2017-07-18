@@ -2,6 +2,7 @@
 
 Tag::Tag()
 {
+    type = TAG;
 }
 
 /**
@@ -11,7 +12,7 @@ Tag::Tag()
  * unless it's at the edge of a current poi or that frame already is tagged
  */
 bool Tag::add_frame(int frame) {
-
+    add_interval(new POI(frame, frame));
 }
 
 void Tag::remove_frame(int frame) {
@@ -31,7 +32,7 @@ void Tag::merge_intervals(){
     POI* current = *it;
     it++;
     while (it != intervals.end()){
-       if (current->getInterval().second >= (*it)->getInterval().first){ // you might want to change it to >=
+       if (current->getInterval().second +1 >= (*it)->getInterval().first){ // you might want to change it to >=
            POI* merged = new POI(current->getInterval().first, (*it)->getInterval().second);
            POI* temp = current;
            current = merged;
