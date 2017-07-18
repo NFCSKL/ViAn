@@ -406,13 +406,6 @@ void VideoWidget::on_bookmark_clicked() {
  */
 void VideoWidget::set_interval_start_clicked() {
     m_interval.first = current_frame;
-//    if (current_frame < m_interval.second) {
-//        m_interval.first = current_frame;
-//    } else if (current_frame > m_interval.second){
-//        // Trying to set start after end, flip
-//        m_interval.first = m_interval.second;
-//        m_interval.second = current_frame;
-//    }
     set_status_bar("Frame interval updated: " +
                    QString().number(m_interval.first) + "-" + QString().number(m_interval.second));
 
@@ -424,13 +417,6 @@ void VideoWidget::set_interval_start_clicked() {
 */
 void VideoWidget::set_interval_end_clicked() {
     m_interval.second = current_frame;
-    /*if (current_frame > m_interval.first){
-        m_interval.second = current_frame;
-    } *//*else if (current_frame < m_interval.first) {
-        // Trying to set end before start, flip
-        m_interval.second = m_interval.first;
-        m_interval.first = current_frame;
-    }*/
     set_status_bar("Frame interval updated: " +
                    QString().number(m_interval.first) + "-" + QString().number(m_interval.second));
 }
