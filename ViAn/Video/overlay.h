@@ -20,15 +20,18 @@
 #include "Library/customdialog.h"
 #include "opencv2/opencv.hpp"
 
-class Overlay {
+class Overlay : public QObject {
+    Q_OBJECT
 
+public slots:
+    void set_tool(SHAPES s);
 public:
     Overlay();
     bool is_showing_overlay();
     void set_showing_overlay(bool value);
     void toggle_overlay();
     cv::Mat draw_overlay(cv::Mat &frame, int frame_nr);
-    void set_tool(SHAPES s);
+
     void set_colour(QColor col);
     QColor get_colour();
     SHAPES get_tool();
@@ -45,7 +48,7 @@ private:
     void update_drawing_position(QPoint pos, int frame_nr);
     Shape* get_empty_shape(SHAPES shape_type);
 
-    bool show_overlay = false;
+    bool show_overlay = true;
 
     SHAPES current_shape = RECTANGLE;
     QColor current_colour = Qt::red;

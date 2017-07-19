@@ -43,6 +43,14 @@ private slots:
     void gen_report(void);
     void cont_bri(void);
     void export_images();
+    void rectangle();
+    void circle();
+    void line();
+    void arrow();
+    void pen();
+    void text();
+    void zoom();
+    void move();
 
 public slots:
     void options(void);
@@ -68,7 +76,6 @@ private:
     void init_analysis_menu();
     void init_tools_menu();
     void init_help_menu();
-protected:
 };
 
 #endif // MAINWINDOW_H

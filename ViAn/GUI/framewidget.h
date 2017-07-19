@@ -11,18 +11,18 @@
 #include "opencv2/videoio/videoio.hpp"
 #include "Project/Analysis/analysis.h"
 
-enum click_tool {NONE, ZOOM, MOVE};
+//enum click_tool {NONE, ZOOM, MOVE, RECTANGLE, CIRCLE, LINE, ARROW, PEN, TEXT};
 
 class FrameWidget : public QWidget
 {
     Q_OBJECT
-    QPainter*  painter;
+    QPainter* painter;
     QSize m_scroll_area_size;
     cv::Rect original_rect; // Contains the size of the unmodified frame
 
     std::vector<cv::Rect> ooi_rects;
 
-    click_tool tool = NONE;
+    SHAPES tool = NONE;
     cv::Mat current_frame;
     Analysis* m_analysis = nullptr;
     // Zoom
@@ -36,6 +36,7 @@ public:
     explicit FrameWidget(QWidget *parent = nullptr);
 
     cv::Mat get_mat() const;
+    void set_tool(SHAPES tool);
 
 signals:
     void video_pressed(QPoint pos);
@@ -47,6 +48,10 @@ signals:
     void current_frame_size(QSize size);
     void zoom_points(QPoint, QPoint);
     void trigger_zoom_out();
+    void send_tool(SHAPES tool);
+    void mouse_pressed(QPoint);
+    void mouse_released(QPoint);
+    void mouse_moved(QPoint);
 public slots:
     void draw_image(cv::Mat image);
     void draw_from_playback(cv::Mat frame);

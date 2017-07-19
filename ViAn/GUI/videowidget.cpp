@@ -63,6 +63,11 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
     connect(this, &VideoWidget::prev_video_frame, m_video_player, &video_player::previous_frame);
 
     connect(this, SIGNAL(set_detections_on_frame(int)), frame_wgt, SLOT(set_detections_on_frame(int)));
+
+    connect(frame_wgt, SIGNAL(send_tool(SHAPES)), m_video_player, SLOT(set_overlay_tool(SHAPES)));
+    connect(frame_wgt, SIGNAL(mouse_pressed(QPoint)), m_video_player, SLOT(video_mouse_pressed(QPoint)));
+    connect(frame_wgt, SIGNAL(mouse_released(QPoint)), m_video_player, SLOT(video_mouse_released(QPoint)));
+    connect(frame_wgt, SIGNAL(mouse_moved(QPoint)), m_video_player, SLOT(video_mouse_moved(QPoint)));
 }
 
 VideoProject *VideoWidget::get_current_video_project(){
@@ -697,7 +702,7 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int frame) {
             m_video_player->wait();
         }
         m_vid_proj = vid_proj;
-        m_video_player->load_video(m_vid_proj->get_video()->file_path, nullptr);
+        m_video_player->load_video(m_vid_proj->get_video()->file_path, m_vid_proj->get_overlay());
         m_video_player->set_playback_speed(speed_slider->value());
         emit set_status_bar("Video loaded");
         play_btn->setIcon(QIcon("../ViAn/Icons/play.png"));

@@ -54,6 +54,11 @@ void FrameWidget::set_detections(bool detections) {
     repaint();  //Repaint to update the current frame directly
 }
 
+void FrameWidget::set_tool(SHAPES tool) {
+    emit send_tool(tool);
+    this->tool = tool;
+}
+
 void FrameWidget::draw_image(cv::Mat image) {
     // Convert the image to the RGB888 format
     switch (image.type()) {
@@ -88,8 +93,6 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     painter.drawImage(QPoint(0,0), _qimage);
 
     if (draw_zoom_rect) {
-
-
         QPoint start = zoom_start_pos;
         QPoint end = zoom_end_pos;
 
@@ -138,6 +141,9 @@ void FrameWidget::resizeEvent(QResizeEvent *event) {
  */
 void FrameWidget::mousePressEvent(QMouseEvent *event) {
     switch (tool) {
+    case NONE:
+        std::cout << "NONE" << std::endl;
+        break;
     case ZOOM:
         if (event->button() == Qt::RightButton) {
             init_panning(event->pos());
@@ -149,7 +155,30 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
             }
         }
         break;
+//    case MOVE:
+//        std::cout << "MOVE" << std::endl;
+//        break;
+//    case RECTANGLE:
+//        std::cout << "RECTANGLE" << std::endl;
+//        break;
+//    case CIRCLE:
+//        std::cout << "cirlce" << std::endl;
+//        break;
+//    case LINE:
+//        std::cout << "line" << std::endl;
+//        break;
+//    case ARROW:
+//        std::cout << "arrow" << std::endl;
+//        break;
+//    case PEN:
+//        std::cout << "pen" << std::endl;
+//
+//        break;
+//    case TEXT:
+//        std::cout << "text" << std::endl;
+//        break;
     default:
+        emit mouse_pressed(event->pos());
         break;
     }
 }
@@ -160,7 +189,7 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
  */
 void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
     switch (tool) {
-    case ZOOM: {
+    case ZOOM:
         if (event->button() == Qt::RightButton) {
             end_panning();
         } else if (event->button() == Qt::LeftButton){
@@ -172,8 +201,8 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
             }
         }
         break;
-    }
     default:
+        emit mouse_released(event->pos());
         break;
     }
 }
@@ -192,6 +221,7 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
         }
         break;
     default:
+        emit mouse_moved(event->pos());
         break;
     }
 }

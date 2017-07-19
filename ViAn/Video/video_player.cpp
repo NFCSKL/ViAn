@@ -153,6 +153,8 @@ void video_player::process_frame() {
     // Applies brightness and contrast
     manipulator->apply(manipulated_frame);
 
+    manipulated_frame = video_overlay->draw_overlay(manipulated_frame, get_current_frame_num());
+
     // Emit manipulated frame and current frame number
     emit processed_image(manipulated_frame.clone());
     emit update_current_frame(capture.get(CV_CAP_PROP_POS_FRAMES) - 1);
@@ -178,7 +180,10 @@ void video_player::fit_screen() {
     zoomer->fit_viewport();
     frame_lock.unlock();
     process_frame();
+}
 
+Overlay* video_player::get_overlay() {
+    return video_overlay;
 }
 
 /**
@@ -302,14 +307,6 @@ void video_player::set_showing_overlay(bool value) {
  */
 bool video_player::is_showing_overlay() {
     return video_overlay->is_showing_overlay();
-}
-
-/**
- * @brief video_player::is_showing_analysis_overlay
- * @return Returns true if the analysis overlay is showing, else false.
- */
-bool video_player::is_showing_analysis_overlay() {
-    return analysis_overlay->is_showing_overlay();
 }
 
 /**
@@ -502,16 +499,6 @@ void video_player::toggle_overlay() {
 }
 
 /**
- * @brief video_player::toggle_analysis_overlay
- * Toggles the showing of the analysis overlay, and if video is paused updates
- * the frame in the GUI to show with/without the overlay.
- */
-void video_player::toggle_analysis_overlay() {
-    analysis_overlay->toggle_showing();
-    update_overlay();
-}
-
-/**
  * @brief video_player::set_overlay_tool
  * Sets the overlay tool's shape.
  * @param shape
@@ -618,6 +605,29 @@ void video_player::rotate_left() {
     process_frame();
 }
 
+void video_player::video_mouse_pressed(QPoint pos) {
+    if (capture.isOpened()) {
+        if (is_paused()) {
+            video_overlay->mouse_pressed(pos, get_current_frame_num());
+        }
+    } update_overlay();
+}
+
+void video_player::video_mouse_released(QPoint pos) {
+    if (capture.isOpened()) {
+        if (is_paused()) {
+            video_overlay->mouse_released(pos, get_current_frame_num());
+        }
+    } update_overlay();
+}
+void video_player::video_mouse_moved(QPoint pos) {
+    if (capture.isOpened()) {
+        if (is_paused()) {
+            video_overlay->mouse_moved(pos, get_current_frame_num());
+        }
+    } update_overlay();
+}
+
 /**
  * @brief video_player::scale_position
  * Recalculates the given mouse position from a position in the window
@@ -695,31 +705,9 @@ int video_player::get_video_height() {
 }
 
 /**
- * @brief video_player::on_set_analysis_results
- * Sets analysis results to be used to draw results on video.
- * @param analysis results
- */
-void video_player::on_set_analysis_results(Analysis analysis) {
-    for (int frame_num = 0; frame_num < get_num_frames(); ++frame_num) {
-        for (cv::Rect rect : analysis.get_detections_on_frame(frame_num)) {
-            analysis_overlay->add_area(frame_num,rect);
-        }
-    }
-}
-
-/**
  * @brief video_player::get_analysis_area_polygon
  * @return analysis area polygon
  */
 std::vector<cv::Point>* video_player::get_analysis_area_polygon() {
     return analysis_area->get_polygon();
 }
-
-/**
- * @brief video_player::clear_analysis_overlay
- */
-void video_player::clear_analysis_overlay(){
-    delete analysis_overlay;
-    analysis_overlay = new AnalysisOverlay();
-}
-

@@ -4,6 +4,7 @@
 #include <QToolBar>
 #include <QAction>
 #include <QActionGroup>
+#include "Video/shapes/shape.h"
 
 class DrawingToolbar : public QToolBar
 {
@@ -28,8 +29,12 @@ public:
 
 private slots:
     void color_tool_clicked();
+    void pen_tool_clicked();
+    void text_tool_clicked();
 signals:
     void set_status_bar(QString);
+    void set_color(QColor);
+    void set_overlay_tool(SHAPES);
 };
 
 #endif // DRAWINGTOOLBAR_H

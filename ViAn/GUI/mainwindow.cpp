@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     setCentralWidget(video_wgt);
 
     // Initialize project widget
-    project_wgt = new ProjectWidget();
+    project_wgt = new ProjectWidget(); //mianwindow->eemit from frame_wgt to videoplayer/overlay
     project_dock->setWidget(project_wgt);
     addDockWidget(Qt::LeftDockWidgetArea, project_dock);
 
@@ -81,6 +81,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     QAction* toggle_draw_toolbar = draw_toolbar->toggleViewAction();
     addToolBar(draw_toolbar);
     connect(main_toolbar->toggle_draw_toolbar_act, &QAction::triggered, toggle_draw_toolbar, &QAction::trigger);   
+    connect(draw_toolbar, SIGNAL(set_color(QColor)), video_wgt->m_video_player, SLOT(set_overlay_colour(QColor)));
+    connect(draw_toolbar, SIGNAL(set_overlay_tool(SHAPES)), video_wgt->m_video_player, SLOT(set_overlay_tool(SHAPES)));
 
     // Status bar
     status_bar = new StatusBar();
@@ -238,20 +240,24 @@ void MainWindow::init_view_menu() {
 
     QAction* annotation_act = new QAction(tr("Annotations"), this);
     QAction* detection_act = new QAction(tr("Detections"), this);
+    QAction* drawing_act = new QAction(tr("Drawing"), this);
 
     annotation_act->setCheckable(true);
     detection_act->setCheckable(true);
+    drawing_act->setCheckable(true);
 
     view_menu->addAction(toggle_project_wgt);
     view_menu->addAction(toggle_bookmark_wgt);
     view_menu->addSeparator();
     view_menu->addAction(annotation_act);
     view_menu->addAction(detection_act);
+    view_menu->addAction(drawing_act);
 
     toggle_project_wgt->setStatusTip(tr("Show/hide project widget"));
     toggle_bookmark_wgt->setStatusTip(tr("Show/hide bookmark widget"));
     annotation_act->setStatusTip(tr("Toggle annotations on/off"));
     detection_act->setStatusTip(tr("Toggle detections on/off"));
+    drawing_act->setStatusTip(tr("Toggle drawings on/off"));
 }
 
 /**
@@ -289,10 +295,7 @@ void MainWindow::init_tools_menu() {
     QAction* pen_act = new QAction(tr("&Pen"), this);
     QAction* text_act = new QAction(tr("&Text"), this);
 
-
-    QAction* export_act  =new QAction(tr("&Frames"));
-
-
+    QAction* export_act = new QAction(tr("&Frames"));
 
     color_act->setIcon(QIcon("../ViAn/Icons/color.png"));
     undo_act->setIcon(QIcon("../ViAn/Icons/undo.png"));
@@ -348,7 +351,14 @@ void MainWindow::init_tools_menu() {
 
     //Connect
     connect(export_act, &QAction::triggered, this, &MainWindow::export_images);
-
+    connect(rectangle_act, &QAction::triggered, this, &MainWindow::rectangle);
+    connect(circle_act, &QAction::triggered, this, &MainWindow::circle);
+    connect(line_act, &QAction::triggered, this, &MainWindow::line);
+    connect(arrow_act, &QAction::triggered, this, &MainWindow::arrow);
+    connect(pen_act, &QAction::triggered, this, &MainWindow::pen);
+    connect(text_act, &QAction::triggered, this, &MainWindow::text);
+    connect(zoom_in_act, &QAction::triggered, this, &MainWindow::zoom);
+    connect(move_act, &QAction::triggered, this, &MainWindow::move);
 }
 
 /**
@@ -364,6 +374,38 @@ void MainWindow::init_help_menu() {
     help_act->setStatusTip(tr("Help"));
 
     //connect
+}
+
+void MainWindow::rectangle() {
+    video_wgt->frame_wgt->set_tool(RECTANGLE);
+}
+
+void MainWindow::circle() {
+    video_wgt->frame_wgt->set_tool(CIRCLE);
+}
+
+void MainWindow::line() {
+    video_wgt->frame_wgt->set_tool(LINE);
+}
+
+void MainWindow::arrow() {
+    video_wgt->frame_wgt->set_tool(ARROW);
+}
+
+void MainWindow::pen() {
+    video_wgt->frame_wgt->set_tool(PEN);
+}
+
+void MainWindow::text() {
+    video_wgt->frame_wgt->set_tool(TEXT);
+}
+
+void MainWindow::zoom() {
+    video_wgt->frame_wgt->set_tool(ZOOM);
+}
+
+void MainWindow::move() {
+    video_wgt->frame_wgt->set_tool(MOVE);
 }
 
 /**

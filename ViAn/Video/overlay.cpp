@@ -14,6 +14,8 @@ Overlay::Overlay() {
  */
 cv::Mat Overlay::draw_overlay(cv::Mat &frame, int frame_nr) {
     if (show_overlay) {
+        std::cout << "draw" << std::endl;
+        std::cout << overlays[frame_nr].size() << std::endl;
         foreach (Shape* s, overlays[frame_nr]) {
             frame = s->draw(frame);
         }
@@ -55,7 +57,7 @@ void Overlay::set_showing_overlay(bool value) {
  */
 void Overlay::set_tool(SHAPES s) {
     current_shape = s;
-
+    std::cout << "tool aquired! " << s << std::endl;
     // If the text option is chosen, a string and size will be entered by the user.
     if (s == TEXT) {
         std::string input_string = current_string.toStdString();
@@ -85,6 +87,7 @@ void Overlay::set_tool(SHAPES s) {
  */
 void Overlay::set_colour(QColor col) {
     current_colour = col;
+    std::cout << "Color" << std::endl;
 }
 
 /**

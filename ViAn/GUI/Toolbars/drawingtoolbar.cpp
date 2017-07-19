@@ -31,6 +31,7 @@ void DrawingToolbar::create_actions() {
     tools->addAction(arrow_tool_act);
     tools->addAction(box_tool_act);
     tools->addAction(circle_tool_act);
+    tools->addAction(line_tool_act);
     tools->addAction(text_tool_act);
     for (QAction* act: tools->actions()) {
         act->setCheckable(true);
@@ -38,6 +39,8 @@ void DrawingToolbar::create_actions() {
     tools->setExclusive(true);
 
     connect(color_tool_act, &QAction::triggered, this, &DrawingToolbar::color_tool_clicked);
+    connect(pen_tool_act, &QAction::triggered, this, &DrawingToolbar::pen_tool_clicked);
+    connect(text_tool_act, &QAction::triggered, this, &DrawingToolbar::text_tool_clicked);
 }
 
 /**
@@ -58,10 +61,20 @@ void DrawingToolbar::create_buttons() {
 void DrawingToolbar::color_tool_clicked() {
     emit set_status_bar("Choose a color");
     QColor color = QColorDialog::getColor();
-    emit set_status_bar("Color " + color.name() + " chosen");
     if (color.isValid()) {
-        // TODO set overlay color
+        emit set_status_bar("Color " + color.name() + " chosen");
+        emit set_color(color);
     }
+}
+
+void DrawingToolbar::pen_tool_clicked() {
+    emit set_status_bar("Pen tool");
+    emit set_overlay_tool(PEN);
+}
+
+void DrawingToolbar::text_tool_clicked() {
+    emit set_status_bar("Text tool");
+    emit set_overlay_tool(TEXT);
 }
 
 
