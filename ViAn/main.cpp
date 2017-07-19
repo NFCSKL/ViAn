@@ -4,7 +4,7 @@
 #include "Test/test_video_player.h"
 #include "Test/test_report_generator.h"
 #include "GUI/mainwindow.h"
-#include "Project/Analysis/analysismeta.h"
+#include "Project/Analysis/analysisproxy.h"
 #include "Project/Test/projecttestsuite.h"
 #include "Project/Test/videoprojecttest.h"
 

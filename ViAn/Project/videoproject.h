@@ -9,7 +9,7 @@
 #include "Video/overlay.h"
 #include "bookmark.h"
 #include "video.h"
-#include "Project/Analysis/analysismeta.h"
+#include "Project/Analysis/analysisproxy.h"
 #include "Project/report.h"
 
 /**

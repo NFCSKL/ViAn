@@ -17,7 +17,6 @@ TEMPLATE = app
 # GENERAL
 #
 SOURCES += main.cpp \
-    Project/Analysis/analysismeta.cpp \
     GUI/TreeItems/itemtypes.cpp \
     GUI/Toolbars/maintoolbar.cpp \
     GUI/Toolbars/drawingtoolbar.cpp \
@@ -40,7 +39,9 @@ SOURCES += main.cpp \
     Project/Analysis/tag.cpp \
     Project/Analysis/basicanalysis.cpp \
     Project/Analysis/analysisinterval.cpp \
-    Filehandler/writeable.cpp
+    Filehandler/writeable.cpp \
+    Project/Analysis/analysisproxy.cpp \
+    Project/Analysis/detectionbox.cpp
 
 
 #
@@ -51,7 +52,6 @@ SOURCES += Test/test_video_player.cpp\
 
 HEADERS += Test/test_video_player.h \
     Test/test_report_generator.h \
-    Project/Analysis/analysismeta.h \
     GUI/TreeItems/itemtypes.h \
     GUI/Toolbars/maintoolbar.h \
     GUI/Toolbars/drawingtoolbar.h \
@@ -74,7 +74,9 @@ HEADERS += Test/test_video_player.h \
     Project/Analysis/tag.h \
     Project/Analysis/basicanalysis.h \
     Project/Analysis/analysisinterval.h \
-    Filehandler/writeable.h
+    Filehandler/writeable.h \
+    Project/Analysis/analysisproxy.h \
+    Project/Analysis/detectionbox.h
 
 #
 # LIBRARY
@@ -187,7 +189,6 @@ SOURCES += Project/Test/projecttestsuite.cpp \
     Project/videoproject.cpp \
     Project/bookmark.cpp \
     Project/Analysis/analysis.cpp \
-    Project/Analysis/ooi.cpp \
     Project/Analysis/poi.cpp
 
 
@@ -198,7 +199,6 @@ HEADERS +=Project/Test/projecttestsuite.h \
     Project/bookmark.h  \
     Project/report.h \
     Project/Analysis/analysis.h \
-    Project/Analysis/ooi.h \
     Project/Analysis/poi.h
 
 

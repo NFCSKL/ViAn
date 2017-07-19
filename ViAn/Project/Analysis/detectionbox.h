@@ -1,5 +1,5 @@
-#ifndef OOI_H
-#define OOI_H
+#ifndef DETECTIONBOX_H
+#define DETECTIONBOX_H
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QString>
@@ -24,4 +24,4 @@ public:
     cv::Rect get_rect();
     void scale_coordinates(float scale_ratio);
 };
-#endif // OOI_H
+#endif // DETECTIONBOX_H

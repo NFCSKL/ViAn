@@ -2,8 +2,7 @@
 #define ANALYSISCONTROLLER_H
 
 #include <QThread>
-#include "Project/Analysis/analysis.h"
-#include "Project/Analysis/analysismeta.h"
+#include "Project/Analysis/analysisproxy.h"
 #include "Analysis/AnalysisMethod.h"
 
 class AnalysisController : public QThread {

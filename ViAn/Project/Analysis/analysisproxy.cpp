@@ -1,4 +1,4 @@
-#include "analysismeta.h"
+#include "analysisproxy.h"
 #include <QJsonObject>
 #include <QString>
 

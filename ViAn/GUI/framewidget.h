@@ -9,7 +9,7 @@
 #include "Video/shapes/zoomrectangle.h"
 #include "opencv2/opencv.hpp"
 #include "opencv2/videoio/videoio.hpp"
-#include "Project/Analysis/analysismeta.h"
+#include "Project/Analysis/analysisproxy.h"
 
 enum click_tool {NONE, ZOOM, MOVE};
 
