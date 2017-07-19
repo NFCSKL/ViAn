@@ -14,11 +14,10 @@
 #include "basicanalysis.h"
 
 class Analysis : public BasicAnalysis {
-    friend class AnalysisMeta;    public:
+    friend class AnalysisMeta;
+public:
     int type = MOTION_DETECTION;
 public:
-    Analysis();
-    ~Analysis();
     virtual void read(const QJsonObject& json);
     virtual void write(QJsonObject& json);
     std::vector<cv::Rect> get_detections_on_frame(int frame_num);

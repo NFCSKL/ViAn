@@ -7,7 +7,7 @@
 #include <tuple>
 
 AnalysisWidget::AnalysisWidget(QWidget *parent) {
-    an_col = new AnalysisController("", "", MOTION_DETECTION);
+    an_col = new AnalysisController(this);
     connect(an_col, SIGNAL(progress_signal(int)), this, SLOT(send_progress(int)));
     connect(an_col, SIGNAL(analysis_done(AnalysisProxy)), this, SLOT(analysis_done(AnalysisProxy)));
 }

@@ -27,6 +27,7 @@ class VideoProject : public Saveable{
     ID m_bm_cnt = 0;  // Bookmark id counter
     ID m_ana_cnt = 0; // Analysis id counter
 public:
+
     VideoProject(Video* v); //Needs to have a video
     VideoProject();
 

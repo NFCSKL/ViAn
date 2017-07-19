@@ -19,7 +19,7 @@ POI::POI(int start_frame, int end_frame)
  * @param frame_num
  * @param detections
  */
-void POI::add_detections(int frame_num, std::vector<OOI> detections) {    
+void POI::add_detections(int frame_num, std::vector<DetectionBox> detections) {
     if (m_start == -1)
         m_start = frame_num;
     OOIs[frame_num] = detections;
@@ -44,7 +44,7 @@ void POI::set_end_frame(int frame_num) {
 std::vector<cv::Rect> POI::get_detections_on_frame(int frame_num) {
     std::vector<cv::Rect> rects = {};
     if(in_interval((frame_num))){
-        for(OOI ooi: OOIs[frame_num]){
+        for(DetectionBox ooi: OOIs[frame_num]){
             rects.push_back(ooi.get_rect());
         }
     }
@@ -62,9 +62,9 @@ void POI::read(const QJsonObject& json) {
     this->m_end = json["end"].toInt();
     for(int i = m_start; i != m_end; i++){
         QJsonArray json_frame_OOIs = json[QString::number(i)].toArray();
-        std::vector<OOI> oois;
+        std::vector<DetectionBox> oois;
         for(int j = 0; j != json_frame_OOIs.size(); j++){
-            OOI ooi;;
+            DetectionBox ooi;;
             ooi.read(json_frame_OOIs[j].toObject());
             oois.push_back(ooi);
         }
@@ -83,8 +83,8 @@ void POI::write(QJsonObject& json) {
     for(const auto& ooi_pair : OOIs){
         QJsonArray json_frame_OOIs;
         int frame = ooi_pair.first;
-        std::vector<OOI> oois = ooi_pair.second;
-        for (OOI o : oois) {
+        std::vector<DetectionBox> oois = ooi_pair.second;
+        for (DetectionBox o : oois) {
             QJsonObject json_ooi;
             o.write(json_ooi);
             json_frame_OOIs.append(json_ooi);

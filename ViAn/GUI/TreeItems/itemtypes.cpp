@@ -13,6 +13,11 @@ VideoProject* VideoItem::get_video_project() {
     return m_vid_proj;
 }
 
+bool AnalysisItem::is_finished() const
+{
+    return finished;
+}
+
 AnalysisItem::AnalysisItem(int type) : QTreeWidgetItem(type) {
 
 }
@@ -22,6 +27,7 @@ AnalysisItem::~AnalysisItem() {
 
 void AnalysisItem::set_analysis(AnalysisProxy *analysis) {
     m_analysis = analysis;
+    finished = true;
 }
 
 AnalysisProxy* AnalysisItem::get_analysis() {

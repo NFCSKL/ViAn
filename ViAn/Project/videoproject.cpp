@@ -179,6 +179,5 @@ void VideoProject::delete_artifacts(){
     for(auto it2 = m_analyses.begin(); it2 != m_analyses.end(); it2++){
         BasicAnalysis* temp = it2->second;
         temp->delete_saveable();
-
     }
 }

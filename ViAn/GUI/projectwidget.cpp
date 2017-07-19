@@ -228,18 +228,18 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     } case ANALYSIS_ITEM: {
         tree_item_clicked(item->parent());
         AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
+        if(!ana_item->is_finished()) break;
         emit marked_analysis(ana_item->get_analysis());
+        emit marked_basic_analysis(dynamic_cast<BasicAnalysis*>(ana_item->get_analysis()));
         emit set_detections(true);
         emit set_poi_slider(true);
-        if (!ana_item->get_analysis()->m_intervals.empty()) {
-            emit enable_poi_btns(true, true);
-        }
+        emit enable_poi_btns(true, true);
         emit update_frame();
         break;
     } case TAG_ITEM: {
         tree_item_clicked(item->parent());
         TagItem* tag_item = dynamic_cast<TagItem*>(item);
-        emit marked_tag(tag_item->get_tag());
+        emit marked_basic_analysis(tag_item->get_tag());
         emit set_tag_slider(true);
         emit enable_poi_btns(true, false);
         emit enable_tag_btn(true);

@@ -492,14 +492,14 @@ void VideoWidget::analysis_btn_clicked() {
 }
 
 void VideoWidget::tag_frame() {
-    Tag* tag =
-    if (m_tag->getType() == TAG){
-        if (m_tag->add_frame(current_frame)) {
-            emit tag_updated(m_tag);
+    Tag* tag = dynamic_cast<Tag*>(m_tag);
+    if (tag->getType() == TAG){
+        if (tag->add_frame(current_frame)) {
+            emit tag_updated(tag);
             emit set_status_bar("Tagged frame number: " + QString::number(current_frame));
         } else {
-            m_tag->remove_frame(current_frame);
-            emit tag_updated(m_tag);
+            tag->remove_frame(current_frame);
+            emit tag_updated(tag);
             emit set_status_bar("Frame untagged");
         }
     } else {

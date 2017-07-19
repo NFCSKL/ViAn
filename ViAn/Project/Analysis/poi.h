@@ -11,10 +11,10 @@
 #include "ooi.h"
 #include "analysisinterval.h"
 class POI : public AnalysisInterval{    
-    std::map<int,std::vector<OOI>> OOIs = {};    
+    std::map<int,std::vector<DetectionBox>> OOIs = {};
 public:
     POI();    
-    void add_detections(int frame_num, std::vector<OOI> detections);
+    void add_detections(int frame_num, std::vector<DetectionBox> detections);
     void set_end_frame(int frame_num);
     std::vector<cv::Rect> get_detections_on_frame(int frame_num);
     friend class Analysis;

@@ -1,25 +1,5 @@
 #include "basicanalysis.h"
 
-std::string BasicAnalysis::getFile_analysis() const
-{
-    return file_analysis;
-}
-
-std::string BasicAnalysis::getName() const
-{
-    return m_name;
-}
-
-int BasicAnalysis::getType() const
-{
-    return type;
-}
-
-interval_set BasicAnalysis::getIntervals() const
-{
-    return m_intervals;
-}
-
 BasicAnalysis::BasicAnalysis()
 {
 
@@ -28,7 +8,6 @@ BasicAnalysis::BasicAnalysis()
 BasicAnalysis::BasicAnalysis(const BasicAnalysis &other) :
     type(other.type),
     m_name(other.m_name),
-    file_analysis(other.file_analysis),
     m_intervals(other.m_intervals)
 {
 
@@ -75,4 +54,19 @@ void BasicAnalysis::write(QJsonObject &json){
         json_ais.append(json_ai);
     }
     json["POI:s"] = json_ais;
+}
+
+std::string BasicAnalysis::getName() const
+{
+    return m_name;
+}
+
+int BasicAnalysis::getType() const
+{
+    return type;
+}
+
+interval_set BasicAnalysis::getIntervals() const
+{
+    return m_intervals;
 }

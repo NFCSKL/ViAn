@@ -6,7 +6,14 @@
 /**
  * @brief AnalysisMeta::AnalysisMeta
  */
-AnalysisProxy::AnalysisProxy() {
+AnalysisProxy::AnalysisProxy()
+{
+
+}
+
+AnalysisProxy::AnalysisProxy(const std::string file_analysis) :
+    file_analysis(file_analysis)
+{
 }
 
 /**
@@ -14,18 +21,25 @@ AnalysisProxy::AnalysisProxy() {
  * @return
  */
 Analysis* AnalysisProxy::load_analysis() {
-    Analysis* analysis = new Analysis();
+    Analysis* analysis = new Analysis();    
     analysis->load_saveable(file_analysis);
     return analysis;
 }
-AnalysisProxy::AnalysisProxy(const Analysis &other) : BasicAnalysis(other)
+AnalysisProxy::AnalysisProxy(const Analysis &other, const std::string file)
+    : BasicAnalysis(other),
+      file_analysis(file)
 {
-
 }
 
-AnalysisProxy::AnalysisProxy(const AnalysisProxy &other) : BasicAnalysis(other)
+AnalysisProxy::AnalysisProxy(const AnalysisProxy &other) :
+    BasicAnalysis(other),
+    file_analysis(other.file_analysis)
 {
+}
 
+std::string AnalysisProxy::full_path() const
+{
+    return file_analysis;
 }
 
 /**

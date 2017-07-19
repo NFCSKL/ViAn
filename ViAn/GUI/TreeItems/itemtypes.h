@@ -8,11 +8,13 @@ enum ITEM_TYPE {VIDEO_ITEM, ANALYSIS_ITEM, FOLDER_ITEM, TAG_ITEM};
 
 class AnalysisItem : public QTreeWidgetItem {
     AnalysisProxy* m_analysis = nullptr;
+    bool finished = false;
 public:
     AnalysisItem(int type);
     ~AnalysisItem();
     void set_analysis(AnalysisProxy* analysis);
     AnalysisProxy *get_analysis();
+    bool is_finished() const;
 };
 
 class TagItem : public QTreeWidgetItem {

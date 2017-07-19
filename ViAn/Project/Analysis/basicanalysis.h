@@ -24,7 +24,6 @@ protected:
 public:
     int type;
     std::string m_name;
-    std::string file_analysis;
     interval_set m_intervals;
 protected:
 public:
