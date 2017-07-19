@@ -48,6 +48,7 @@ public:
     std::map<ID,Bookmark*> get_bookmarks();
     std::map<ID,BasicAnalysis*> get_analyses();
     BasicAnalysis *get_analysis(const int &id);
+
 };
 
 

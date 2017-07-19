@@ -27,7 +27,7 @@ void Analysis::write(QJsonObject &json){
     QJsonArray json_POIs;
     for(auto it = this->m_intervals.begin(); it != this->m_intervals.end(); it++){
         QJsonObject json_POI;
-        POI* p = static_cast<POI*>(*it);
+        POI* p = dynamic_cast<POI*>(*it);
         p->write(json_POI);
         json_POIs.append(json_POI);
     }

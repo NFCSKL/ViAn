@@ -78,7 +78,7 @@ void AnalysisSlider::set_analysis(BasicAnalysis* analysis) {
 
 void AnalysisSlider::set_tag(BasicAnalysis *tag)
 {
-    set_analysis(static_cast<BasicAnalysis*>(tag));
+    set_analysis(dynamic_cast<BasicAnalysis*>(tag));
 }
 
 void AnalysisSlider::set_interval(int frame) {

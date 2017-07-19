@@ -6,13 +6,6 @@
 POI::POI(){
 }
 
-
-POI::POI(int start_frame, int end_frame)
-{
-    m_start = start_frame;
-    m_end = end_frame;
-}
-
 /**
  * @brief POI::add_detections
  * Adds OOIs for a specific frame in a POI.
@@ -33,6 +26,7 @@ void POI::add_detections(int frame_num, std::vector<DetectionBox> detections) {
 void POI::set_end_frame(int frame_num) {
     m_end = frame_num;
 }
+
 
 
 /**
@@ -92,3 +86,4 @@ void POI::write(QJsonObject& json) {
         json[QString::number(frame)] = json_frame_OOIs;
     }
 }
+

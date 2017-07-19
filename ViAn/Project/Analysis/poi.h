@@ -18,8 +18,6 @@ public:
     void set_end_frame(int frame_num);
     std::vector<cv::Rect> get_detections_on_frame(int frame_num);
     friend class Analysis;
-public:
-    POI(int start_frame, int end_frame);
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
 };

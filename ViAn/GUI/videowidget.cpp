@@ -521,6 +521,7 @@ void VideoWidget::new_tag(QString name) {
 
 void VideoWidget::set_tag(BasicAnalysis *tag) {
     m_tag = dynamic_cast<Tag*>(tag);
+
 }
 
 void VideoWidget::clear_tag() {
@@ -538,7 +539,7 @@ void VideoWidget::interval_clicked() {
     }
     int lower = std::min(current_frame, playback_slider->interval);
     int upper = std::max(current_frame, playback_slider->interval);
-    m_tag->add_interval(new POI(lower, upper));
+    m_tag->add_interval(new AnalysisInterval(lower, upper));
     emit set_interval(-1);
     emit tag_updated(m_tag);
 }

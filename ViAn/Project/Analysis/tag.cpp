@@ -12,12 +12,12 @@ Tag::Tag()
  * unless it's at the edge of a current poi or that frame already is tagged
  */
 bool Tag::add_frame(int frame) {
-    add_interval(new POI(frame, frame));
+    add_interval(new AnalysisInterval(frame, frame));
 }
 
 void Tag::remove_frame(int frame) {
 }
-void Tag::add_interval(POI *an_interval){
+void Tag::add_interval(AnalysisInterval *an_interval){
     BasicAnalysis::add_interval(an_interval);
     merge_intervals();
 }

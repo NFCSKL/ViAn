@@ -103,6 +103,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     connect(project_wgt, SIGNAL(marked_analysis(AnalysisProxy*)), video_wgt->frame_wgt, SLOT(set_analysis(AnalysisProxy*)));
     connect(project_wgt, SIGNAL(marked_basic_analysis(BasicAnalysis*)), video_wgt->playback_slider, SLOT(set_analysis(BasicAnalysis*)));
+
     connect(project_wgt, SIGNAL(set_detections(bool)), video_wgt->frame_wgt, SLOT(set_detections(bool)));
 
     connect(project_wgt, SIGNAL(enable_poi_btns(bool,bool)), video_wgt, SLOT(enable_poi_btns(bool,bool)));
@@ -116,6 +117,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     connect(video_wgt, SIGNAL(add_tag(VideoProject*, BasicAnalysis*)), project_wgt, SLOT(add_tag(VideoProject*, BasicAnalysis*)));
     connect(video_wgt, SIGNAL(tag_updated(BasicAnalysis*)), video_wgt->playback_slider, SLOT(set_tag(BasicAnalysis*)));
+
 
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->playback_slider, &AnalysisSlider::update);
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->frame_wgt, &FrameWidget::update);

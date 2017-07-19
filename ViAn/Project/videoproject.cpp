@@ -139,7 +139,6 @@ void VideoProject::write(QJsonObject& json){
         json_analyses.append(json_analysis);
     }
     json["analyses"] = json_analyses;
-
     QJsonObject json_overlay;
     this->m_overlay->write(json_overlay);
     json["overlay"] = json_overlay;

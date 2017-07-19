@@ -8,7 +8,6 @@
  */
 AnalysisProxy::AnalysisProxy()
 {
-
 }
 
 AnalysisProxy::AnalysisProxy(const std::string file_analysis) :
@@ -51,11 +50,10 @@ void AnalysisProxy::read(const QJsonObject &json) {
     file_analysis = json["full_path"].toString().toStdString();
     QJsonArray json_intervals = json["intervals"].toArray();
     for (int i = 0; i < json_intervals.size() ; ++i) {
-        QJsonObject json_pair = json_intervals[i].toObject();
-        std::pair<int,int> pair;
-        pair.first = json_pair["start"].toInt();
-        pair.second = json_pair["end"].toInt();
-        m_intervals.insert(new POI(pair.first, pair.second));
+        QJsonObject json_poi = json_intervals[i].toObject();
+        POI* poi = new POI();
+        poi->read(json);
+        m_intervals.insert(poi);
     }
 }
 
@@ -69,7 +67,7 @@ void AnalysisProxy::write(QJsonObject &json) {
     QJsonArray intervals;
     for (auto it = m_intervals.begin(); it != m_intervals.end(); ++it) {
         QJsonObject interval;
-        AnalysisInterval* pair = *it;
+        POI* pair = dynamic_cast<POI*>(*it);
         interval["start"] = pair->getStart();
         interval["end"] = pair->getEnd();
         intervals.push_back(interval);

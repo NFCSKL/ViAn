@@ -18,11 +18,13 @@ class Analysis : public BasicAnalysis {
 public:
     int type = MOTION_DETECTION;
 public:
+
     virtual void read(const QJsonObject& json);
     virtual void write(QJsonObject& json);
     std::vector<cv::Rect> get_detections_on_frame(int frame_num);
     void set_name(const std::string &name);
     std::string get_name() const;
+
 };
 
 #endif // ANALYSIS_H

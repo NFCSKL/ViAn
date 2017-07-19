@@ -139,13 +139,13 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
     m_videos->setExpanded(true);
     for (std::pair<int,BasicAnalysis*> ana : vid_proj->get_analyses()){
         if (ana.second->type == TAG) {
-            TagItem* tag_item = new TagItem(static_cast<Tag*>(ana.second), TAG_ITEM);
+            TagItem* tag_item = new TagItem(dynamic_cast<Tag*>(ana.second), TAG_ITEM);
             tag_item->setText(0, QString::fromStdString(ana.second->m_name));
             vid->addChild(tag_item);
             vid->setExpanded(true);
         } else {
             AnalysisItem* ana_item = new AnalysisItem(ANALYSIS_ITEM);
-            ana_item->set_analysis(static_cast<AnalysisProxy*>(ana.second));
+            ana_item->set_analysis(dynamic_cast<AnalysisProxy*>(ana.second));
             ana_item->setText(0, QString::fromStdString(ana.second->m_name));
             vid->addChild(ana_item);
             vid->setExpanded(true);
