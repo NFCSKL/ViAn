@@ -39,7 +39,8 @@ SOURCES += main.cpp \
     GUI/frameexporterdialog.cpp \
     Project/Analysis/tag.cpp \
     Project/Analysis/basicanalysis.cpp \
-    Project/Analysis/analysisinterval.cpp
+    Project/Analysis/analysisinterval.cpp \
+    Filehandler/writeable.cpp
 
 
 #
@@ -72,7 +73,8 @@ HEADERS += Test/test_video_player.h \
     GUI/frameexporterdialog.h \
     Project/Analysis/tag.h \
     Project/Analysis/basicanalysis.h \
-    Project/Analysis/analysisinterval.h
+    Project/Analysis/analysisinterval.h \
+    Filehandler/writeable.h
 
 #
 # LIBRARY
