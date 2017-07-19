@@ -41,6 +41,7 @@ public:
     StatusBar* status_bar;
     QAction* detect_intv_act;
     QAction* bound_box_act;
+    QAction* drawing_act;
 private slots:
     void gen_report(void);
     void cont_bri(void);

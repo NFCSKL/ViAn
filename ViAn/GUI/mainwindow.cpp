@@ -242,52 +242,35 @@ void MainWindow::init_edit_menu() {
 void MainWindow::init_view_menu() {
     QMenu* view_menu = menuBar()->addMenu(tr("&View"));
 
-<<<<<<< HEAD
-    QAction* annotation_act = new QAction(tr("Annotations"), this);
-    QAction* detection_act = new QAction(tr("Detections"), this);
-    QAction* drawing_act = new QAction(tr("Drawing"), this);
-
-    annotation_act->setCheckable(true);
-    detection_act->setCheckable(true);
-    drawing_act->setCheckable(true);
-=======
     detect_intv_act = new QAction(tr("&Detection intervals"), this);      //Slider pois
     bound_box_act = new QAction(tr("&Bounding boxes"), this);        //Video oois
+    drawing_act = new QAction(tr("&Paintings"), this);
 
     detect_intv_act->setCheckable(true);
     bound_box_act->setCheckable(true);
+    drawing_act->setCheckable(true);
 
     detect_intv_act->setChecked(true);
     bound_box_act->setChecked(true);
->>>>>>> development
+    drawing_act->setChecked(true);
 
     view_menu->addAction(toggle_project_wgt);
     view_menu->addAction(toggle_bookmark_wgt);
     view_menu->addSeparator();
-<<<<<<< HEAD
-    view_menu->addAction(annotation_act);
-    view_menu->addAction(detection_act);
+    view_menu->addAction(detect_intv_act);
+    view_menu->addAction(bound_box_act);
     view_menu->addAction(drawing_act);
 
     toggle_project_wgt->setStatusTip(tr("Show/hide project widget"));
     toggle_bookmark_wgt->setStatusTip(tr("Show/hide bookmark widget"));
-    annotation_act->setStatusTip(tr("Toggle annotations on/off"));
-    detection_act->setStatusTip(tr("Toggle detections on/off"));
+    detect_intv_act->setStatusTip(tr("Toggle detection intervals on/off"));
+    bound_box_act->setStatusTip(tr("Toggle bounding boxes on/off"));
     drawing_act->setStatusTip(tr("Toggle drawings on/off"));
-=======
-    view_menu->addAction(detect_intv_act);
-    view_menu->addAction(bound_box_act);
-
-    toggle_project_wgt->setStatusTip(tr("Show/hide project widget"));
-    toggle_bookmark_wgt->setStatusTip(tr("Show/hide bookmark widget"));
-    detect_intv_act->setStatusTip(tr("Toggle annotations on/off"));
-    bound_box_act->setStatusTip(tr("Toggle detections on/off"));
 
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_show_detections);
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::update);
     connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_on_slider);
     connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
->>>>>>> development
 }
 
 /**
