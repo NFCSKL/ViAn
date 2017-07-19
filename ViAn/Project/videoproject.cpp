@@ -54,7 +54,7 @@ std::map<ID, Bookmark *> VideoProject::get_bookmarks(){
  * @param id of the analysis
  * @return the analysis
  */
-AnalysisMeta* VideoProject::get_analysis(const int& id) {
+Analysis* VideoProject::get_analysis(const int& id) {
     return m_analyses[id];
 }
 
@@ -63,7 +63,7 @@ AnalysisMeta* VideoProject::get_analysis(const int& id) {
  * @param id of the analysis
  */
 void VideoProject::delete_analysis(const int& id) {
-    AnalysisMeta* am = m_analyses.at(id);
+    Analysis* am = m_analyses.at(id);
     m_analyses.erase(id);
     am->delete_saveable();
     delete am;
@@ -87,7 +87,7 @@ void VideoProject::delete_bookmark(const int &id) {
  * @return analyses
  * return all analyses.
  */
-std::map<ID, AnalysisMeta *> VideoProject::get_analyses() {
+std::map<ID, Analysis *> VideoProject::get_analyses() {
     return m_analyses;
 }
 
@@ -110,10 +110,11 @@ void VideoProject::read(const QJsonObject& json){
     QJsonObject json_overlay = json["overlay"].toObject();
     this->m_overlay->read(json_overlay);
     QJsonArray json_analyses = json["analyses"].toArray();
+
     // Read analyses from json
     for (int j = 0; j < json_analyses.size(); ++j) {
         QJsonObject json_analysis = json_analyses[j].toObject();
-        AnalysisMeta* analysis = new AnalysisMeta();
+        Analysis* analysis = new Analysis();
         analysis->read(json_analysis);
         add_analysis(analysis);
     }
@@ -127,6 +128,7 @@ void VideoProject::read(const QJsonObject& json){
 void VideoProject::write(QJsonObject& json){
     json["tree_index"] = QString::fromStdString(m_tree_index);
     this->video->write(json);
+    // Write bookmarks to json
     QJsonArray json_bookmarks;
     for(auto it = m_bookmarks.begin(); it != m_bookmarks.end(); it++){
         QJsonObject json_bookmark;
@@ -139,7 +141,7 @@ void VideoProject::write(QJsonObject& json){
     QJsonArray json_analyses;
     for(auto it2 = m_analyses.begin(); it2 != m_analyses.end(); it2++){
         QJsonObject json_analysis;
-        AnalysisMeta* an = it2->second;
+        Analysis* an = it2->second;
         an->write(json_analysis);
         json_analyses.append(json_analysis);
     }
@@ -180,9 +182,9 @@ void VideoProject::set_project(Project *proj){
  * @return id of the analysis
  * Adds analysis to video project.
  */
-ID VideoProject::add_analysis(AnalysisMeta* analysis){
-    this->m_analyses.insert(std::make_pair(this->m_ana_cnt, analysis));
-    return this->m_ana_cnt++;
+ID VideoProject::add_analysis(Analysis *analysis){
+    m_analyses.insert(std::make_pair(m_ana_cnt, analysis));
+    return m_ana_cnt++;
 }
 
 /**
@@ -195,7 +197,7 @@ void VideoProject::delete_artifacts(){
         temp->remove_exported_image();
     }
     for(auto it2 = m_analyses.begin(); it2 != m_analyses.end(); it2++){
-        AnalysisMeta* temp = it2->second;
+        Analysis* temp = it2->second;
         temp->delete_saveable();
 
     }

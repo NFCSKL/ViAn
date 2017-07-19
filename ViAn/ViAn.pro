@@ -34,8 +34,10 @@ SOURCES += main.cpp \
     GUI/analysiswidget.cpp \
     GUI/manipulatordialog.cpp \
     Video/frameprocessor.cpp \
-    Project/projecttreestate.cpp
-
+    Project/projecttreestate.cpp \
+    GUI/tagdialog.cpp \
+    imageexporter.cpp \
+    GUI/frameexporterdialog.cpp
 
 #
 # TEST
@@ -62,7 +64,10 @@ HEADERS += Test/test_video_player.h \
     GUI/analysiswidget.h \
     GUI/manipulatordialog.h \
     Video/frameprocessor.h \
-    Project/projecttreestate.h
+    Project/projecttreestate.h \
+    GUI/tagdialog.h \
+    imageexporter.h \
+    GUI/frameexporterdialog.h
 
 #
 # LIBRARY

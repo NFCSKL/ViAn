@@ -24,7 +24,7 @@ class Bookmark;
 class VideoProject : public Saveable{
     friend class VideoProjectTest;
     std::map<ID,Bookmark*> m_bookmarks;
-    std::map<ID,AnalysisMeta*> m_analyses;
+    std::map<ID,Analysis*> m_analyses;
     std::string m_tree_index = "";
     Overlay* m_overlay = new Overlay();
     Video* video = nullptr;
@@ -41,7 +41,7 @@ public:
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
 
-    ID add_analysis(AnalysisMeta* analysis);
+    ID add_analysis(Analysis* analysis);
     ID add_bookmark(Bookmark* bookmark);
 
     void set_tree_index(std::stack<int> tree_index);
@@ -56,8 +56,8 @@ public:
     Video* get_video();
     Overlay* get_overlay();
     std::map<ID,Bookmark*> get_bookmarks();
-    std::map<ID,AnalysisMeta*> get_analyses();
-    AnalysisMeta *get_analysis(const int &id);
+    std::map<ID,Analysis*> get_analyses();
+    Analysis *get_analysis(const int &id);
 };
 
 

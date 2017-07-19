@@ -19,7 +19,6 @@
 #include "Project/videoproject.h"
 #include "drawscrollarea.h"
 
-
 class VideoWidget : public QWidget
 {
     Q_OBJECT
@@ -32,6 +31,8 @@ private:
     int current_frame = 0;
     int prev_frame_idx;
     int POI_end;
+
+    std::pair<int, int> m_interval = std::make_pair(0, 1);
 public:
     explicit VideoWidget(QWidget *parent = nullptr);
 
@@ -41,6 +42,9 @@ public:
     video_player* m_video_player;
     FrameWidget* frame_wgt;
     AnalysisSlider* playback_slider;
+
+    VideoProject* get_current_video_project();
+    std::pair<int, int> get_frame_interval();
 
 signals:
     void first_frame(cv::Mat frame);
@@ -56,6 +60,9 @@ signals:
     void new_bookmark(VideoProject*, int, cv::Mat);
     void set_detections_on_frame(int);
     void start_analysis(VideoProject*);
+    void add_tag(VideoProject*, Analysis*);
+    void tag_updated(Analysis*);
+    void set_interval(int);
     void set_status_bar(QString);
 public slots:
     void set_current_time(int time);
@@ -65,10 +72,16 @@ public slots:
     void next_frame_clicked(void);
     void prev_frame_clicked(void);
     void analysis_btn_clicked(void);
-    void analysis_play_btn_toggled(bool value);
+    void tag_frame(void);
+    void new_tag_clicked();
+    void new_tag(QString name);
+    void set_tag(Analysis *);
+    void clear_tag(void);
+    void interval_clicked(void);
+    void zoom_out_clicked(void);
     void next_poi_btn_clicked(void);
     void prev_poi_btn_clicked(void);
-    void zoom_out_clicked();
+    void analysis_play_btn_toggled(bool value);
     void set_slider_max(int value);
     void on_new_frame(int frame_num);
     void on_playback_slider_pressed(void);
@@ -76,15 +89,15 @@ public slots:
     void on_playback_slider_value_changed(void);
     void on_playback_slider_moved(void);
     void fit_clicked(void);
-    //void next_poi_clicked(void);
-    //void prev_poi_clicked(void);
-    void load_marked_video(VideoProject* vid_proj, int frame = 0);
-    void enable_poi_btns(bool);
+    void load_marked_video(VideoProject* vid_proj, int frame);
     void update_bar_pos(int change_x, int change_y);
     void set_current_frame_size(QSize size);
     void on_bookmark_clicked(void);
-    //void next_poi_clicked(void);
-    //void prev_poi_clicked(void);
+    void set_interval_start_clicked();
+    void set_interval_end_clicked();
+    void frame_line_edit_finished();
+    void enable_poi_btns(bool, bool);
+    void enable_tag_btn(bool);
 
 private:
     const QSize BTN_SIZE = QSize(30, 30);
@@ -94,6 +107,7 @@ private:
     QSlider* speed_slider;
     QLabel* current_time;
     QLabel* total_time;
+    QLineEdit* frame_line_edit;
 
 
     //Buttons
@@ -107,10 +121,14 @@ private:
     QPushButton* analysis_play_btn;
     QPushButton* bookmark_btn;    
     QPushButton* tag_btn;
+    QPushButton* new_tag_btn;
+    QPushButton* interval_btn;
     QPushButton* zoom_in_btn;
     QPushButton* zoom_out_btn;
     QPushButton* fit_btn;
     QPushButton* move_btn;
+    QPushButton* set_start_interval_btn;
+    QPushButton* set_end_interval_btn;
 
     //Layouts
     QHBoxLayout* control_row;     // Container for all button areas
@@ -119,20 +137,14 @@ private:
     QHBoxLayout* other_btns;      // Bookmark, tag
     QHBoxLayout* zoom_btns;       // Zoom buttons
     QGridLayout* speed_slider_layout;
-
-    //Shortcuts
-    QShortcut* play_sc;
-    QShortcut* stop_sc;
-    QShortcut* next_frame_sc;
-    QShortcut* prev_frame_sc;
-    QShortcut* next_poi_sc;
-    QShortcut* prev_poi_sc;
-    QShortcut* zoom_in_sc;
     
     std::vector<QPushButton*> btns;
 
     QString convert_time(int time);
-    VideoProject* m_vid_proj;
+    VideoProject* m_vid_proj = nullptr;
+    Analysis* m_tag = nullptr;
+
+    bool tag_clicked = false;
 
     bool slider_is_blocked = false;
     bool video_btns_enabled = false;

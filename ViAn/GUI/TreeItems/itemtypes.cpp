@@ -1,17 +1,19 @@
 #include "itemtypes.h"
 
 TreeItem::TreeItem(int type) : QTreeWidgetItem(type) {
-
+    setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 }
 
-VideoItem::VideoItem(VideoProject* video_project, int type): TreeItem(type) {
-    setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);
+
+
+VideoItem::VideoItem(VideoProject* video_project): TreeItem(VIDEO_ITEM) {
     m_vid_proj = video_project;
+    setFlags(flags() | Qt::ItemIsDragEnabled);
     setText(0, QString::fromStdString(video_project->get_video()->get_name()));
 }
 
-VideoItem::VideoItem(int type): TreeItem(type) {
-    setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);
+VideoItem::VideoItem(): TreeItem(VIDEO_ITEM) {
+    setFlags(flags() | Qt::ItemIsDragEnabled);
     setText(0,"placeholder");
 }
 
@@ -25,6 +27,8 @@ void VideoItem::remove(){
 
 }
 
+void VideoItem::rename(){}
+
 VideoProject* VideoItem::get_video_project() {
     return m_vid_proj;
 }
@@ -34,12 +38,22 @@ void VideoItem::set_video_project(VideoProject *vid_proj) {
     setText(0, QString::fromStdString(vid_proj->get_video()->get_name()));
 }
 
-AnalysisItem::AnalysisItem(int type) : QTreeWidgetItem(type) {
-    setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
+
+
+AnalysisItem::AnalysisItem(Analysis analysis) : TreeItem(ANALYSIS_ITEM) {
+    m_analysis = analysis;
+    const QIcon folder_icon("../ViAn/Icons/analysis.png");
+    setIcon(0, folder_icon);
+    setText(0, QString::fromStdString(m_analysis.get_name()));
 }
 
-AnalysisItem::~AnalysisItem() {
+AnalysisItem::AnalysisItem() : TreeItem(ANALYSIS_ITEM) {
+    const QIcon folder_icon("../ViAn/Icons/analysis.png");
+    setIcon(0, folder_icon);
+    setText(0, "Analysis");
 }
+
+AnalysisItem::~AnalysisItem() {}
 
 void AnalysisItem::set_analysis(Analysis analysis) {
     m_analysis = analysis;
@@ -49,14 +63,43 @@ Analysis* AnalysisItem::get_analysis() {
     return &m_analysis;
 }
 
-FolderItem::FolderItem(int type) : TreeItem(type) {
-    setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled);
+void AnalysisItem::remove(){}
+
+void AnalysisItem::rename(){
+    m_analysis.set_name(text(0).toStdString());
+}
+
+
+
+FolderItem::FolderItem() : TreeItem(FOLDER_ITEM) {
+    setFlags(flags() | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled);
     const QIcon folder_icon("../ViAn/Icons/folder.png");
     setIcon(0, folder_icon);
 }
 
-void FolderItem::remove() {
+void FolderItem::remove() {}
 
+void FolderItem::rename(){}
+
+
+
+TagItem::TagItem(Analysis* tag) : TreeItem(TAG_ITEM) {
+    qDebug() << flags();
+//    setFlags(flags() & ~Qt::ItemIsSelectable  & ~Qt::ItemIsDragEnabled & ~Qt::ItemIsDropEnabled);
+    m_tag = tag;
+    setText(0, QString::fromStdString(tag->get_name()));
+    const QIcon folder_icon("../ViAn/Icons/tag.png");
+    setIcon(0, folder_icon);
+}
+
+void TagItem::remove(){}
+
+void TagItem::rename() {
+    m_tag->set_name(text(0).toStdString());
+}
+
+Analysis* TagItem::get_tag() {
+    return m_tag;
 }
 
 

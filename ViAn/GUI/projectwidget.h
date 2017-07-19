@@ -18,6 +18,8 @@ class ProjectWidget : public QTreeWidget
     Q_OBJECT
     QTreeWidgetItem* clicked_item = nullptr;
     QPoint* clicked_point = nullptr;
+    QTreeWidgetItem* selection_parent = nullptr;
+    bool selecting = false;
 public:
     explicit ProjectWidget(QWidget *parent = nullptr);
     Project* m_proj = nullptr;
@@ -28,9 +30,12 @@ signals:
     void proj_path(std::string);
     void load_bookmarks(VideoProject* vid_proj);
     void marked_analysis(Analysis*);
+    void marked_tag(Analysis*);
     void set_detections(bool);
-    void enable_poi_btns(bool);
+    void enable_poi_btns(bool, bool);
+    void enable_tag_btn(bool);
     void set_poi_slider(bool);
+    void set_tag_slider(bool);
     void set_status_bar(QString);
     void begin_analysis(std::string, std::string, QTreeWidgetItem*);
 
@@ -39,6 +44,7 @@ public slots:
     void add_project(const QString project_name, const QString project_path);
     void add_video();
     void start_analysis(VideoProject*);
+    void add_tag(VideoProject*, Analysis *tag);
     void set_tree_item_name(QTreeWidgetItem *item, QString);
     void save_project();
     void open_project();
@@ -47,11 +53,13 @@ public slots:
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
 private slots:
-    void tree_item_clicked(QTreeWidgetItem *item, const int& col);
     void context_menu(const QPoint& point);
     void remove_item();
     void rename_item();
     void create_folder_item();
+    void tree_item_clicked(QTreeWidgetItem *item, const int& col = 0);
+    void check_selection();
+    void check_selection_level(QTreeWidgetItem* current, QTreeWidgetItem* prev);
 private:
     void tree_add_video();
     void tree_add_video(VideoProject* vid_proj, const QString& video_name);
@@ -60,10 +68,10 @@ private:
     void folder_dropped(QString path);
     void insert_dropped(VideoItem* item);
     std::stack<int> get_index_path(QTreeWidgetItem* item);
-    VideoItem* get_video_item(VideoProject* v_proj);
-    VideoItem* search_folder(FolderItem* f_item, VideoProject* v_proj);
+    VideoItem* get_video_item(VideoProject* v_proj, QTreeWidgetItem* s_item = nullptr);
     void insert_to_path_index(VideoProject* vid_proj);
-    void update_index_paths(QTreeWidgetItem* item = nullptr);
+    void save_item_data(QTreeWidgetItem* item = nullptr);
+    void add_analyses_to_item(VideoItem* v_item);
 signals:
     void project_closed();
 

@@ -93,10 +93,10 @@ void Project::remove_report(const int &id)
  */
 void Project::delete_artifacts(){
     // Delete files in all videoprojects
-    while (!m_videos.empty()) {
-        delete m_videos.back();
-        m_videos.pop_back();
+    for (auto it = m_videos.begin(); it != m_videos.end(); it++) {
+        (*it)->delete_artifacts();
     }
+
     // Delete all reports.
     for(auto it = m_reports.begin(); it != m_reports.end(); it++){
         Report* temp = (*it).second;
