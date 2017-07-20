@@ -7,7 +7,7 @@
 #include "opencv2/videoio/videoio.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "Project/Analysis/analysis.h"
-#include "Project/Analysis/analysismeta.h"
+#include "Project/Analysis/analysisproxy.h"
 #include "Analysis/MotionDetection.h"
 
 /**

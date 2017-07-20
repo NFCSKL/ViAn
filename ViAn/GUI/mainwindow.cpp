@@ -306,7 +306,7 @@ void MainWindow::init_tools_menu() {
     QAction* text_act = new QAction(tr("&Text"), this);
 
 
-    QAction* export_act  =new QAction(tr("&Frames"));
+    QAction* export_act  =new QAction(tr("&Frames"), this);
 
 
 
@@ -429,7 +429,7 @@ void MainWindow::export_images(){
                 "Exporting images...", "Abort", 0, abs(interval.first - interval.second) + 1, this, Qt::WindowMinimizeButtonHint);
 
     connect(im_exp, &ImageExporter::finished_msg, this, &MainWindow::set_status_bar);
-    connect(progress, &QProgressDialog::canceled, im_exp, ImageExporter::abort);
+    connect(progress, &QProgressDialog::canceled, im_exp, &ImageExporter::abort);
     connect (im_exp, &ImageExporter::update_progress, progress, &QProgressDialog::setValue);
 
     QThread* exporter_thread = new QThread;

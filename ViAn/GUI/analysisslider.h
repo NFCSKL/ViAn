@@ -5,7 +5,7 @@
 #include <QSlider>
 #include <vector>
 #include <set>
-#include "Project/Analysis/analysismeta.h"
+#include "Project/Analysis/basicanalysis.h"
 #include "Project/Analysis/tag.h"
 
 

@@ -8,7 +8,7 @@
 #include <map>
 #include "Filehandler/saveable.h"
 #include "opencv2/core/core.hpp"
-#include "ooi.h"
+#include "detectionbox.h"
 #include "analysisinterval.h"
 class POI : public AnalysisInterval{    
     std::map<int,std::vector<DetectionBox>> OOIs = {};

@@ -10,7 +10,7 @@
 #include "Filehandler/saveable.h"
 #include "opencv2/core/core.hpp"
 #include "poi.h"
-#include "ooi.h"
+#include "detectionbox.h"
 #include "basicanalysis.h"
 
 class Analysis : public BasicAnalysis {
