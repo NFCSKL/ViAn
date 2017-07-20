@@ -13,7 +13,7 @@ const std::map<std::string, ANALYSIS_TYPE> ANALYSIS_NAMES_TYPE_MAP = {std::make_
                                                                      std::make_pair("Tag",TAG)};
 struct interval_cmp {
     bool operator()(const AnalysisInterval* lhs, const AnalysisInterval* rhs) const {
-        return lhs->getEnd() < rhs->getStart();
+        return lhs->get_start() < rhs->get_start();
     }
 };
 using interval_set = std::set<AnalysisInterval*, interval_cmp> ;
@@ -33,11 +33,10 @@ public:
     virtual void read(const QJsonObject& json);
     virtual void write(QJsonObject& json);
 
-    std::string getFile_analysis() const;
-    std::string getName() const;
-    int getType() const;
+    std::string get_name() const;
+    int get_type() const;
     virtual void add_interval(AnalysisInterval *ai);
-    interval_set getIntervals() const;
+    interval_set get_interval() const;
 };
 Q_DECLARE_METATYPE(BasicAnalysis)
 #endif // BASICANALYSIS_H

@@ -56,17 +56,17 @@ void BasicAnalysis::write(QJsonObject &json){
     json["POI:s"] = json_ais;
 }
 
-std::string BasicAnalysis::getName() const
+std::string BasicAnalysis::get_name() const
 {
     return m_name;
 }
 
-int BasicAnalysis::getType() const
+int BasicAnalysis::get_type() const
 {
     return type;
 }
 
-interval_set BasicAnalysis::getIntervals() const
+interval_set BasicAnalysis::get_interval() const
 {
     return m_intervals;
 }

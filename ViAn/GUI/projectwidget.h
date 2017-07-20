@@ -40,7 +40,7 @@ public slots:
     void add_project(const QString project_name, const QString project_path);
     void add_video();
     void start_analysis(VideoProject*);
-    void add_tag(VideoProject*, BasicAnalysis *tag);
+    void add_basic_analysis(VideoProject*, BasicAnalysis *tag);
     void set_tree_item_name(QTreeWidgetItem *item, QString);
     void save_project();
     void open_project();

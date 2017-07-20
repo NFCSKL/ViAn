@@ -101,7 +101,7 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj) {
  * @param tag
  * Adds a tag 'tag' under vid_proj
  */
-void ProjectWidget::add_tag(VideoProject* vid_proj, BasicAnalysis *tag) {
+void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, BasicAnalysis *tag) {
     TagItem* tag_item = new TagItem(dynamic_cast<Tag*>(tag), TAG_ITEM);
     vid_proj->add_analysis(tag);
     for (int i = 0; i < m_videos->childCount(); i++) {

@@ -28,13 +28,15 @@ void Tag::add_interval(AnalysisInterval *an_interval){
 void Tag::merge_intervals(){
     std::set<AnalysisInterval*, interval_cmp> intervals = m_intervals;
     std::set<AnalysisInterval*, interval_cmp> res;
-    auto it = intervals.begin();    
+    auto it = intervals.begin();
     AnalysisInterval* current = *it;
     it++;
     while (it != intervals.end()){
-       if (current->getInterval().second +1 >= (*it)->getInterval().first){ // you might want to change it to >=
-           AnalysisInterval* merged = new AnalysisInterval(current->getInterval().first, (*it)->getInterval().second);
-           AnalysisInterval* temp = current;
+       if (current->get_interval().second +1 >= (*it)->get_interval().first){ // you might want to change it to >=
+           auto m_end = std::max((*it)->get_interval().second, current->get_interval().second);
+           auto m_start = current->get_interval().first;
+           AnalysisInterval* merged = new AnalysisInterval(m_end,m_start);
+           AnalysisInterval* temp = *it;
            current = merged;
            delete temp;
        } else {

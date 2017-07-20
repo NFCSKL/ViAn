@@ -68,8 +68,8 @@ void AnalysisProxy::write(QJsonObject &json) {
     for (auto it = m_intervals.begin(); it != m_intervals.end(); ++it) {
         QJsonObject interval;
         POI* pair = dynamic_cast<POI*>(*it);
-        interval["start"] = pair->getStart();
-        interval["end"] = pair->getEnd();
+        interval["start"] = pair->get_start();
+        interval["end"] = pair->get_end();
         intervals.push_back(interval);
     }
     json["intervals"] = intervals;

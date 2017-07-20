@@ -493,18 +493,17 @@ void VideoWidget::analysis_btn_clicked() {
 
 void VideoWidget::tag_frame() {
     Tag* tag = dynamic_cast<Tag*>(m_tag);
-    if (tag->getType() == TAG){
-        if (tag->add_frame(current_frame)) {
-            emit tag_updated(tag);
-            emit set_status_bar("Tagged frame number: " + QString::number(current_frame));
-        } else {
-            tag->remove_frame(current_frame);
-            emit tag_updated(tag);
-            emit set_status_bar("Frame untagged");
-        }
-    } else {
-        emit set_status_bar("Select a tag");
+    if (tag->add_frame(current_frame)) {
+        emit tag_updated(tag);
+        emit set_status_bar("Tagged frame number: " + QString::number(current_frame));
+        return;
+    }else {
+        tag->remove_frame(current_frame);
+        emit tag_updated(tag);
+        emit set_status_bar("Frame untagged");
+        return;
     }
+    emit set_status_bar("Select a tag");
 }
 
 void VideoWidget::new_tag_clicked() {
@@ -516,11 +515,11 @@ void VideoWidget::new_tag_clicked() {
 void VideoWidget::new_tag(QString name) {
     BasicAnalysis* tag = new Tag();
     tag->m_name = name.toStdString();
-    emit add_tag(m_vid_proj, tag);
+    emit add_basic_analysis(m_vid_proj, tag);
 }
 
-void VideoWidget::set_tag(BasicAnalysis *tag) {
-    m_tag = dynamic_cast<Tag*>(tag);
+void VideoWidget::set_basic_analysis(BasicAnalysis *basic_analysis) {
+    m_tag = dynamic_cast<Tag*>(basic_analysis);
 
 }
 

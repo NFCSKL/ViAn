@@ -53,17 +53,17 @@ bool AnalysisInterval::in_interval(int frame) const
    return frame >= m_start && frame <= m_end;
 }
 
-int AnalysisInterval::getStart() const
+int AnalysisInterval::get_start() const
 {
     return m_start;
 }
 
-int AnalysisInterval::getEnd() const
+int AnalysisInterval::get_end() const
 {
     return m_end;
 }
 
-std::pair<int, int> AnalysisInterval::getInterval()
+AnalysisInterval::interval AnalysisInterval::get_interval()
 {
     return std::make_pair(m_start, m_end);
 }

@@ -61,7 +61,7 @@ signals:
     void set_detections_on_frame(int);
     void start_analysis(VideoProject*);
 
-    void add_tag(VideoProject*, BasicAnalysis*);
+    void add_basic_analysis(VideoProject*, BasicAnalysis*);
     void tag_updated(BasicAnalysis*);
 
     void set_interval(int);
@@ -77,7 +77,7 @@ public slots:
     void tag_frame(void);
     void new_tag_clicked();
     void new_tag(QString name);
-    void set_tag(BasicAnalysis *);
+    void set_basic_analysis(BasicAnalysis *);
 
     void clear_tag(void);
     void interval_clicked(void);
@@ -145,7 +145,7 @@ private:
 
     QString convert_time(int time);
     VideoProject* m_vid_proj = nullptr;
-    BasicAnalysis* m_tag = nullptr;
+    Tag* m_tag = nullptr;
 
     bool tag_clicked = false;
 

@@ -66,19 +66,14 @@ void AnalysisSlider::update(){
  * Adds all POIs to the slider
  * @param analysis
  */
-void AnalysisSlider::set_analysis(BasicAnalysis* analysis) {
+void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
     rects.clear();
     if (analysis != nullptr) {
-        for (auto p : analysis->getIntervals()) {
-            add_slider_interval(p->getStart(), p->getEnd());
+        for (auto p : analysis->get_interval()) {
+            add_slider_interval(p->get_start(), p->get_end());
         }
     }
     repaint();
-}
-
-void AnalysisSlider::set_tag(BasicAnalysis *tag)
-{
-    set_analysis(dynamic_cast<BasicAnalysis*>(tag));
 }
 
 void AnalysisSlider::set_interval(int frame) {
