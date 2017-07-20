@@ -19,6 +19,7 @@
 #include "Project/videoproject.h"
 #include "drawscrollarea.h"
 #include "Project/Analysis/tag.h"
+#include "Video/videocontroller.h"
 class VideoWidget : public QWidget
 {
     Q_OBJECT
@@ -31,6 +32,8 @@ private:
     int current_frame = 0;
     int prev_frame_idx;
     int POI_end;
+
+    VideoController* v_controller;
 
     std::pair<int, int> m_interval = std::make_pair(0, 1);
 public:
@@ -64,6 +67,7 @@ signals:
     void tag_updated(Tag*);
     void set_interval(int);
     void set_status_bar(QString);
+    void load_video(std::string video_path);
 public slots:
     void set_current_time(int time);
     void set_total_time(int time);

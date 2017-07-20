@@ -63,6 +63,15 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
     connect(this, &VideoWidget::prev_video_frame, m_video_player, &video_player::previous_frame);
 
     connect(this, SIGNAL(set_detections_on_frame(int)), frame_wgt, SLOT(set_detections_on_frame(int)));
+
+    v_controller = new VideoController();
+    v_controller->start();
+    connect(play_btn, &QPushButton::clicked, v_controller, &VideoController::play);
+    connect(next_frame_btn, &QPushButton::clicked, v_controller, &VideoController::pause);
+    connect(stop_btn, &QPushButton::clicked, v_controller, &VideoController::stop);
+    connect(this, &VideoWidget::set_playback_frame, v_controller, &VideoController::set_frame);
+    connect(this, &VideoWidget::load_video, v_controller, &VideoController::load_video);
+
 }
 
 VideoProject *VideoWidget::get_current_video_project(){
@@ -662,6 +671,7 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int frame) {
     }
 
     if (m_vid_proj != vid_proj) {
+        load_video(vid_proj->get_video()->file_path);
         m_interval = make_pair(0,0);
         if (m_video_player->is_paused()) {
             // Playback thread sleeping, wake it
