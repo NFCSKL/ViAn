@@ -2,6 +2,8 @@
 #include <QDebug>
 #include "Project/Analysis/analysis.h"
 
+#include <QThread>
+
 FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {
 }
 
@@ -24,8 +26,8 @@ void FrameWidget::set_scroll_area_size(QSize size) {
     m_scroll_area_size = size;
 }
 
-void FrameWidget::set_analysis(AnalysisMeta* analysis) {
-    m_analysis = analysis->get_analysis();
+void FrameWidget::set_analysis(AnalysisProxy *analysis) {
+    m_analysis = analysis->load_analysis();
 }
 
 /**

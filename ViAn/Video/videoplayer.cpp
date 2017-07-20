@@ -3,9 +3,7 @@
 #include <QDebug>
 #include <QTime>
 
-VideoPlayer::VideoPlayer(QObject *parent) : QObject(parent) {
-    cv::namedWindow("test");
-}
+VideoPlayer::VideoPlayer(QObject *parent) : QObject(parent) {}
 
 /**
  * @brief VideoPlayer::on_load_video
@@ -15,46 +13,36 @@ VideoPlayer::VideoPlayer(QObject *parent) : QObject(parent) {
  */
 void VideoPlayer::on_load_video(std::string video_path){
     m_is_playing = false;
-    qDebug() << QThread::currentThreadId() << "::on_load_video" << QString::fromStdString(video_path);
+
     capture.open(video_path);
     if (!capture.isOpened()) return;
+
     m_delay = 1000 / capture.get(CV_CAP_PROP_FPS);
     last_frame = capture.get(CV_CAP_PROP_FRAME_COUNT) - 1;
-    capture.read(frame);
-    current_frame = 0;
-    cv::imshow("test", frame);
-
+    set_frame(0);
 }
 
 /**
  * @brief VideoPlayer::on_play
+ * Sets the playback status according to play
  */
-void VideoPlayer::on_play(){
-    qDebug() << QThread::currentThreadId() << "::on_play";
+void VideoPlayer::on_play_pause(bool play){
+    if (!play) {
+        m_is_playing = false;
+        return;
+    }
+
     if (m_is_playing) return;
     m_is_playing = true;
     playback_loop();
 }
 
 /**
- * @brief VideoPlayer::on_pause
- */
-void VideoPlayer::on_pause(){
-    qDebug() << QThread::currentThreadId() << "::on_pause";
-    m_is_playing = false;
-}
-
-/**
  * @brief VideoPlayer::on_stop
  */
 void VideoPlayer::on_stop(){
-    qDebug() << QThread::currentThreadId() << "::on_stop";
     m_is_playing = false;
-    capture.set(CV_CAP_PROP_POS_FRAMES, 0);
-    capture.read(frame);
-    current_frame = 0;
-    cv::imshow("test", frame);
-    display(frame.clone());
+    set_frame(0);
 }
 
 /**
@@ -63,15 +51,15 @@ void VideoPlayer::on_stop(){
  * @param frame_index   :   index of the frame that should be displayed
  */
 void VideoPlayer::on_set_frame(int frame_index) {
-    if (frame_index >= 0 && frame_index <= last_frame && !QCoreApplication::hasPendingEvents()) {
-        qDebug() << QThread::currentThreadId() << "::" << QString::number(frame_index - 1);
-        capture.set(CV_CAP_PROP_POS_FRAMES, frame_index);
-        capture.read(frame);
-        current_frame = frame_index;
-        cv::imshow("test", frame);
-        display(frame.clone());
-        display_index(current_frame);
-    }
+    if (!QCoreApplication::hasPendingEvents()) set_frame(frame_index);
+}
+
+void VideoPlayer::on_step_forward() {
+    on_set_frame(current_frame + 1);
+}
+
+void VideoPlayer::on_step_backward() {
+    on_set_frame(current_frame - 1);
 }
 
 /**
@@ -96,11 +84,16 @@ void VideoPlayer::playback_loop() {
             m_is_playing = false;
             continue;
         }
-
-        cv::imshow("test", frame);
         display(frame.clone());
         display_index(++current_frame);
-
     }
     m_is_playing = false;
+}
+
+void VideoPlayer::set_frame(int frame_index) {
+    if (frame_index < 0 || frame_index > last_frame) return;
+    capture.set(CV_CAP_PROP_POS_FRAMES, frame_index);
+    capture.read(frame);
+    current_frame = frame_index;
+    display(frame.clone());
 }

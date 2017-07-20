@@ -24,7 +24,7 @@ class VideoPlayer : public QObject
     int m_delay = 0;    // Delay time to reach the right frame rate
 
     bool m_is_playing = false;
-    bool m_video_loaded = true;
+    bool m_video_loaded = false;
 public:
     explicit VideoPlayer(QObject *parent = nullptr);
 
@@ -35,13 +35,15 @@ signals:
 
 public slots:
     void on_load_video(std::string);
-    void on_play();
-    void on_pause();
-    void on_stop();
+    void on_play_pause(bool play);
+    void on_stop(void);
     void on_set_frame(int frame_index);
+    void on_step_forward(void);
+    void on_step_backward(void);
 
 private:
     void playback_loop();
+    void set_frame(int frame_index);
 };
 
 #endif // VIDEOPLAYER_H
