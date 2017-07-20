@@ -21,6 +21,7 @@ class VideoPlayer : public QObject
     std::string m_vid_path = "D:/Testdata/Sequence 01.mp4";
     int current_frame = -1;
     int last_frame = 0;
+    int m_delay = 0;    // Delay time to reach the right frame rate
 
     bool m_is_playing = false;
     bool m_video_loaded = true;
@@ -28,6 +29,9 @@ public:
     explicit VideoPlayer(QObject *parent = nullptr);
 
 signals:
+    void display(cv::Mat);
+    void display_index(int frame_index);
+
 
 public slots:
     void on_load_video(std::string);
