@@ -41,7 +41,7 @@ public slots:
     void add_tag(VideoProject*, Tag *tag);
     void set_tree_item_name(QTreeWidgetItem *item, QString);
     void save_project();
-    void open_project();
+    void open_project(QString project_path="");
     void close_project();
     void remove_project();
     void dragEnterEvent(QDragEnterEvent *event);
