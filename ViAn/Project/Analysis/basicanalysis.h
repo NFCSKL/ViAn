@@ -36,7 +36,7 @@ public:
     std::string get_name() const;
     int get_type() const;
     virtual void add_interval(AnalysisInterval *ai);
-    interval_set get_interval() const;
+    interval_set get_intervals() const;
 };
 Q_DECLARE_METATYPE(BasicAnalysis)
 #endif // BASICANALYSIS_H
