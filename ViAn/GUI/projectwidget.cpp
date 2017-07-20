@@ -8,6 +8,7 @@
 #include <QDirIterator>
 #include <iostream>
 #include <algorithm>
+#include "Project/recentproject.h"
 
 ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     header()->close();
@@ -101,14 +102,14 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj) {
  * @param tag
  * Adds a tag 'tag' under vid_proj
  */
-void ProjectWidget::add_tag(VideoProject* vid_proj, Tag *tag) {
-    TagItem* tag_item = new TagItem(tag, TAG_ITEM);
-    vid_proj->add_analysis(new AnalysisMeta(static_cast<Analysis>(*tag)));
+void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, BasicAnalysis *tag) {
+    TagItem* tag_item = new TagItem(dynamic_cast<Tag*>(tag), TAG_ITEM);
+    vid_proj->add_analysis(tag);
     for (int i = 0; i < m_videos->childCount(); i++) {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(m_videos->child(i));
         if (vid_item->get_video_project() == vid_proj) {
             m_videos->child(i)->addChild(tag_item);
-            tag_item->setText(0, QString::fromStdString(tag->get_name()));
+            tag_item->setText(0, QString::fromStdString(tag->m_name));
             m_videos->child(i)->setExpanded(true);
         }
     }
@@ -137,15 +138,15 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
     m_videos->addChild(vid);
     emit set_status_bar("Video added: " + vid_name);
     m_videos->setExpanded(true);
-    for (std::pair<int,AnalysisMeta*> ana : vid_proj->get_analyses()){
+    for (std::pair<int,BasicAnalysis*> ana : vid_proj->get_analyses()){
         if (ana.second->type == TAG) {
-            TagItem* tag_item = new TagItem(static_cast<Tag*>(ana.second->get_analysis()), TAG_ITEM);
+            TagItem* tag_item = new TagItem(dynamic_cast<Tag*>(ana.second), TAG_ITEM);
             tag_item->setText(0, QString::fromStdString(ana.second->m_name));
             vid->addChild(tag_item);
             vid->setExpanded(true);
         } else {
             AnalysisItem* ana_item = new AnalysisItem(ANALYSIS_ITEM);
-            ana_item->set_analysis(ana.second);
+            ana_item->set_analysis(dynamic_cast<AnalysisProxy*>(ana.second));
             ana_item->setText(0, QString::fromStdString(ana.second->m_name));
             vid->addChild(ana_item);
             vid->setExpanded(true);
@@ -228,18 +229,18 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     } case ANALYSIS_ITEM: {
         tree_item_clicked(item->parent());
         AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(item);
+        if(!ana_item->is_finished()) break;
         emit marked_analysis(ana_item->get_analysis());
+        emit marked_basic_analysis(dynamic_cast<BasicAnalysis*>(ana_item->get_analysis()));
         emit set_detections(true);
         emit set_poi_slider(true);
-        if (!ana_item->get_analysis()->m_poi_intervals.empty()) {
-            emit enable_poi_btns(true, true);
-        }
+        emit enable_poi_btns(true, true);
         emit update_frame();
         break;
     } case TAG_ITEM: {
         tree_item_clicked(item->parent());
         TagItem* tag_item = dynamic_cast<TagItem*>(item);
-        emit marked_tag(tag_item->get_tag());
+        emit marked_basic_analysis(tag_item->get_tag());
         emit set_tag_slider(true);
         emit enable_poi_btns(true, false);
         emit enable_tag_btn(true);
@@ -259,6 +260,10 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
 void ProjectWidget::save_project() {
     if (m_proj != nullptr) {
         m_proj->save_project();
+
+        RecentProject rp;
+        rp.load_recent();
+        rp.update_recent(m_proj->getName(), m_proj->full_path());
         emit set_status_bar("Project saved");
     }
 }
@@ -267,8 +272,7 @@ void ProjectWidget::save_project() {
  * @brief ProjectWidget::open_project
  * Slot function to open a previously created project
  */
-void ProjectWidget::open_project() {
-    QString project_path = QFileDialog().getOpenFileName(this, tr("Open project"), QDir::homePath());
+void ProjectWidget::open_project(QString project_path) {
     if (!project_path.isEmpty()) {
         if (m_proj != nullptr) close_project();
         emit set_status_bar("Opening project");

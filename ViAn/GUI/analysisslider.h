@@ -5,7 +5,7 @@
 #include <QSlider>
 #include <vector>
 #include <set>
-#include "Project/Analysis/analysismeta.h"
+#include "Project/Analysis/basicanalysis.h"
 #include "Project/Analysis/tag.h"
 
 
@@ -42,8 +42,7 @@ public:
 protected:
     void paintEvent(QPaintEvent *ev);
 public slots:
-    void set_analysis(AnalysisMeta *analysis);
-    void set_tag(Tag *tag);
+    void set_basic_analysis(BasicAnalysis *analysis);
 
     void update();
 
