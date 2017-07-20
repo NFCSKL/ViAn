@@ -34,6 +34,11 @@ void FrameWidget::set_analysis(Analysis* analysis) {
  */
 void FrameWidget::clear_analysis() {
     m_analysis = nullptr;
+    ooi_rects.clear();
+}
+
+void FrameWidget::set_video_project(VideoProject* vid_proj) {
+    m_vid_proj = vid_proj;
 }
 
 /**
@@ -60,8 +65,10 @@ void FrameWidget::update(){
 }
 
 void FrameWidget::set_tool(SHAPES tool) {
-    emit send_tool(tool);
-    this->tool = tool;
+    if (m_vid_proj != nullptr) {
+        emit send_tool(tool);
+        this->tool = tool;
+    }
 }
 
 void FrameWidget::draw_image(cv::Mat image) {
@@ -128,7 +135,6 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
             painter.drawRect(detect_rect);
         }
     }
-
     painter.end();
 }
 
@@ -147,7 +153,7 @@ void FrameWidget::resizeEvent(QResizeEvent *event) {
 void FrameWidget::mousePressEvent(QMouseEvent *event) {
     switch (tool) {
     case NONE:
-        std::cout << "NONE" << std::endl;
+        std::cout << "None" << std::endl;
         break;
     case ZOOM:
         if (event->button() == Qt::RightButton) {
@@ -160,28 +166,6 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
             }
         }
         break;
-//    case MOVE:
-//        std::cout << "MOVE" << std::endl;
-//        break;
-//    case RECTANGLE:
-//        std::cout << "RECTANGLE" << std::endl;
-//        break;
-//    case CIRCLE:
-//        std::cout << "cirlce" << std::endl;
-//        break;
-//    case LINE:
-//        std::cout << "line" << std::endl;
-//        break;
-//    case ARROW:
-//        std::cout << "arrow" << std::endl;
-//        break;
-//    case PEN:
-//        std::cout << "pen" << std::endl;
-//
-//        break;
-//    case TEXT:
-//        std::cout << "text" << std::endl;
-//        break;
     default:
         emit mouse_pressed(event->pos());
         break;
@@ -194,6 +178,8 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
  */
 void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
     switch (tool) {
+    case NONE:
+        break;
     case ZOOM:
         if (event->button() == Qt::RightButton) {
             end_panning();
@@ -218,6 +204,8 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
  */
 void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
     switch (tool) {
+    case NONE:
+        break;
     case ZOOM:
         if (event->buttons() == Qt::RightButton){
             panning(event->pos());
@@ -304,7 +292,7 @@ void FrameWidget::end_zoom() {
     QPoint end = QPoint(zoom_end_pos.x(), zoom_start_pos.y() + height_mod);
 
     cv::Rect zoom_rect(cv::Point(zoom_start_pos.x(), zoom_start_pos.y()), cv::Point(end.x(), end.y()));
-    double  scale_ratio = std::min(m_scroll_area_size.width() / double(zoom_rect.width), m_scroll_area_size.height() / double(zoom_rect.height));
+    double scale_ratio = std::min(m_scroll_area_size.width() / double(zoom_rect.width), m_scroll_area_size.height() / double(zoom_rect.height));
 
     emit zoom_points(zoom_start_pos, end);
 }

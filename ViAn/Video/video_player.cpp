@@ -153,8 +153,7 @@ void video_player::process_frame() {
     // Applies brightness and contrast
     manipulator->apply(manipulated_frame);
 
-    manipulated_frame = video_overlay->draw_overlay(manipulated_frame, get_current_frame_num());
-
+    video_overlay->draw_overlay(manipulated_frame, get_current_frame_num());
     // Emit manipulated frame and current frame number
     emit processed_image(manipulated_frame.clone());
     emit update_current_frame(capture.get(CV_CAP_PROP_POS_FRAMES) - 1);
@@ -252,6 +251,7 @@ void video_player::set_playback_pos(int pos) {
         capture.read(frame);                        // Read it
         frame_lock.unlock();
     }
+    process_frame(); //Blink blink
 }
 
 /**

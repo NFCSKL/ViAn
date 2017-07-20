@@ -18,7 +18,7 @@ public:
     QAction* color_tool_act;
     QAction* pen_tool_act;
     QAction* arrow_tool_act;
-    QAction* box_tool_act;
+    QAction* rectangle_tool_act;
     QAction* circle_tool_act;
     QAction* line_tool_act;
     QAction* text_tool_act;
@@ -30,6 +30,10 @@ public:
 private slots:
     void color_tool_clicked();
     void pen_tool_clicked();
+    void arrow_tool_clicked();
+    void rectangle_tool_clicked();
+    void circle_tool_clicked();
+    void line_tool_clicked();
     void text_tool_clicked();
 signals:
     void set_status_bar(QString);

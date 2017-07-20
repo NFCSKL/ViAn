@@ -26,6 +26,7 @@ void FrameProcessor::process() {
     m_f_man->apply(m_frame);
     // Emit manipulated frame and current frame number
     emit done_processing(m_frame.clone());
+    std::cout << "fraaame " << (m_capture->get(CV_CAP_PROP_POS_FRAMES) - 1) << std::endl;
     emit frame_num(m_capture->get(CV_CAP_PROP_POS_FRAMES) - 1);
     m_frame.release();
     m_mutex->unlock();

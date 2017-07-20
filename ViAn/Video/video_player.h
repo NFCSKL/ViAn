@@ -20,7 +20,7 @@
 class video_player : public QThread {
     Q_OBJECT
     cv::VideoCapture capture;
-    cv::Mat frame, manipulated_frame;   // Frame is the original frame read video capture
+    cv::Mat frame, manipulated_frame ,man_fram;   // Frame is the original frame read video capture
     QThread* processing_thread = nullptr;
 
     // Current capture data
@@ -152,6 +152,7 @@ public slots:
     void video_mouse_pressed(QPoint pos);
     void video_mouse_released(QPoint pos);
     void video_mouse_moved(QPoint pos);
+    void update_overlay();
 protected:
     void run() override;
     void msleep(int ms);
@@ -161,7 +162,6 @@ private:
     void check_last_frame();
     cv::Mat scale_frame(cv::Mat &src);
     void process_frame();
-    void update_overlay();
     void convert_frame(bool scale);
     void scale_position(QPoint &pos);
     void scale_mat(double scale);

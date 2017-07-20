@@ -83,7 +83,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     addToolBar(draw_toolbar);
     connect(main_toolbar->toggle_draw_toolbar_act, &QAction::triggered, toggle_draw_toolbar, &QAction::trigger);   
     connect(draw_toolbar, SIGNAL(set_color(QColor)), video_wgt->m_video_player, SLOT(set_overlay_colour(QColor)));
-    connect(draw_toolbar, SIGNAL(set_overlay_tool(SHAPES)), video_wgt->m_video_player, SLOT(set_overlay_tool(SHAPES)));
+    connect(draw_toolbar, SIGNAL(set_overlay_tool(SHAPES)), video_wgt->frame_wgt, SLOT(set_tool(SHAPES)));
 
     // Status bar
     status_bar = new StatusBar();
@@ -100,6 +100,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt->playback_slider, &AnalysisSlider::clear_slider);
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::load_marked_video);
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::clear_tag);
+    connect(project_wgt, &ProjectWidget::marked_video, video_wgt->frame_wgt, &FrameWidget::set_video_project);
 
     connect(analysis_wgt, SIGNAL(name_in_tree(QTreeWidgetItem*,QString)), project_wgt, SLOT(set_tree_item_name(QTreeWidgetItem*,QString)));
 
@@ -327,7 +328,6 @@ void MainWindow::init_tools_menu() {
     // Export submenu
     QMenu* export_menu = tool_menu->addMenu(tr("&Export"));
     export_menu->addAction(export_act);
-
 
     tool_menu->addAction(color_act);
     QMenu* drawing_tools = tool_menu->addMenu(tr("&Shapes"));

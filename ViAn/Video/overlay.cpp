@@ -12,15 +12,12 @@ Overlay::Overlay() {
  * @param img Frame to draw on
  * @param frame_nr Number of the frame currently shown in the video.
  */
-cv::Mat Overlay::draw_overlay(cv::Mat &frame, int frame_nr) {
+void Overlay::draw_overlay(cv::Mat &frame, int frame_nr) {
     if (show_overlay) {
-        std::cout << "draw" << std::endl;
-        std::cout << overlays[frame_nr].size() << std::endl;
         foreach (Shape* s, overlays[frame_nr]) {
             frame = s->draw(frame);
         }
     }
-    return frame;
 }
 
 /**
@@ -56,8 +53,9 @@ void Overlay::set_showing_overlay(bool value) {
  * @param s New tool to be set.
  */
 void Overlay::set_tool(SHAPES s) {
-    current_shape = s;
     std::cout << "tool aquired! " << s << std::endl;
+    current_shape = s;
+    //std::cout << "tool aquired! " << s << std::endl;
     // If the text option is chosen, a string and size will be entered by the user.
     if (s == TEXT) {
         std::string input_string = current_string.toStdString();
