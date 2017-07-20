@@ -296,6 +296,7 @@ void MainWindow::init_interval_menu() {
 
     QAction* tag_interval_act = new QAction(tr("&Tag interval"), this);
     QAction* analysis_interval_act = new QAction(tr("&Analysis on interval"), this);
+    tag_interval_act->setShortcut(tr("Shift+T"));
     interval_menu->addAction(tag_interval_act);
     interval_menu->addAction(analysis_interval_act);
     connect(tag_interval_act, &QAction::triggered, video_wgt, &VideoWidget::tag_interval);
