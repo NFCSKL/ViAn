@@ -32,7 +32,7 @@ private:
     int prev_frame_idx;
     int POI_end;
 
-    std::pair<int, int> m_interval = std::make_pair(0, 1);
+    std::pair<int, int> m_interval = std::make_pair(0, 0);
 public:
     explicit VideoWidget(QWidget *parent = nullptr);
 
@@ -61,8 +61,6 @@ signals:
     void set_detections_on_frame(int);
     void start_analysis(VideoProject*);
     void add_tag(VideoProject*, Tag*);
-    void tag_updated(Tag*);
-    void set_interval(int);
     void set_status_bar(QString);
 public slots:
     void set_current_time(int time);
@@ -75,6 +73,7 @@ public slots:
     void tag_frame(void);
     void new_tag_clicked();
     void new_tag(QString name);
+    void tag_interval(void);
     void set_tag(Tag *);
     void clear_tag(void);
     void interval_clicked(void);
@@ -95,6 +94,7 @@ public slots:
     void on_bookmark_clicked(void);
     void set_interval_start_clicked();
     void set_interval_end_clicked();
+    void set_interval(int start, int end);
     void frame_line_edit_finished();
     void enable_poi_btns(bool, bool);
     void enable_tag_btn(bool);
@@ -108,7 +108,6 @@ private:
     QLabel* current_time;
     QLabel* total_time;
     QLineEdit* frame_line_edit;
-
 
     //Buttons
     QPushButton* play_btn;
@@ -136,6 +135,7 @@ private:
     QHBoxLayout* analysis_btns;   // Buttons for starting analysis and jumping between pois
     QHBoxLayout* other_btns;      // Bookmark, tag
     QHBoxLayout* zoom_btns;       // Zoom buttons
+    QHBoxLayout* interval_btns;   // Interval buttons
     QGridLayout* speed_slider_layout;
     
     std::vector<QPushButton*> btns;

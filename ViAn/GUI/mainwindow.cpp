@@ -65,6 +65,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     init_edit_menu();
     init_view_menu();
     init_analysis_menu();
+    init_interval_menu();
     init_tools_menu();
     init_help_menu();
 
@@ -114,13 +115,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, SIGNAL(marked_tag(Tag*)), video_wgt, SLOT(set_tag(Tag*)));
     connect(project_wgt, SIGNAL(marked_tag(Tag*)), video_wgt->playback_slider, SLOT(set_tag(Tag*)));
     connect(video_wgt, SIGNAL(add_tag(VideoProject*, Tag*)), project_wgt, SLOT(add_tag(VideoProject*, Tag*)));
-    connect(video_wgt, SIGNAL(tag_updated(Tag*)), video_wgt->playback_slider, SLOT(set_tag(Tag*)));
 
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->playback_slider, &AnalysisSlider::update);
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->frame_wgt, &FrameWidget::update);
-
-
-    connect(video_wgt, SIGNAL(set_interval(int)), video_wgt->playback_slider, SLOT(set_interval(int)));
 }
 
 
@@ -282,6 +279,16 @@ void MainWindow::init_analysis_menu() {
     connect(analysis_act, &QAction::triggered, video_wgt, &VideoWidget::analysis_btn_clicked);
 }
 
+void MainWindow::init_interval_menu() {
+    QMenu* interval_menu = menuBar()->addMenu(tr("&Interval"));
+
+    QAction* tag_interval_act = new QAction(tr("&Tag interval"), this);
+    QAction* analysis_interval_act = new QAction(tr("&Analysis on interval"), this);
+    interval_menu->addAction(tag_interval_act);
+    interval_menu->addAction(analysis_interval_act);
+    connect(tag_interval_act, &QAction::triggered, video_wgt, &VideoWidget::tag_interval);
+}
+
 /**
  * @brief MainWindow::init_tools_menu
  * Set up the tools menu
@@ -305,8 +312,6 @@ void MainWindow::init_tools_menu() {
 
 
     QAction* export_act  =new QAction(tr("&Frames"));
-
-
 
     color_act->setIcon(QIcon("../ViAn/Icons/color.png"));
     undo_act->setIcon(QIcon("../ViAn/Icons/undo.png"));

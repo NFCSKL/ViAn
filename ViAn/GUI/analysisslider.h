@@ -25,6 +25,8 @@ public:
 
     int last_poi_end = -1;
     int interval = -1;
+    int interval_first = -1;
+    int interval_second = -1;
 
     void set_blocked(bool value);
     bool is_blocked();
@@ -35,6 +37,8 @@ public:
     int get_next_poi_end(int frame);
     int get_prev_poi_start(int curr_frame);
     bool is_in_POI(int frame);
+    int set_interval_first();
+    int set_interval_second();
 protected:
     void paintEvent(QPaintEvent *ev);
 public slots:
@@ -43,7 +47,7 @@ public slots:
 
     void update();
 
-    void set_interval(int frame);
+    void set_interval(int start, int end);
     void set_show_pois(bool);
     void set_show_tags(bool);
     void set_show_on_slider(bool);

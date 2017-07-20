@@ -99,12 +99,14 @@ void VideoWidget::init_layouts() {
     analysis_btns = new QHBoxLayout;   // Buttons for starting analysis and jumping between pois
     other_btns = new QHBoxLayout;      // Bookmark, tag
     zoom_btns = new QHBoxLayout;       // Zoom buttons
+    interval_btns = new QHBoxLayout;   // Interval buttons
 
     control_row->setAlignment(Qt::AlignLeft);
     video_btns->setSpacing(5);
     analysis_btns->setSpacing(5);
     other_btns->setSpacing(5);
     zoom_btns->setSpacing(5);
+    interval_btns->setSpacing(5);
     control_row->setSpacing(15);
 
     speed_slider_layout = new QGridLayout;
@@ -279,21 +281,27 @@ void VideoWidget::add_btns_to_layouts() {
     analysis_btns->addWidget(analysis_btn);
     analysis_btns->addWidget(next_poi_btn);
     analysis_btns->addWidget(analysis_play_btn);
+
     control_row->addLayout(analysis_btns);
 
     other_btns->addWidget(bookmark_btn);
     other_btns->addWidget(tag_btn);
     other_btns->addWidget(new_tag_btn);
     other_btns->addWidget(interval_btn);
+
     control_row->addLayout(other_btns);
 
     zoom_btns->addWidget(zoom_in_btn);
     zoom_btns->addWidget(zoom_out_btn);
     zoom_btns->addWidget(fit_btn);
     zoom_btns->addWidget(move_btn);
+
     control_row->addLayout(zoom_btns);
-    control_row->addWidget(set_start_interval_btn);
-    control_row->addWidget(set_end_interval_btn);
+
+    interval_btns->addWidget(set_start_interval_btn);
+    interval_btns->addWidget(set_end_interval_btn);
+
+    control_row->addLayout(interval_btns);
 
     vertical_layout->addLayout(control_row);
 }
@@ -320,14 +328,13 @@ void VideoWidget::connect_btns() {
     connect(zoom_out_btn, &QPushButton::clicked, m_video_player, &video_player::zoom_out);
 
     connect(bookmark_btn, &QPushButton::clicked, this, &VideoWidget::on_bookmark_clicked);
-
     connect(tag_btn, &QPushButton::clicked, this, &VideoWidget::tag_frame);
     connect(new_tag_btn, &QPushButton::clicked, this, &VideoWidget::new_tag_clicked);
     connect(interval_btn, &QPushButton::clicked, this, &VideoWidget::interval_clicked);
 
     connect(frame_wgt, &FrameWidget::trigger_zoom_out, zoom_out_btn, &QPushButton::click);
-
     connect(fit_btn, &QPushButton::clicked, m_video_player, &video_player::fit_screen);
+
     connect(set_start_interval_btn, &QPushButton::clicked, this, &VideoWidget::set_interval_start_clicked);
     connect(set_end_interval_btn, &QPushButton::clicked, this, &VideoWidget::set_interval_end_clicked);
 }
@@ -405,10 +412,10 @@ void VideoWidget::on_bookmark_clicked() {
  * Sets the start point of the frame interval
  */
 void VideoWidget::set_interval_start_clicked() {
-    m_interval.first = current_frame;
+    m_interval.first = playback_slider->set_interval_first();
     set_status_bar("Frame interval updated: " +
                    QString().number(m_interval.first) + "-" + QString().number(m_interval.second));
-
+    playback_slider->update();
 }
 
 /**
@@ -416,9 +423,16 @@ void VideoWidget::set_interval_start_clicked() {
  * Sets the end of the frame interval
 */
 void VideoWidget::set_interval_end_clicked() {
-    m_interval.second = current_frame;
+    m_interval.second = playback_slider->set_interval_second();
     set_status_bar("Frame interval updated: " +
                    QString().number(m_interval.first) + "-" + QString().number(m_interval.second));
+    playback_slider->update();
+}
+
+void VideoWidget::set_interval(int start, int end) {
+    m_interval.first = start;
+    m_interval.second = end;
+    playback_slider->set_interval(start, end);
 }
 
 /**
@@ -494,11 +508,11 @@ void VideoWidget::analysis_btn_clicked() {
 void VideoWidget::tag_frame() {
     if (m_tag->type == TAG){
         if (m_tag->add_frame(current_frame)) {
-            emit tag_updated(m_tag);
+            playback_slider->set_tag(m_tag);
             emit set_status_bar("Tagged frame number: " + QString::number(current_frame));
         } else {
             m_tag->remove_frame(current_frame);
-            emit tag_updated(m_tag);
+            playback_slider->set_tag(m_tag);
             emit set_status_bar("Frame untagged");
         }
     } else {
@@ -518,6 +532,13 @@ void VideoWidget::new_tag(QString name) {
     emit add_tag(m_vid_proj, tag);
 }
 
+void VideoWidget::tag_interval() {
+    if (m_interval.first != -1 && m_interval.second != -1 && m_interval.first <= m_interval.second) {
+        m_tag->add_interval(new POI(m_interval.first, m_interval.second));
+        playback_slider->set_tag(m_tag);
+    }
+}
+
 void VideoWidget::set_tag(Tag *tag) {
     m_tag = tag;
 }
@@ -527,19 +548,19 @@ void VideoWidget::clear_tag() {
 }
 
 void VideoWidget::interval_clicked() {
-    if (playback_slider->interval == -1) {
-        emit set_interval(current_frame);
-        return;
-    }
-    if (m_tag == nullptr) {
-        emit set_status_bar("Pick a tag");
-        return;
-    }
-    int lower = std::min(current_frame, playback_slider->interval);
-    int upper = std::max(current_frame, playback_slider->interval);
-    m_tag->add_interval(new POI(lower, upper));
-    emit set_interval(-1);
-    emit tag_updated(m_tag);
+//    if (playback_slider->interval == -1) {
+//        //emit set_interval(current_frame);
+//        return;
+//    }
+//    if (m_tag == nullptr) {
+//        emit set_status_bar("Pick a tag");
+//        return;
+//    }
+//    int lower = std::min(current_frame, playback_slider->interval);
+//    int upper = std::max(current_frame, playback_slider->interval);
+//    m_tag->add_interval(new POI(lower, upper));
+//    emit set_interval(-1);
+//    emit tag_updated(m_tag);
 }
 
 void VideoWidget::analysis_play_btn_toggled(bool value) {
@@ -683,7 +704,7 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int frame) {
         emit set_status_bar("Video loaded");
         play_btn->setIcon(QIcon("../ViAn/Icons/play.png"));
         m_video_player->start();
-        emit set_interval(-1);
+        playback_slider->set_interval(-1, -1);
     }
     if (frame == -1) return;
 
