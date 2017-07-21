@@ -36,6 +36,11 @@ AnalysisProxy::AnalysisProxy(const AnalysisProxy &other) :
 {
 }
 
+SAVE_TYPE AnalysisProxy::get_save_type() const
+{
+    return DET_ANALYSIS;
+}
+
 std::string AnalysisProxy::full_path() const
 {
     return file_analysis;
@@ -52,7 +57,7 @@ void AnalysisProxy::read(const QJsonObject &json) {
     for (int i = 0; i < json_intervals.size() ; ++i) {
         QJsonObject json_poi = json_intervals[i].toObject();
         POI* poi = new POI();
-        poi->read(json);
+        poi->read(json_poi);
         m_intervals.insert(poi);
     }
 }

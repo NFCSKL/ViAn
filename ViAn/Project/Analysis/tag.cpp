@@ -1,10 +1,4 @@
 #include "tag.h"
-
-Tag::Tag()
-{
-    type = TAG;
-}
-
 /**
  * @brief Tag::add_frame
  * @param frame
