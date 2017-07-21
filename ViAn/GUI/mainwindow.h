@@ -43,6 +43,7 @@ public:
     StatusBar* status_bar;
     QAction* detect_intv_act;
     QAction* bound_box_act;
+    QAction* interval_act;
     RecentProjectDialog* rp_dialog;
 private slots:
     void gen_report(void);

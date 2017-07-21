@@ -253,28 +253,35 @@ void MainWindow::init_view_menu() {
 
     detect_intv_act = new QAction(tr("&Detection intervals"), this);      //Slider pois
     bound_box_act = new QAction(tr("&Bounding boxes"), this);        //Video oois
+    interval_act = new QAction(tr("&Interval"), this);
 
     detect_intv_act->setCheckable(true);
     bound_box_act->setCheckable(true);
+    interval_act->setCheckable(true);
 
     detect_intv_act->setChecked(true);
     bound_box_act->setChecked(true);
+    interval_act->setChecked(true);
 
     view_menu->addAction(toggle_project_wgt);
     view_menu->addAction(toggle_bookmark_wgt);
     view_menu->addSeparator();
     view_menu->addAction(detect_intv_act);
     view_menu->addAction(bound_box_act);
+    view_menu->addAction(interval_act);
 
     toggle_project_wgt->setStatusTip(tr("Show/hide project widget"));
     toggle_bookmark_wgt->setStatusTip(tr("Show/hide bookmark widget"));
     detect_intv_act->setStatusTip(tr("Toggle annotations on/off"));
     bound_box_act->setStatusTip(tr("Toggle detections on/off"));
+    interval_act->setStatusTip(tr("Toggle interval on/off"));
 
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_show_detections);
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::update);
     connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_on_slider);
     connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
+    connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_interval);
+    connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
 }
 
 /**
@@ -284,7 +291,7 @@ void MainWindow::init_view_menu() {
 void MainWindow::init_analysis_menu() {
     QMenu* analysis_menu = menuBar()->addMenu(tr("&Analysis"));
 
-    QAction* analysis_act = new QAction(tr("&Perform_analysis"), this);
+    QAction* analysis_act = new QAction(tr("&Perform analysis"), this);
     analysis_act->setIcon(QIcon("../ViAn/Icons/analysis.png"));
     analysis_act->setStatusTip(tr("Perform analysis"));
     analysis_menu->addAction(analysis_act);
@@ -295,11 +302,16 @@ void MainWindow::init_interval_menu() {
     QMenu* interval_menu = menuBar()->addMenu(tr("&Interval"));
 
     QAction* tag_interval_act = new QAction(tr("&Tag interval"), this);
-    QAction* analysis_interval_act = new QAction(tr("&Analysis on interval"), this);
+    QAction* rm_tag_interval_act = new QAction(tr("&Remove tag on interval"), this);
+    QAction* rm_interval_act = new QAction(tr("&Delete interval"), this);
     tag_interval_act->setShortcut(tr("Shift+T"));
+    rm_tag_interval_act->setShortcut(tr("Shift+R"));
     interval_menu->addAction(tag_interval_act);
-    interval_menu->addAction(analysis_interval_act);
+    interval_menu->addAction(rm_tag_interval_act);
+    interval_menu->addAction(rm_interval_act);
     connect(tag_interval_act, &QAction::triggered, video_wgt, &VideoWidget::tag_interval);
+    connect(rm_tag_interval_act, &QAction::triggered, video_wgt, &VideoWidget::remove_tag_interval);
+    connect(rm_interval_act, &QAction::triggered, video_wgt, &VideoWidget::delete_interval);
 }
 
 /**

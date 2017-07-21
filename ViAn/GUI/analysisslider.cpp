@@ -48,22 +48,22 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
             painter.fillRect(rect, brush);
         }
     }
-    brush = Qt::black;
-    if (interval_first != -1 && interval_second != -1 && interval_first <= interval_second) {
+    if (show_interval) {
+        brush = Qt::black;
         double first = (groove_rect.left()+(double)interval_first*c);
         double second = (groove_rect.left()+(double)interval_second*c);
-        QRect rect(first, groove_rect.top()+groove_rect.height()/3, 1+second-first, groove_rect.height()/3);
-        painter.fillRect(rect, brush);
-    }
-    if (interval_first != -1) {
-        double first = (groove_rect.left()+(double)interval_first*c);
-        QRect rect(first, groove_rect.top(), 1, groove_rect.height());
-        painter.fillRect(rect, brush);
-    }
-    if (interval_second != -1) {
-        double second = (groove_rect.left()+(double)interval_second*c);
-        QRect rect(second, groove_rect.top(), 1, groove_rect.height());
-        painter.fillRect(rect, brush);
+        if (interval_first != -1 && interval_second != -1 && interval_first <= interval_second) {
+            QRect rect(first, groove_rect.top()+groove_rect.height()/3, 1+second-first, groove_rect.height()/3);
+            painter.fillRect(rect, brush);
+        }
+        if (interval_first != -1) {
+            QRect rect(first, groove_rect.top(), 1, groove_rect.height());
+            painter.fillRect(rect, brush);
+        }
+        if (interval_second != -1) {
+            QRect rect(second, groove_rect.top(), 1, groove_rect.height());
+            painter.fillRect(rect, brush);
+        }
     }
 
     option.subControls = QStyle::SC_SliderHandle;
@@ -92,6 +92,11 @@ void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
 void AnalysisSlider::set_interval(int start, int end) {
     interval_first = start;
     interval_second = end;
+}
+
+void AnalysisSlider::clear_interval() {
+    interval_first = -1;
+    interval_second = -1;
 }
 
 int AnalysisSlider::set_interval_first() {
@@ -223,6 +228,10 @@ void AnalysisSlider::set_show_tags(bool show_tags) {
 
 void AnalysisSlider::set_show_on_slider(bool show) {
     show_on_slider = show;
+}
+
+void AnalysisSlider::set_show_interval(bool show) {
+    show_interval = show;
 }
 
 /**

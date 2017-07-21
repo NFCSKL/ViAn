@@ -16,6 +16,7 @@ class AnalysisSlider : public QSlider {
     bool m_show_pois = false;
     bool m_show_tags = false;
     bool show_on_slider = true;
+    bool show_interval = true;
 
     //Change this to set how many frames the POI buttons should ignore
     const int JUMP_INTERVAL = 0;
@@ -47,9 +48,11 @@ public slots:
     void update();
 
     void set_interval(int start, int end);
+    void clear_interval(void);
     void set_show_pois(bool);
     void set_show_tags(bool);
     void set_show_on_slider(bool);
+    void set_show_interval(bool);
     void clear_slider();
 
 private:

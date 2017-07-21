@@ -71,12 +71,13 @@ public slots:
     void prev_frame_clicked(void);
     void analysis_btn_clicked(void);
     void tag_frame(void);
+    void remove_tag_frame(void);
     void new_tag_clicked();
     void new_tag(QString name);
     void tag_interval(void);
+    void remove_tag_interval(void);
     void set_basic_analysis(BasicAnalysis*);
     void clear_tag(void);
-    void interval_clicked(void);
     void zoom_out_clicked(void);
     void next_poi_btn_clicked(void);
     void prev_poi_btn_clicked(void);
@@ -95,6 +96,7 @@ public slots:
     void set_interval_start_clicked();
     void set_interval_end_clicked();
     void set_interval(int start, int end);
+    void delete_interval(void);
     void frame_line_edit_finished();
     void enable_poi_btns(bool, bool);
     void enable_tag_btn(bool);
@@ -109,6 +111,8 @@ private:
     QLabel* total_time;
     QLineEdit* frame_line_edit;
 
+    QShortcut* remove_frame_act;
+
     //Buttons
     QPushButton* play_btn;
     QPushButton* stop_btn;
@@ -121,7 +125,6 @@ private:
     QPushButton* bookmark_btn;    
     QPushButton* tag_btn;
     QPushButton* new_tag_btn;
-    QPushButton* interval_btn;
     QPushButton* zoom_in_btn;
     QPushButton* zoom_out_btn;
     QPushButton* fit_btn;
