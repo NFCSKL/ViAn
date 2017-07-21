@@ -32,7 +32,7 @@ void ReportGenerator::create_report() {
         //2.OPEN THE DOCUMENT        
         QAxObject* doc = word->querySubObject("Documents");
         doc->dynamicCall("Add()");
-        word->setProperty("Visible",true); // second bool to hide application when opened.
+        word->setProperty("Visible",false); // second bool to hide application when opened.
 
         //3.GET TO THE CONTENTS
         QAxObject* active_document = word->querySubObject("ActiveDocument");
@@ -49,7 +49,6 @@ void ReportGenerator::create_report() {
     }else{
         qWarning("could not find Word instance");
     }
-
     qDebug() << "report finished!";
 }
 /**
@@ -114,6 +113,7 @@ void ReportGenerator::add_bookmarks(QAxObject* selection, std::vector<BookmarkIt
         QString pic_path = QString::fromStdString(bookmark->m_file);
         //Fix to make path work with windows word
         //application when spaces are involved
+        qDebug() << pic_path;
         pic_path.replace("/", "\\\\");
         qDebug() << pic_path;
         QAxObject* inline_shape = shapes->querySubObject(
@@ -169,13 +169,11 @@ std::string ReportGenerator::date_time_generator() {
  */
 QString ReportGenerator::save_report(QAxObject* active_document) {
     std::string dt = date_time_generator();
-    std::string proj_path = "C:/Documents/Vian/";
-    std::string path = proj_path.append("RAPPORTT").append(".docx");
-    qDebug() << QString::fromStdString(path) << "rapportnamn";
-    active_document->dynamicCall("SaveAs (const QString&)", QString::fromStdString(path).replace("/", "\\\\"));
-    return QString::fromStdString(path).replace("/", "\\\\");
+    std::string proj_path = "C:/Users/Student/Documents/Vian/HEJSAN/";
+    std::string path = proj_path.append("_").append(dt).append(".docx");
+    active_document->dynamicCall("SaveAs (const QString&)", QString::fromStdString(path));
+    return QString::fromStdString(path);
 }
-
 /**
  * @brief ReportGenerator::close_report
  * This method will close the document and quit the the word application that are sent in

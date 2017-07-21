@@ -112,8 +112,9 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, const int frame_nbr
     im_gen.create_tiff(file_name);
     qDebug() << "mpath:" << m_path.c_str();
     qDebug() << "fpath:" << file_name.c_str();
-    Bookmark* bookmark = new Bookmark(vid_proj, m_path+ "_thumbnails/"+ file_name,text.toStdString() +".png" , frame_nbr);
+    Bookmark* bookmark = new Bookmark(vid_proj, thumbnail_path, text.toStdString() , frame_nbr);
     vid_proj->add_bookmark(bookmark);
+    qDebug()<< bookmark->m_file.c_str();
 
     BookmarkItem* bm_item = new BookmarkItem(bookmark, BOOKMARK);
     bm_item->set_thumbnail(thumbnail_path);
