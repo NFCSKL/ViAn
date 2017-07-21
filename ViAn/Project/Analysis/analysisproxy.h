@@ -15,14 +15,15 @@
 class AnalysisProxy : public BasicAnalysis
 {
     std::string file_analysis = "";    
+    ANALYSIS_TYPE type;
 public:
-    const int save_type = DET_ANALYSIS; // this analysis has detections
     AnalysisProxy();
     AnalysisProxy(const std::string file_analysis);
     Analysis *load_analysis(); // Only use this if all analysisinformation is needed
     AnalysisProxy(const Analysis &other, const std::string file);
     AnalysisProxy(const AnalysisProxy &other);
 
+    virtual ANALYSIS_TYPE get_type() const override;
     virtual SAVE_TYPE get_save_type() const override;
     virtual std::string full_path() const override;
     virtual void read(const QJsonObject& json) override;

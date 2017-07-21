@@ -111,14 +111,15 @@ void VideoProject::read(const QJsonObject& json){
         BasicAnalysis* analysis;
         SAVE_TYPE save_type = (SAVE_TYPE)json_analysis["save_type"].toInt();
         switch(save_type){
-        case BASIC_ANALYSIS:
-            analysis = new BasicAnalysis();
+        case INTERVAL:
+            analysis = new Tag();
             break;
-        case DET_ANALYSIS:
+        case DETECTION:
             analysis = new AnalysisProxy();
             break;
         default:
             analysis = new BasicAnalysis();
+            qWarning("Undefined analysis, read as default basic analysis");
             break;
         }
         analysis->read(json_analysis);

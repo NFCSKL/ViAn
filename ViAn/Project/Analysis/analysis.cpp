@@ -36,7 +36,12 @@ void Analysis::write(QJsonObject &json){
 
 SAVE_TYPE Analysis::get_save_type() const
 {
-    return DET_ANALYSIS;
+    return DETECTION;
+}
+
+ANALYSIS_TYPE Analysis::get_type() const
+{
+    return type;
 }
 
 std::vector<cv::Rect> Analysis::get_detections_on_frame(int frame_num)

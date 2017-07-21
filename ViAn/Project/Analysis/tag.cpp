@@ -15,6 +15,11 @@ void Tag::add_interval(AnalysisInterval *an_interval){
     BasicAnalysis::add_interval(an_interval);
     merge_intervals();
 }
+
+ANALYSIS_TYPE Tag::get_type() const
+{
+    return TAG;
+}
 /**
  * @brief Tag::merge_intervals
  * This function assumes m_intervals is sorted

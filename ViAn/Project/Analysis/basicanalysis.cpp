@@ -1,22 +1,22 @@
 #include "basicanalysis.h"
 #include "tag.h"
 #include "analysis.h"
-int BasicAnalysis::get_type() const
-{
-    return type;
-}
 BasicAnalysis::BasicAnalysis()
 {
 
 }
 
 BasicAnalysis::BasicAnalysis(const BasicAnalysis &other) :
-    type(other.type),
     m_name(other.m_name),
     m_intervals(other.m_intervals)
 {
 
 }
+
+//BasicAnalysis::~BasicAnalysis()
+//{
+//    for(auto interval : m_intervals) delete interval;
+//}
 /**
  * @brief BasicAnalysis::add_POI
  * Adds a POI to the BasicAnalysis.
@@ -28,6 +28,11 @@ void BasicAnalysis::add_interval(AnalysisInterval *ai){
 
 SAVE_TYPE BasicAnalysis::get_save_type() const
 {
+    return INTERVAL;
+}
+
+ANALYSIS_TYPE BasicAnalysis::get_type() const
+{
     return BASIC_ANALYSIS;
 }
 
@@ -37,7 +42,6 @@ SAVE_TYPE BasicAnalysis::get_save_type() const
  * @param json
  */
 void BasicAnalysis::read(const QJsonObject &json){
-    this->type = (ANALYSIS_TYPE)json["type"].toInt();
     this->m_name = json["name"].toString().toStdString();
     QJsonArray json_intervals = json["POI:s"].toArray();
     for (int i = 0; i < json_intervals.size(); ++i) {
@@ -54,7 +58,6 @@ void BasicAnalysis::read(const QJsonObject &json){
  * @param json
  */
 void BasicAnalysis::write(QJsonObject &json){
-    json["type"] = this->type;
     json["name"] = QString::fromStdString(m_name);
     QJsonArray json_ais;
     for(auto it = this->m_intervals.begin(); it != this->m_intervals.end(); it++){
