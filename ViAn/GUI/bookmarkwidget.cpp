@@ -44,8 +44,9 @@ void BookmarkWidget::add_new_folder() {
 
 void BookmarkWidget::generate_report()
 {
-    std::vector<BookmarkItem*> bm_disp,bm_ref = {};
+    RefDisp ref_disp;
     for(int i = 0; i != bm_list->count(); ++i){
+        std::vector<BookmarkItem*> bm_disp,bm_ref = {};
         QListWidgetItem* item = bm_list->item(i);
         if (item->type() == CONTAINER) {
             BookmarkCategory* _tmp_cat = dynamic_cast<BookmarkCategory*>(item);
@@ -56,9 +57,10 @@ void BookmarkWidget::generate_report()
             qDebug() << "disp";
             bm_disp.insert(bm_disp.end(),temp.begin(), temp.end());
         }
+        ref_disp.push_back(std::make_pair(bm_disp,bm_ref));
     }
     processing_thread = new QThread;    
-    ReportGenerator* rp_gen = new ReportGenerator(std::make_pair(bm_ref,bm_disp));
+    ReportGenerator* rp_gen = new ReportGenerator(m_path,ref_disp);
     qDebug() << "rpgen";
     rp_gen->create_report();
     // Move reportgenerator to other thread
@@ -109,12 +111,9 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, const int frame_nbr
 
     ImageGenerator im_gen(frame, m_path);
     std::string thumbnail_path = im_gen.create_thumbnail(file_name);
-    im_gen.create_tiff(file_name);
-    qDebug() << "mpath:" << m_path.c_str();
-    qDebug() << "fpath:" << file_name.c_str();
-    Bookmark* bookmark = new Bookmark(vid_proj, thumbnail_path, text.toStdString() , frame_nbr);
+    std::string bm_file = im_gen.create_tiff(file_name);
+    Bookmark* bookmark = new Bookmark(vid_proj, bm_file, text.toStdString() , frame_nbr);
     vid_proj->add_bookmark(bookmark);
-    qDebug()<< bookmark->m_file.c_str();
 
     BookmarkItem* bm_item = new BookmarkItem(bookmark, BOOKMARK);
     bm_item->set_thumbnail(thumbnail_path);

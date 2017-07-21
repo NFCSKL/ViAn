@@ -6,7 +6,8 @@
  * @param proj, the current project that we are creating document for.
  * @param file_handler, the file_handler that is used to get path information for saving.
  */
-ReportGenerator::ReportGenerator(RefDisp ref_disp) {
+ReportGenerator::ReportGenerator(std::string proj_path, RefDisp ref_disp) {
+    m_path = proj_path;
     m_ref_disp = ref_disp;
     word = new QAxObject("Word.Application");
 }
@@ -41,8 +42,7 @@ void ReportGenerator::create_report() {
 
         // Make sure there is bookmarks to put in report.
         //4. ADD IMAGES FROM BOOKMARK FOLDER
-        add_bookmarks(selection, m_ref_disp.first);
-        add_bookmarks(selection, m_ref_disp.second);
+        add_bookmarks(selection, m_ref_disp);
         //5. SAVE AND CLOSE FILE
         QString file_path = save_report(active_document);
         close_report(doc, word);
@@ -106,43 +106,52 @@ QString ReportGenerator::calculate_time(int ms) {
  * to the document.
  * @param selection, the selector in the active document.
  */
-void ReportGenerator::add_bookmarks(QAxObject* selection, std::vector<BookmarkItem*> bookmark_list) {
-    QAxObject* shapes = selection->querySubObject( "InlineShapes" );
-    for (BookmarkItem* bmi : bookmark_list) {
-        Bookmark* bookmark = bmi->get_bookmark();
-        QString pic_path = QString::fromStdString(bookmark->m_file);
-        //Fix to make path work with windows word
-        //application when spaces are involved
-        qDebug() << pic_path;
-        pic_path.replace("/", "\\\\");
-        qDebug() << pic_path;
-        QAxObject* inline_shape = shapes->querySubObject(
-                    "AddPicture(const QString&,bool,bool,QVariant)",
-                     pic_path, false, true);
-
-        resize_picture(pic_path, inline_shape);
-
-        // Center image
-        selection->querySubObject( "ParagraphFormat" )->setProperty( "Alignment", 1 );
-        //adds description beneath image
-        QString frame_nr = QString("Frame number: %1").arg(bookmark->get_frame_number());
-        QString time = QString("Time: %1").arg(calculate_time(bookmark->get_time()));
-        QString bm_description = QString::fromStdString(bookmark->get_description());
-        QString description = "";
-
-        if (!bm_description.isEmpty()) {
-            description = QString("Description: %1").arg(bm_description);
+void ReportGenerator::add_bookmarks(QAxObject* selection, RefDisp bookmark_list) {
+    for (auto bmi : bookmark_list) { // for each category, make a paragraph of bookmarks
+        std::vector<BookmarkItem*> bm_ref = bmi.first;
+        std::vector<BookmarkItem*> bm_disp = bmi.second;
+        for(size_t i = 0; i != std::min(bm_ref.size(), bm_disp.size()); ++i){ // while images on both sides
+            add_bookmark_pair(selection, bm_ref.at(i), bm_disp.at(i));
         }
-        selection->dynamicCall( "InsertParagraphAfter()" );
-        selection->dynamicCall("InsertAfter(const QString&)", time);
-        selection->dynamicCall( "InsertParagraphAfter()" );
-        selection->dynamicCall("InsertAfter(const QString&)", frame_nr);
-        selection->dynamicCall( "InsertParagraphAfter()" );
-        selection->dynamicCall("InsertAfter(const QString&)", description);
-
         // Add paragraphs between images
         add_paragraph(selection);
     }
+}
+
+void ReportGenerator::add_bookmark_pair(QAxObject *selection, BookmarkItem *bm_ref, BookmarkItem* bm_disp)
+{
+    add_bookmark(selection, bm_ref->get_bookmark(), 0);
+    add_bookmark(selection, bm_disp->get_bookmark(), 1);
+}
+
+void ReportGenerator::add_bookmark(QAxObject *selection, Bookmark *bm, int alignment)
+{
+    QAxObject* shapes = selection->querySubObject( "InlineShapes" );
+    QString img_path = QString::fromStdString(bm->m_file);
+    //Fix to make path work with windows word
+    //application when spaces are involved
+    img_path.replace("/", "\\\\");
+    QAxObject* inline_shape = shapes->querySubObject(
+                "AddPicture(const QString&,bool,bool,QVariant)",
+                 img_path, false, true);
+    resize_picture(img_path, inline_shape);
+    // Center image
+    selection->querySubObject( "ParagraphFormat" )->setProperty( "Alignment", alignment);
+    //adds description beneath image
+    QString frame_nr = QString("Frame number: %1").arg(bm->get_frame_number());
+    QString time = QString("Time: %1").arg(calculate_time(bm->get_time()));
+    QString bm_description = QString::fromStdString(bm->get_description());
+    QString description = "";
+
+    if (!bm_description.isEmpty()) {
+        description = QString("Description: %1").arg(bm_description);
+    }
+    selection->dynamicCall( "InsertParagraphAfter()" );
+    selection->dynamicCall("InsertAfter(const QString&)", time);
+    selection->dynamicCall( "InsertParagraphAfter()" );
+    selection->dynamicCall("InsertAfter(const QString&)", frame_nr);
+    selection->dynamicCall( "InsertParagraphAfter()" );
+    selection->dynamicCall("InsertAfter(const QString&)", description);
 }
 
 /**
@@ -169,8 +178,10 @@ std::string ReportGenerator::date_time_generator() {
  */
 QString ReportGenerator::save_report(QAxObject* active_document) {
     std::string dt = date_time_generator();
-    std::string proj_path = "C:/Users/Student/Documents/Vian/HEJSAN/";
-    std::string path = proj_path.append("_").append(dt).append(".docx");
+    std::string proj_name = m_path.substr(0, m_path.find_last_of("/")); // Strip away last "/"
+    proj_name = proj_name.substr(proj_name.find_last_of("/"), proj_name.size());
+    qDebug() << proj_name.c_str();
+    std::string path = m_path.append(proj_name).append("_").append(dt).append(".docx");
     active_document->dynamicCall("SaveAs (const QString&)", QString::fromStdString(path));
     return QString::fromStdString(path);
 }
