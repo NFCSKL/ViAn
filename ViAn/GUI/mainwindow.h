@@ -43,7 +43,9 @@ public:
     StatusBar* status_bar;
     QAction* detect_intv_act;
     QAction* bound_box_act;
+    QAction* interval_act;
     QAction* drawing_act;
+
     RecentProjectDialog* rp_dialog;
 
 private slots:
@@ -83,6 +85,7 @@ private:
     void init_edit_menu();
     void init_view_menu();
     void init_analysis_menu();
+    void init_interval_menu();
     void init_tools_menu();
     void init_help_menu();
 };

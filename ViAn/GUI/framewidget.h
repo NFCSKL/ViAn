@@ -10,6 +10,7 @@
 #include "opencv2/opencv.hpp"
 #include "opencv2/videoio/videoio.hpp"
 #include "Project/Analysis/analysisproxy.h"
+#include "Project/videoproject.h"
 
 class FrameWidget : public QWidget
 {

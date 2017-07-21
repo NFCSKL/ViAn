@@ -55,7 +55,6 @@ void Overlay::set_showing_overlay(bool value) {
 void Overlay::set_tool(SHAPES s) {
     std::cout << "tool aquired! " << s << std::endl;
     current_shape = s;
-    //std::cout << "tool aquired! " << s << std::endl;
     // If the text option is chosen, a string and size will be entered by the user.
     if (s == TEXT) {
         std::string input_string = current_string.toStdString();
@@ -85,7 +84,6 @@ void Overlay::set_tool(SHAPES s) {
  */
 void Overlay::set_colour(QColor col) {
     current_colour = col;
-    std::cout << "Color" << std::endl;
 }
 
 /**
