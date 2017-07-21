@@ -6,7 +6,7 @@ class Tag : public BasicAnalysis
 {
 public:
     void remove_interval(AnalysisInterval *rm_interval);
-    bool add_frame(int frame);
+    void add_frame(int frame);
     void remove_frame(int frame);
     void add_interval(AnalysisInterval *an_interval) override;
     virtual ANALYSIS_TYPE get_type() const override;
