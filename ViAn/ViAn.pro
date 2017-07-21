@@ -95,7 +95,6 @@ HEADERS += Library/customdialog.h
 #
 SOURCES += GUI/mainwindow.cpp \
     GUI/bookmarkitem.cpp \
-    GUI/reportgenerator.cpp \
     GUI/fpsdialog.cpp \
     GUI/videowidget.cpp \
     GUI/framewidget.cpp \
@@ -105,7 +104,6 @@ SOURCES += GUI/mainwindow.cpp \
 
 HEADERS  += GUI/mainwindow.h \
     GUI/action.h \
-    GUI/reportgenerator.h \
     GUI/bookmarkitem.h \
     GUI/fpsdialog.h \
     GUI/videowidget.h \

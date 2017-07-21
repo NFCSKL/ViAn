@@ -12,19 +12,19 @@
 class ReportGenerator : public QObject {
     Q_OBJECT
 public:
-    using ref_disp = std::pair<std::vector<BookmarkItem*>,std::vector<BookmarkItem*>>;
+    using RefDisp = std::pair<std::vector<BookmarkItem*>,std::vector<BookmarkItem*>>;
     friend class test_report_generator;
-    explicit ReportGenerator(ref_disp ref_disp);
+    explicit ReportGenerator(RefDisp RefDisp);
     ~ReportGenerator();
     void create_report();
-    ref_disp m_ref_disp;
+    RefDisp m_ref_disp;
 private:
     QAxObject* word;   
     std::vector<Bookmark*> all_bookmarks;
     const double IMAGE_WIDTH_REFERENCE = 272.0;
 
     void create_list_of_names();
-    void add_bookmarks(QAxObject* selection, ref_disp ref_disp);
+    void add_bookmarks(QAxObject* selection, std::vector<BookmarkItem *> bookmark_list);
     QString save_report(QAxObject* active_document);
     void close_report(QAxObject* doc, QAxObject*  word);
     void resize_picture(QString pic_path, QAxObject* inline_shape);

@@ -6,8 +6,9 @@
  * @param proj, the current project that we are creating document for.
  * @param file_handler, the file_handler that is used to get path information for saving.
  */
-ReportGenerator::ReportGenerator(ref_disp ref_disp) {
+ReportGenerator::ReportGenerator(RefDisp ref_disp) {
     m_ref_disp = ref_disp;
+    word = new QAxObject("Word.Application");
 }
 
 /**
@@ -25,33 +26,31 @@ ReportGenerator::~ReportGenerator() {
 void ReportGenerator::create_report() {
     //1. START APPLICATION
     qDebug() << "startat rapport";
-    word = new QAxObject("Word.Application");
+
     if(!word->isNull()){
         qDebug() << "startat word";
         //2.OPEN THE DOCUMENT        
         QAxObject* doc = word->querySubObject("Documents");
         doc->dynamicCall("Add()");
-        word->setProperty("Visible",false); // second bool to hide application when opened.
+        word->setProperty("Visible",true); // second bool to hide application when opened.
 
         //3.GET TO THE CONTENTS
         QAxObject* active_document = word->querySubObject("ActiveDocument");
         QAxObject* active_window = active_document->querySubObject( "ActiveWindow" );
         QAxObject* selection = active_window->querySubObject( "Selection" );
 
-
         // Make sure there is bookmarks to put in report.
-        if(!all_bookmarks.empty()){
-            //4. ADD IMAGES FROM BOOKMARK FOLDER
-            add_bookmarks(selection, m_ref_disp);
-
-            //5. SAVE AND CLOSE FILE
-            QString file_path = save_report(active_document);
-            // this->proj->add_report(new Report(file_path.toStdString()));
-        }
+        //4. ADD IMAGES FROM BOOKMARK FOLDER
+        add_bookmarks(selection, m_ref_disp.first);
+        add_bookmarks(selection, m_ref_disp.second);
+        //5. SAVE AND CLOSE FILE
+        QString file_path = save_report(active_document);
         close_report(doc, word);
     }else{
         qWarning("could not find Word instance");
     }
+
+    qDebug() << "report finished!";
 }
 /**
  * @brief ReportGenerator::resize_picture
@@ -108,14 +107,15 @@ QString ReportGenerator::calculate_time(int ms) {
  * to the document.
  * @param selection, the selector in the active document.
  */
-void ReportGenerator::add_bookmarks(QAxObject* selection, ref_disp rp) {
+void ReportGenerator::add_bookmarks(QAxObject* selection, std::vector<BookmarkItem*> bookmark_list) {
     QAxObject* shapes = selection->querySubObject( "InlineShapes" );
-    for (Bookmark* bookmark : all_bookmarks) {
-        QString pic_path = QString::fromStdString(bookmark->full_path());
+    for (BookmarkItem* bmi : bookmark_list) {
+        Bookmark* bookmark = bmi->get_bookmark();
+        QString pic_path = QString::fromStdString(bookmark->m_file);
         //Fix to make path work with windows word
         //application when spaces are involved
         pic_path.replace("/", "\\\\");
-
+        qDebug() << pic_path;
         QAxObject* inline_shape = shapes->querySubObject(
                     "AddPicture(const QString&,bool,bool,QVariant)",
                      pic_path, false, true);
@@ -124,7 +124,6 @@ void ReportGenerator::add_bookmarks(QAxObject* selection, ref_disp rp) {
 
         // Center image
         selection->querySubObject( "ParagraphFormat" )->setProperty( "Alignment", 1 );
-
         //adds description beneath image
         QString frame_nr = QString("Frame number: %1").arg(bookmark->get_frame_number());
         QString time = QString("Time: %1").arg(calculate_time(bookmark->get_time()));
@@ -170,11 +169,11 @@ std::string ReportGenerator::date_time_generator() {
  */
 QString ReportGenerator::save_report(QAxObject* active_document) {
     std::string dt = date_time_generator();
-//    std::string proj_path = proj->getDir();
-//    std::string path = proj_path.append("/").append(proj->getName()).append("_").append(dt).append(".docx");
-//    active_document->dynamicCall("SaveAs (const QString&)", QString::fromStdString(path));
-    //return QString::fromStdString(path);
-    return QString();
+    std::string proj_path = "C:/Documents/Vian/";
+    std::string path = proj_path.append("RAPPORTT").append(".docx");
+    qDebug() << QString::fromStdString(path) << "rapportnamn";
+    active_document->dynamicCall("SaveAs (const QString&)", QString::fromStdString(path).replace("/", "\\\\"));
+    return QString::fromStdString(path).replace("/", "\\\\");
 }
 
 /**

@@ -44,23 +44,30 @@ void BookmarkWidget::add_new_folder() {
 
 void BookmarkWidget::generate_report()
 {
-    std::vector<BookmarkItem*> bm_disp,bm_ref;
+    std::vector<BookmarkItem*> bm_disp,bm_ref = {};
     for(int i = 0; i != bm_list->count(); ++i){
         QListWidgetItem* item = bm_list->item(i);
         if (item->type() == CONTAINER) {
             BookmarkCategory* _tmp_cat = dynamic_cast<BookmarkCategory*>(item);
-            bm_ref.insert(bm_ref.end(),_tmp_cat->get_references().begin(), _tmp_cat->get_references().end());
-            bm_disp.insert(bm_ref.end(),_tmp_cat->get_disputed().begin(), _tmp_cat->get_disputed().end());
+            std::vector<BookmarkItem*> temp = _tmp_cat->get_references();
+            qDebug() << "ref";
+            bm_ref.insert(bm_ref.end(),temp.begin(), temp.end());
+            temp = _tmp_cat->get_disputed();
+            qDebug() << "disp";
+            bm_disp.insert(bm_disp.end(),temp.begin(), temp.end());
         }
     }
-    processing_thread = new QThread;
+    processing_thread = new QThread;    
     ReportGenerator* rp_gen = new ReportGenerator(std::make_pair(bm_ref,bm_disp));
+    qDebug() << "rpgen";
+    rp_gen->create_report();
     // Move reportgenerator to other thread
-    rp_gen->moveToThread(processing_thread);
-    connect(processing_thread, &QThread::finished, rp_gen, &ReportGenerator::deleteLater);
-    connect(rp_gen, &ReportGenerator::done, processing_thread, &QThread::quit);
-    connect(processing_thread, &QThread::started, rp_gen, &ReportGenerator::create_report);
-    processing_thread->start();
+//    rp_gen->moveToThread(processing_thread);
+//    connect(processing_thread, &QThread::finished, rp_gen, &ReportGenerator::deleteLater);
+//    connect(rp_gen, &ReportGenerator::done, processing_thread, &QThread::quit);
+//    connect(processing_thread, &QThread::started, rp_gen, &ReportGenerator::create_report);
+//    qDebug() << "rpgen";
+//    processing_thread->start();
 }
 
 BookmarkCategory* BookmarkWidget::add_to_container(BookmarkItem *bm_item, std::pair<int, string> *container) {
@@ -94,8 +101,6 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, const int frame_nbr
     bool ok;
     QString text = get_input_text("", &ok);    
     if(!ok) return;
-    Bookmark* bookmark = new Bookmark(vid_proj, text.toStdString(), frame_nbr);
-    vid_proj->add_bookmark(bookmark);
 
     std::string file_name = vid_proj->get_video()->file_path;
     int index = file_name.find_last_of('/') + 1;
@@ -105,6 +110,10 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, const int frame_nbr
     ImageGenerator im_gen(frame, m_path);
     std::string thumbnail_path = im_gen.create_thumbnail(file_name);
     im_gen.create_tiff(file_name);
+    qDebug() << "mpath:" << m_path.c_str();
+    qDebug() << "fpath:" << file_name.c_str();
+    Bookmark* bookmark = new Bookmark(vid_proj, m_path+ "_thumbnails/"+ file_name,text.toStdString() +".png" , frame_nbr);
+    vid_proj->add_bookmark(bookmark);
 
     BookmarkItem* bm_item = new BookmarkItem(bookmark, BOOKMARK);
     bm_item->set_thumbnail(thumbnail_path);

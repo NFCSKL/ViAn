@@ -9,11 +9,11 @@
  * @param dir_path Path to the directory to store image in.
  * @param text Text description of the bookmark.
  */
-Bookmark::Bookmark(VideoProject *vid_proj, const std::string &text, const int &frame_nbr){
+Bookmark::Bookmark(VideoProject *vid_proj,const std::string file_name, const std::string &text, const int &frame_nbr){
     this->m_vid_proj = vid_proj;
     this->frame_number = frame_nbr;
     this->description = text;
-
+    this->m_file = file_name;
     std::pair<int, string> _tmp(UNSORTED, "");
     m_containers.push_back(_tmp);
 }
