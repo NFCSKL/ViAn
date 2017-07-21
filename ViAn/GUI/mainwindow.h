@@ -18,7 +18,9 @@
 #include "action.h"
 
 #include "Analysis/AnalysisController.h"
-#include "Project/Analysis/analysismeta.h"
+#include "GUI/recentprojectdialog.h"
+#include "Project/Analysis/analysisproxy.h"
+
 
 #include "videowidget.h"
 #include "projectwidget.h"
@@ -42,6 +44,8 @@ public:
     QAction* detect_intv_act;
     QAction* bound_box_act;
     QAction* drawing_act;
+    RecentProjectDialog* rp_dialog;
+
 private slots:
     void gen_report(void);
     void cont_bri(void);
@@ -57,9 +61,11 @@ private slots:
 
 public slots:
     void options(void);
+    void open_project_dialog();
 
 signals:
     void set_status_bar(QString);
+    void open_project(QString proj_path);
 
 private:
 

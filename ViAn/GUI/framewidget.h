@@ -9,10 +9,7 @@
 #include "Video/shapes/zoomrectangle.h"
 #include "opencv2/opencv.hpp"
 #include "opencv2/videoio/videoio.hpp"
-#include "Project/Analysis/analysis.h"
-#include "Project/videoproject.h"
-
-//enum click_tool {NONE, ZOOM, MOVE, RECTANGLE, CIRCLE, LINE, ARROW, PEN, TEXT};
+#include "Project/Analysis/analysisproxy.h"
 
 class FrameWidget : public QWidget
 {
@@ -59,7 +56,7 @@ public slots:
     void draw_from_playback(cv::Mat frame);
     void toggle_zoom(bool value);
     void set_scroll_area_size(QSize size);
-    void set_analysis(Analysis*);
+    void set_analysis(AnalysisProxy *);
     void clear_analysis();
     void set_video_project(VideoProject*);
     void set_detections_on_frame(int);

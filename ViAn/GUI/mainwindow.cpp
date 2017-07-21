@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QMenuBar>
 #include <QTime>
+#include <QTimer>
 #include <QDebug>
 #include <QProgressDialog>
 #include <chrono>
@@ -18,6 +19,7 @@
 #include "Toolbars/drawingtoolbar.h"
 #include "manipulatordialog.h"
 #include "GUI/frameexporterdialog.h"
+
 
 /**
  * @brief MainWindow::MainWindow
@@ -74,7 +76,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     addToolBar(main_toolbar);
     connect(main_toolbar->add_video_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
     connect(main_toolbar->save_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
-    connect(main_toolbar->open_act, &QAction::triggered, project_wgt, &ProjectWidget::open_project);
+    connect(main_toolbar->open_act, &QAction::triggered, this, &MainWindow::open_project_dialog);
 
     // Draw toolbar
     DrawingToolbar* draw_toolbar = new DrawingToolbar();
@@ -104,8 +106,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     connect(analysis_wgt, SIGNAL(name_in_tree(QTreeWidgetItem*,QString)), project_wgt, SLOT(set_tree_item_name(QTreeWidgetItem*,QString)));
 
-    connect(project_wgt, SIGNAL(marked_analysis(Analysis*)), video_wgt->frame_wgt, SLOT(set_analysis(Analysis*)));
-    connect(project_wgt, SIGNAL(marked_analysis(Analysis*)), video_wgt->playback_slider, SLOT(set_analysis(Analysis*)));
+    connect(project_wgt, SIGNAL(marked_analysis(AnalysisProxy*)), video_wgt->frame_wgt, SLOT(set_analysis(AnalysisProxy*)));
+    connect(project_wgt, SIGNAL(marked_basic_analysis(BasicAnalysis*)), video_wgt->playback_slider, SLOT(set_basic_analysis(BasicAnalysis*)));
+
     connect(project_wgt, SIGNAL(set_detections(bool)), video_wgt->frame_wgt, SLOT(set_detections(bool)));
 
     connect(project_wgt, SIGNAL(enable_poi_btns(bool,bool)), video_wgt, SLOT(enable_poi_btns(bool,bool)));
@@ -114,14 +117,25 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, SIGNAL(set_poi_slider(bool)), video_wgt->playback_slider, SLOT(set_show_pois(bool)));
     connect(project_wgt, SIGNAL(set_tag_slider(bool)), video_wgt->playback_slider, SLOT(set_show_tags(bool)));
 
+    connect(project_wgt, SIGNAL(marked_basic_analysis(BasicAnalysis*)), video_wgt, SLOT(set_basic_analysis(BasicAnalysis*)));
+
+    connect(video_wgt, SIGNAL(add_basic_analysis(VideoProject*, BasicAnalysis*)), project_wgt, SLOT(add_basic_analysis(VideoProject*, BasicAnalysis*)));
+    connect(video_wgt, SIGNAL(tag_updated(BasicAnalysis*)), video_wgt->playback_slider, SLOT(set_basic_analysis(BasicAnalysis*)));
+
+
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->playback_slider, &AnalysisSlider::update);
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->frame_wgt, &FrameWidget::update);
+    connect(this, &MainWindow::open_project, project_wgt, &ProjectWidget::open_project);
 
-    connect(project_wgt, SIGNAL(marked_tag(Analysis*)), video_wgt, SLOT(set_tag(Analysis*)));
-    connect(project_wgt, SIGNAL(marked_tag(Analysis*)), video_wgt->playback_slider, SLOT(set_tag(Analysis*)));
-    connect(video_wgt, SIGNAL(add_tag(VideoProject*, Analysis*)), project_wgt, SLOT(add_tag(VideoProject*, Analysis*)));
-    connect(video_wgt, SIGNAL(tag_updated(Analysis*)), video_wgt->playback_slider, SLOT(set_tag(Analysis*)));
+
     connect(video_wgt, SIGNAL(set_interval(int)), video_wgt->playback_slider, SLOT(set_interval(int)));
+
+    // Recent projects menu
+    RecentProjectDialog* rp_dialog = new RecentProjectDialog(this);
+    connect(rp_dialog, &RecentProjectDialog::open_project, project_wgt, &ProjectWidget::open_project);
+    connect(rp_dialog, &RecentProjectDialog::new_project, project_wgt, &ProjectWidget::new_project);
+    connect(rp_dialog, &RecentProjectDialog::open_project_from_file, this, &MainWindow::open_project_dialog);
+    QTimer::singleShot(0, rp_dialog, SLOT(exec()));
 }
 
 
@@ -194,7 +208,7 @@ void MainWindow::init_file_menu() {
     // Connet with signals and slots
     connect(new_project_act, &QAction::triggered, project_wgt, &ProjectWidget::new_project);
     connect(add_vid_act, &QAction::triggered, project_wgt, &ProjectWidget::add_video);
-    connect(open_project_act, &QAction::triggered, project_wgt, &ProjectWidget::open_project);
+    connect(open_project_act, &QAction::triggered, this, &MainWindow::open_project_dialog);
     connect(save_project_act, &QAction::triggered, project_wgt, &ProjectWidget::save_project);
     connect(gen_report_act, &QAction::triggered, this, &MainWindow::gen_report);
     connect(close_project_act, &QAction::triggered, project_wgt, &ProjectWidget::close_project);
@@ -309,7 +323,7 @@ void MainWindow::init_tools_menu() {
     QAction* pen_act = new QAction(tr("&Pen"), this);
     QAction* text_act = new QAction(tr("&Text"), this);
 
-    QAction* export_act = new QAction(tr("&Frames"));
+    QAction* export_act  =new QAction(tr("&Frames"), this);
 
     color_act->setIcon(QIcon("../ViAn/Icons/color.png"));
     undo_act->setIcon(QIcon("../ViAn/Icons/undo.png"));
@@ -468,7 +482,7 @@ void MainWindow::export_images(){
                 "Exporting images...", "Abort", 0, abs(interval.first - interval.second) + 1, this, Qt::WindowMinimizeButtonHint);
 
     connect(im_exp, &ImageExporter::finished_msg, this, &MainWindow::set_status_bar);
-    connect(progress, &QProgressDialog::canceled, im_exp, ImageExporter::abort);
+    connect(progress, &QProgressDialog::canceled, im_exp, &ImageExporter::abort);
     connect (im_exp, &ImageExporter::update_progress, progress, &QProgressDialog::setValue);
 
     QThread* exporter_thread = new QThread;
@@ -487,4 +501,9 @@ void MainWindow::export_images(){
  */
 void MainWindow::options() {
     emit set_status_bar("Opening options");
+}
+
+void MainWindow::open_project_dialog(){
+    QString project_path = QFileDialog().getOpenFileName(this, tr("Open project"), QDir::homePath());
+    open_project(project_path);
 }

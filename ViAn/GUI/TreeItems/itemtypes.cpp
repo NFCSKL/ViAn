@@ -13,6 +13,11 @@ VideoProject* VideoItem::get_video_project() {
     return m_vid_proj;
 }
 
+bool AnalysisItem::is_finished() const
+{
+    return finished;
+}
+
 AnalysisItem::AnalysisItem(int type) : QTreeWidgetItem(type) {
 
 }
@@ -20,19 +25,20 @@ AnalysisItem::AnalysisItem(int type) : QTreeWidgetItem(type) {
 AnalysisItem::~AnalysisItem() {
 }
 
-void AnalysisItem::set_analysis(Analysis analysis) {
+void AnalysisItem::set_analysis(AnalysisProxy *analysis) {
     m_analysis = analysis;
+    finished = true;
 }
 
-Analysis* AnalysisItem::get_analysis() {
-    return &m_analysis;
+AnalysisProxy* AnalysisItem::get_analysis() {
+    return m_analysis;
 }
 
-TagItem::TagItem(Analysis* tag, int type) : QTreeWidgetItem(type) {
+TagItem::TagItem(Tag *tag, int type) : QTreeWidgetItem(type) {
     m_tag = tag;
 }
 
-Analysis* TagItem::get_tag() {
+Tag *TagItem::get_tag() {
     return m_tag;
 }
 

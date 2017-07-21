@@ -50,7 +50,7 @@ Analysis AnalysisMethod::run_analysis() {
         return m_analysis;
     }
     calculate_scaling_factor();
-    std::vector<OOI> detections;
+    std::vector<DetectionBox> detections;
     num_frames = capture.get(CV_CAP_PROP_FRAME_COUNT);
     POI* m_POI = new POI();
     while(!aborted && capture.read(frame)) {
@@ -65,13 +65,13 @@ Analysis AnalysisMethod::run_analysis() {
             // in a frame into the correct POIs.
             if (detections.empty() && detecting) {
                 m_POI->set_end_frame(current_frame_index - 1);
-                m_analysis.add_POI(m_POI);
+                m_analysis.add_interval(m_POI);
                 m_POI = new POI();
                 detecting = false;
             } else if (!detections.empty()) {
                 detecting = true;
                 if (scaling_needed) {
-                    for (OOI detection : detections) {
+                    for (DetectionBox detection : detections) {
                         detection.scale_coordinates(1.0/scaling_ratio);
                     }
                 }
@@ -97,7 +97,7 @@ Analysis AnalysisMethod::run_analysis() {
     // video gets an end frame.
     if (detecting) {
         m_POI->set_end_frame(current_frame_index);
-        m_analysis.add_POI(m_POI);
+        m_analysis.add_interval(m_POI);
     }
     capture.release();
     return m_analysis;

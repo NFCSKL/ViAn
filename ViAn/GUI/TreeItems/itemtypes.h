@@ -3,24 +3,25 @@
 
 #include "Project/videoproject.h"
 #include <QTreeWidgetItem>
-
+#include "Project/Analysis/tag.h"
 enum ITEM_TYPE {VIDEO_ITEM, ANALYSIS_ITEM, FOLDER_ITEM, TAG_ITEM};
 
 class AnalysisItem : public QTreeWidgetItem {
-    Analysis m_analysis;
-
+    AnalysisProxy* m_analysis = nullptr;
+    bool finished = false;
 public:
     AnalysisItem(int type);
     ~AnalysisItem();
-    void set_analysis(Analysis analysis);
-    Analysis *get_analysis();
+    void set_analysis(AnalysisProxy* analysis);
+    AnalysisProxy *get_analysis();
+    bool is_finished() const;
 };
 
 class TagItem : public QTreeWidgetItem {
-    Analysis* m_tag;
+    Tag* m_tag;
 public:
-    TagItem(Analysis *tag, int type);
-    Analysis *get_tag();
+    TagItem(Tag *tag, int type);
+    Tag *get_tag();
 };
 
 class VideoItem : public QTreeWidgetItem {

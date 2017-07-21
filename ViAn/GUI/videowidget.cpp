@@ -411,13 +411,6 @@ void VideoWidget::on_bookmark_clicked() {
  */
 void VideoWidget::set_interval_start_clicked() {
     m_interval.first = current_frame;
-//    if (current_frame < m_interval.second) {
-//        m_interval.first = current_frame;
-//    } else if (current_frame > m_interval.second){
-//        // Trying to set start after end, flip
-//        m_interval.first = m_interval.second;
-//        m_interval.second = current_frame;
-//    }
     set_status_bar("Frame interval updated: " +
                    QString().number(m_interval.first) + "-" + QString().number(m_interval.second));
 
@@ -429,13 +422,6 @@ void VideoWidget::set_interval_start_clicked() {
 */
 void VideoWidget::set_interval_end_clicked() {
     m_interval.second = current_frame;
-    /*if (current_frame > m_interval.first){
-        m_interval.second = current_frame;
-    } *//*else if (current_frame < m_interval.first) {
-        // Trying to set end before start, flip
-        m_interval.second = m_interval.first;
-        m_interval.first = current_frame;
-    }*/
     set_status_bar("Frame interval updated: " +
                    QString().number(m_interval.first) + "-" + QString().number(m_interval.second));
 }
@@ -511,18 +497,18 @@ void VideoWidget::analysis_btn_clicked() {
 }
 
 void VideoWidget::tag_frame() {
-    if (m_tag->type == TAG){
-        if (m_tag->add_frame(current_frame)) {
-            emit tag_updated(m_tag);
-            emit set_status_bar("Tagged frame number: " + QString::number(current_frame));
-        } else {
-            m_tag->remove_frame(current_frame);
-            emit tag_updated(m_tag);
-            emit set_status_bar("Frame untagged");
-        }
-    } else {
-        emit set_status_bar("Select a tag");
+    Tag* tag = dynamic_cast<Tag*>(m_tag);
+    if (tag->add_frame(current_frame)) {
+        emit tag_updated(tag);
+        emit set_status_bar("Tagged frame number: " + QString::number(current_frame));
+        return;
+    }else {
+        tag->remove_frame(current_frame);
+        emit tag_updated(tag);
+        emit set_status_bar("Frame untagged");
+        return;
     }
+    emit set_status_bar("Select a tag");
 }
 
 void VideoWidget::new_tag_clicked() {
@@ -532,14 +518,14 @@ void VideoWidget::new_tag_clicked() {
 }
 
 void VideoWidget::new_tag(QString name) {
-    Analysis* tag = new Analysis();
-    tag->set_name(name.toStdString());
-    tag->type = TAG;
-    emit add_tag(m_vid_proj, tag);
+    BasicAnalysis* tag = new Tag();
+    tag->m_name = name.toStdString();
+    emit add_basic_analysis(m_vid_proj, tag);
 }
 
-void VideoWidget::set_tag(Analysis* tag) {
-    m_tag = tag;
+void VideoWidget::set_basic_analysis(BasicAnalysis *basic_analysis) {
+    m_tag = dynamic_cast<Tag*>(basic_analysis);
+
 }
 
 void VideoWidget::clear_tag() {
@@ -549,23 +535,17 @@ void VideoWidget::clear_tag() {
 void VideoWidget::interval_clicked() {
     if (playback_slider->interval == -1) {
         emit set_interval(current_frame);
-    } else {
-        if (m_tag == nullptr) {
-            emit set_status_bar("Pick a tag");
-            return;
-        }
-        if (current_frame < playback_slider->interval) {
-            for (int i = current_frame; i <= playback_slider->interval; i++) {
-                m_tag->add_frame(i);
-            }
-        } else {
-            for (int i = playback_slider->interval; i <= current_frame; i++) {
-                m_tag->add_frame(i);
-            }
-        }
-        emit set_interval(-1);
-        emit tag_updated(m_tag);
+        return;
     }
+    if (m_tag == nullptr) {
+        emit set_status_bar("Pick a tag");
+        return;
+    }
+    int lower = std::min(current_frame, playback_slider->interval);
+    int upper = std::max(current_frame, playback_slider->interval);
+    m_tag->add_interval(new AnalysisInterval(lower, upper));
+    emit set_interval(-1);
+    emit tag_updated(m_tag);
 }
 
 void VideoWidget::analysis_play_btn_toggled(bool value) {
