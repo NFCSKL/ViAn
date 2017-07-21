@@ -13,10 +13,7 @@ BasicAnalysis::BasicAnalysis(const BasicAnalysis &other) :
 
 }
 
-//BasicAnalysis::~BasicAnalysis()
-//{
-//    for(auto interval : m_intervals) delete interval;
-//}
+
 /**
  * @brief BasicAnalysis::add_POI
  * Adds a POI to the BasicAnalysis.
