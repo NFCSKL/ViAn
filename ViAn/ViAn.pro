@@ -17,6 +17,7 @@ TEMPLATE = app
 # GENERAL
 #
 SOURCES += main.cpp \
+    reportgenerator.cpp \
     GUI/TreeItems/itemtypes.cpp \
     GUI/Toolbars/maintoolbar.cpp \
     GUI/Toolbars/drawingtoolbar.cpp \
@@ -52,7 +53,8 @@ SOURCES += main.cpp \
 SOURCES += Test/test_video_player.cpp\
     Test/test_report_generator.cpp
 
-HEADERS += Test/test_video_player.h \
+HEADERS += reportgenerator.h\
+    Test/test_video_player.h \
     Test/test_report_generator.h \
     GUI/TreeItems/itemtypes.h \
     GUI/Toolbars/maintoolbar.h \
