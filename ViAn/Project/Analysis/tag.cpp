@@ -1,10 +1,4 @@
 #include "tag.h"
-
-Tag::Tag()
-{
-    type = TAG;
-}
-
 /**
  * @brief Tag::add_frame
  * @param frame
@@ -103,4 +97,9 @@ std::pair<AnalysisInterval*, AnalysisInterval*> Tag::remove_overlap(AnalysisInte
         pair.second = new AnalysisInterval(new_start, new_end);
     }
     return pair;
+}
+
+ANALYSIS_TYPE Tag::get_type() const
+{
+    return TAG;
 }
