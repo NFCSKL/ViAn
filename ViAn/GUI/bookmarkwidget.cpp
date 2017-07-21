@@ -9,6 +9,7 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent){
     QPushButton* generate_btn = new QPushButton(tr("Generate"));
     QPushButton* new_folder_btn = new QPushButton(tr("New folder"));
     connect(new_folder_btn, &QPushButton::clicked, this, &BookmarkWidget::add_new_folder);
+    connect(generate_btn, &QPushButton::clicked, this, &BookmarkWidget::generate_report);
     bm_list = new BookmarkList(this);
     connect(bm_list, SIGNAL(set_bookmark_video(VideoProject*,int)), this, SIGNAL(play_bookmark_video(VideoProject*,int)));
     bm_list_layout = new QVBoxLayout();
@@ -39,6 +40,27 @@ void BookmarkWidget::add_new_folder() {
     bm_list->addItem(f2);
     connect(f2, SIGNAL(set_bookmark_video(VideoProject*,int)), this, SIGNAL(play_bookmark_video(VideoProject*,int)));
 
+}
+
+void BookmarkWidget::generate_report()
+{
+    std::vector<BookmarkItem*> bm_disp,bm_ref;
+    for(int i = 0; i != bm_list->count(); ++i){
+        QListWidgetItem* item = bm_list->item(i);
+        if (item->type() == CONTAINER) {
+            BookmarkCategory* _tmp_cat = dynamic_cast<BookmarkCategory*>(item);
+            bm_ref.insert(bm_ref.end(),_tmp_cat->get_references().begin(), _tmp_cat->get_references().end());
+            bm_disp.insert(bm_ref.end(),_tmp_cat->get_disputed().begin(), _tmp_cat->get_disputed().end());
+        }
+    }
+    processing_thread = new QThread;
+    ReportGenerator* rp_gen = new ReportGenerator(std::make_pair(bm_ref,bm_disp));
+    // Move reportgenerator to other thread
+    rp_gen->moveToThread(processing_thread);
+    connect(processing_thread, &QThread::finished, rp_gen, &ReportGenerator::deleteLater);
+    connect(rp_gen, &ReportGenerator::done, processing_thread, &QThread::quit);
+    connect(processing_thread, &QThread::started, rp_gen, &ReportGenerator::create_report);
+    processing_thread->start();
 }
 
 BookmarkCategory* BookmarkWidget::add_to_container(BookmarkItem *bm_item, std::pair<int, string> *container) {
@@ -87,7 +109,6 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, const int frame_nbr
     BookmarkItem* bm_item = new BookmarkItem(bookmark, BOOKMARK);
     bm_item->set_thumbnail(thumbnail_path);
     bm_list->addItem(bm_item);
-
 }
 
 
