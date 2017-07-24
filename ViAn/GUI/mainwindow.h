@@ -46,6 +46,8 @@ public:
     QAction* interval_act;
     QAction* drawing_act;
 
+    QAction* color_act;
+
     RecentProjectDialog* rp_dialog;
 
 private slots:
@@ -59,6 +61,7 @@ private slots:
     void pen();
     void text();
     void undo();
+    void redo();
     void clear();
     void zoom();
     void move();

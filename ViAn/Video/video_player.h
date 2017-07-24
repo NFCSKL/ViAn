@@ -96,8 +96,6 @@ public:
     void set_slider_frame(int frame_nbr);
 
     Overlay* get_overlay();
-    
-    void toggle_overlay();
 
     void undo_overlay();
     void clear_overlay();

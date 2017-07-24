@@ -23,12 +23,15 @@ public:
     QAction* line_tool_act;
     QAction* text_tool_act;
     QAction* undo_tool_act;
+    QAction* redo_tool_act;
     QAction* clear_tool_act;
 
     QActionGroup* tools;
 
-private slots:
+public slots:
     void color_tool_clicked();
+
+private slots:
     void pen_tool_clicked();
     void arrow_tool_clicked();
     void rectangle_tool_clicked();

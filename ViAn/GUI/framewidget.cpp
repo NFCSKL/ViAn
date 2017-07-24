@@ -153,7 +153,6 @@ void FrameWidget::resizeEvent(QResizeEvent *event) {
 void FrameWidget::mousePressEvent(QMouseEvent *event) {
     switch (tool) {
     case NONE:
-        std::cout << "None" << std::endl;
         break;
     case ZOOM:
         if (event->button() == Qt::RightButton) {

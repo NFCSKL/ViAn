@@ -489,16 +489,6 @@ void video_player::set_playback_speed(int speed_steps) {
 }
 
 /**
- * @brief video_player::toggle_overlay
- * Toggles the showing of the overlay, and if video is paused updates
- * the frame in the GUI to show with/without the overlay.
- */
-void video_player::toggle_overlay() {
-    video_overlay->toggle_overlay();
-    update_overlay();
-}
-
-/**
  * @brief video_player::set_overlay_tool
  * Sets the overlay tool's shape.
  * @param shape

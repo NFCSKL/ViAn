@@ -89,6 +89,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(draw_toolbar, SIGNAL(set_overlay_tool(SHAPES)), video_wgt->frame_wgt, SLOT(set_tool(SHAPES)));
     connect(draw_toolbar->undo_tool_act, &QAction::triggered, this, &MainWindow::undo);
     connect(draw_toolbar->clear_tool_act, &QAction::triggered, this, &MainWindow::clear);
+    connect(color_act, &QAction::triggered, draw_toolbar, &DrawingToolbar::color_tool_clicked);
 
     // Status bar
     status_bar = new StatusBar();
@@ -292,6 +293,7 @@ void MainWindow::init_view_menu() {
     connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_interval);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
+    //connect(drawing_act, &QAction::toggled, video_wgt->m_video_player->get_overlay(), &Overlay::set_showing_overlay); TODO
 }
 
 /**
@@ -331,7 +333,7 @@ void MainWindow::init_interval_menu() {
 void MainWindow::init_tools_menu() {
     QMenu* tool_menu = menuBar()->addMenu(tr("&Tools"));
 
-    QAction* color_act = new QAction(tr("&Color"), this);
+    color_act = new QAction(tr("&Color"), this);
     QAction* zoom_in_act = new QAction(tr("Zoom &in"), this);
     QAction* zoom_out_act = new QAction(tr("Zoom &out"), this);
     QAction* fit_screen_act = new QAction(tr("&Fit to screen"), this);
@@ -343,6 +345,7 @@ void MainWindow::init_tools_menu() {
     QAction* pen_act = new QAction(tr("&Pen"), this);
     QAction* text_act = new QAction(tr("&Text"), this);
     QAction* undo_act = new QAction(tr("&Undo"), this);
+    QAction* redo_act = new QAction(tr("Re&do"), this);
     QAction* clear_act = new QAction(tr("C&lear"), this);
 
     QAction* export_act  =new QAction(tr("&Frames"), this);
@@ -359,6 +362,7 @@ void MainWindow::init_tools_menu() {
     pen_act->setIcon(QIcon("../ViAn/Icons/pen.png"));
     text_act->setIcon(QIcon("../ViAn/Icons/text.png"));
     undo_act->setIcon(QIcon("../ViAn/Icons/undo.png"));
+    redo_act->setIcon(QIcon("../ViAn/Icons/redo.png"));
     clear_act->setIcon(QIcon("../ViAn/Icons/clear.png"));
 
     // Export submenu
@@ -374,6 +378,7 @@ void MainWindow::init_tools_menu() {
     drawing_tools->addAction(pen_act);
     drawing_tools->addAction(text_act);
     tool_menu->addAction(undo_act);
+    tool_menu->addAction(redo_act);
     tool_menu->addAction(clear_act);
     tool_menu->addSeparator();
     tool_menu->addAction(zoom_in_act);
@@ -382,6 +387,7 @@ void MainWindow::init_tools_menu() {
     tool_menu->addAction(move_act);
 
     undo_act->setShortcut(QKeySequence::Undo);
+    redo_act->setShortcut(QKeySequence::Redo);
     fit_screen_act->setShortcut(tr("Ctrl+F"));
 
     color_act->setStatusTip(tr("Color picker"));
@@ -396,6 +402,7 @@ void MainWindow::init_tools_menu() {
     pen_act->setStatusTip(tr("Pen tool"));
     text_act->setStatusTip(tr("Text tool"));
     undo_act->setStatusTip(tr("Undo last drawing"));
+    redo_act->setStatusTip(tr("Redo last drawing"));
     clear_act->setStatusTip(tr("Clear all drawings"));
 
     //Connect
@@ -407,6 +414,7 @@ void MainWindow::init_tools_menu() {
     connect(pen_act, &QAction::triggered, this, &MainWindow::pen);
     connect(text_act, &QAction::triggered, this, &MainWindow::text);
     connect(undo_act, &QAction::triggered, this, &MainWindow::undo);
+    connect(redo_act, &QAction::triggered, this, &MainWindow::redo);
     connect(clear_act, &QAction::triggered, this, &MainWindow::clear);
     connect(zoom_in_act, &QAction::triggered, this, &MainWindow::zoom);
     connect(move_act, &QAction::triggered, this, &MainWindow::move);
@@ -453,7 +461,10 @@ void MainWindow::text() {
 
 void MainWindow::undo() {
     video_wgt->m_video_player->get_overlay()->undo(video_wgt->get_current_frame());
+}
 
+void MainWindow::redo() {
+    video_wgt->m_video_player->get_overlay()->redo(video_wgt->get_current_frame());
 }
 
 void MainWindow::clear() {

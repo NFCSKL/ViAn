@@ -29,7 +29,6 @@ public:
     Overlay();
     bool is_showing_overlay();
     void set_showing_overlay(bool value);
-    void toggle_overlay();
     void draw_overlay(cv::Mat &frame, int frame_nr);
 
     void set_colour(QColor col);
@@ -39,6 +38,7 @@ public:
     void mouse_released(QPoint pos, int frame_nr);
     void mouse_moved(QPoint pos, int frame_nr);
     void undo(int frame_nr);
+    void redo(int frame_nr);
     void clear(int frame_nr);
 
     void read(const QJsonObject& json);
@@ -47,6 +47,8 @@ public:
 private:
     void update_drawing_position(QPoint pos, int frame_nr);
     Shape* get_empty_shape(SHAPES shape_type);
+    void empty_undo_list(int frame_nr);
+    void add_drawing(Shape *shape, int frame_nr);
 
     bool show_overlay = true;
 
@@ -55,7 +57,12 @@ private:
     QString current_string = "Enter text";
     float current_font_scale = 1;
 
-    std::map<int, QList<Shape*>> overlays;
+    struct FrameOverlay{
+        std::vector<Shape*> overlay;
+        std::vector<Shape*>::iterator drawn = overlay.end();
+    };
+
+    std::map<int, FrameOverlay> overlays;
 };
 
 #endif // OVERLAY_H
