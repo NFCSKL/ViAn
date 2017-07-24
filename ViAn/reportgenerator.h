@@ -24,13 +24,14 @@ private:
     QAxObject* word;   
     std::vector<Bookmark*> all_bookmarks;
     const double IMAGE_WIDTH_REFERENCE = 272.0;
-
+    QString get_bookmark_descr(Bookmark *bm);
     void create_list_of_names();
-
-    void add_bookmarks(QAxObject* selection, RefDisp bookmark_list);
+    void make_doc(QAxObject* obj, QString file_name);
+    std::vector<std::pair<std::string, std::string> > add_bookmarks(QAxObject *active_document, QAxObject* selection, RefDisp bookmark_list);
     void add_bookmark_pair(QAxObject* selection, BookmarkItem* bm1, BookmarkItem* bm2);
     void add_bookmark(QAxObject* selection, Bookmark *bm, int alignment);
-
+    QAxObject *add_table(QAxObject *active_document, QAxObject* selection, int rows, int cols);
+    void add_pic_ref(std::vector<std::pair<std::string, std::string> >  table_contents);
     QString save_report(QAxObject* active_document);
     void close_report(QAxObject* doc, QAxObject*  word);
     void resize_picture(QString pic_path, QAxObject* inline_shape);

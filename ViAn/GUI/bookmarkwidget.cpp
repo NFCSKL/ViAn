@@ -56,10 +56,11 @@ void BookmarkWidget::generate_report()
             temp = _tmp_cat->get_disputed();
             qDebug() << "disp";
             bm_disp.insert(bm_disp.end(),temp.begin(), temp.end());
-        }
-        ref_disp.push_back(std::make_pair(bm_disp,bm_ref));
+            ref_disp.push_back(std::make_pair(bm_disp,bm_ref));
+        }    
     }
     processing_thread = new QThread;    
+    qDebug() << "refdispsize" << ref_disp.size();
     ReportGenerator* rp_gen = new ReportGenerator(m_path,ref_disp);
     qDebug() << "rpgen";
     rp_gen->create_report();

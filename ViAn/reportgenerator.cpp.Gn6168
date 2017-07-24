@@ -41,8 +41,8 @@ void ReportGenerator::create_report() {
         QAxObject* selection = active_window->querySubObject( "Selection" );
 
         // Make sure there is bookmarks to put in report.
-        //4. ADD IMAGES FROM BOOKMARK FOLDER        
-        std::vector<std::pair<std::string,std::string>> table_contents = add_bookmarks(active_document,selection, m_ref_disp);
+        //4. ADD IMAGES FROM BOOKMARK FOLDER
+        auto table_contents = add_bookmarks(active_document,selection, m_ref_disp);
         add_pic_ref(table_contents);
         //5. SAVE AND CLOSE FILE
         QString file_path = save_report(active_document);
@@ -127,8 +127,8 @@ QString ReportGenerator::calculate_time(int ms) {
  * to the document.
  * @param selection, the selector in the active document.
  */
-std::vector<std::pair<std::string, std::string > > ReportGenerator::add_bookmarks(QAxObject* active_document,QAxObject* selection, RefDisp bookmark_list) {
-    std::vector<std::pair<std::string, std::string> > image_refs;
+std::vector<std::pair<QString, QString> > ReportGenerator::add_bookmarks(QAxObject* active_document,QAxObject* selection, RefDisp bookmark_list) {
+    std::vector<std::pair<QString, QString> > image_refs;
     int fig_num = 1;
     for (int i = 0; i != bookmark_list.size(); i++) { // for each category, make a paragraph of bookmarks
         qDebug() << "beg loop "<< i;
@@ -155,7 +155,7 @@ std::vector<std::pair<std::string, std::string > > ReportGenerator::add_bookmark
             QString disp_txt = QString::fromStdString(
                         "Figur" + std::to_string(fig_num++) + ": ") + bm_right->getDescription();
 
-            image_refs.push_back(std::make_pair(ref_txt.toStdString(),disp_txt.toStdString()));
+            image_refs.push_back(std::make_pair(ref_txt,disp_txt));
             add_bookmark_pair(selection, bm_left, bm_right);
         }
 
