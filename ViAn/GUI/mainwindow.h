@@ -58,6 +58,8 @@ private slots:
     void arrow();
     void pen();
     void text();
+    void undo();
+    void clear();
     void zoom();
     void move();
 

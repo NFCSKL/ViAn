@@ -101,7 +101,3 @@ void DrawingToolbar::text_tool_clicked() {
     emit set_status_bar("Text tool");
     emit set_overlay_tool(TEXT);
 }
-
-
-
-

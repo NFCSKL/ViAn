@@ -407,6 +407,10 @@ void VideoWidget::set_total_time(int time) {
     total_time->setText(convert_time(time));
 }
 
+int VideoWidget::get_current_frame() {
+    return current_frame;
+}
+
 void VideoWidget::on_bookmark_clicked() {
     cv::Mat bookmark_frame = frame_wgt->get_mat();
     emit new_bookmark(m_vid_proj, current_frame, bookmark_frame);

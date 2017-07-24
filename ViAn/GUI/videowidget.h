@@ -45,6 +45,7 @@ public:
 
     VideoProject* get_current_video_project();
     std::pair<int, int> get_frame_interval();
+    int get_current_frame();
 
 signals:
     void first_frame(cv::Mat frame);

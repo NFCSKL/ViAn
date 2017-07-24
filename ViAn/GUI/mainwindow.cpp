@@ -87,6 +87,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(main_toolbar->toggle_draw_toolbar_act, &QAction::triggered, toggle_draw_toolbar, &QAction::trigger);   
     connect(draw_toolbar, SIGNAL(set_color(QColor)), video_wgt->m_video_player, SLOT(set_overlay_colour(QColor)));
     connect(draw_toolbar, SIGNAL(set_overlay_tool(SHAPES)), video_wgt->frame_wgt, SLOT(set_tool(SHAPES)));
+    connect(draw_toolbar->undo_tool_act, &QAction::triggered, this, &MainWindow::undo);
+    connect(draw_toolbar->clear_tool_act, &QAction::triggered, this, &MainWindow::clear);
 
     // Status bar
     status_bar = new StatusBar();
@@ -330,8 +332,6 @@ void MainWindow::init_tools_menu() {
     QMenu* tool_menu = menuBar()->addMenu(tr("&Tools"));
 
     QAction* color_act = new QAction(tr("&Color"), this);
-    QAction* undo_act = new QAction(tr("&Undo"), this);
-    QAction* clear_act = new QAction(tr("C&lear"), this);
     QAction* zoom_in_act = new QAction(tr("Zoom &in"), this);
     QAction* zoom_out_act = new QAction(tr("Zoom &out"), this);
     QAction* fit_screen_act = new QAction(tr("&Fit to screen"), this);
@@ -342,12 +342,12 @@ void MainWindow::init_tools_menu() {
     QAction* arrow_act = new QAction(tr("&Arrow"), this);
     QAction* pen_act = new QAction(tr("&Pen"), this);
     QAction* text_act = new QAction(tr("&Text"), this);
+    QAction* undo_act = new QAction(tr("&Undo"), this);
+    QAction* clear_act = new QAction(tr("C&lear"), this);
 
     QAction* export_act  =new QAction(tr("&Frames"), this);
 
     color_act->setIcon(QIcon("../ViAn/Icons/color.png"));
-    undo_act->setIcon(QIcon("../ViAn/Icons/undo.png"));
-    clear_act->setIcon(QIcon("../ViAn/Icons/clear.png"));
     zoom_in_act->setIcon(QIcon("../ViAn/Icons/zoom_in.png"));
     zoom_out_act->setIcon(QIcon("../ViAn/Icons/zoom_out.png"));
     fit_screen_act->setIcon(QIcon("../ViAn/Icons/fit_screen.png"));
@@ -358,6 +358,8 @@ void MainWindow::init_tools_menu() {
     arrow_act->setIcon(QIcon("../ViAn/Icons/arrow.png"));
     pen_act->setIcon(QIcon("../ViAn/Icons/pen.png"));
     text_act->setIcon(QIcon("../ViAn/Icons/text.png"));
+    undo_act->setIcon(QIcon("../ViAn/Icons/undo.png"));
+    clear_act->setIcon(QIcon("../ViAn/Icons/clear.png"));
 
     // Export submenu
     QMenu* export_menu = tool_menu->addMenu(tr("&Export"));
@@ -383,8 +385,6 @@ void MainWindow::init_tools_menu() {
     fit_screen_act->setShortcut(tr("Ctrl+F"));
 
     color_act->setStatusTip(tr("Color picker"));
-    undo_act->setStatusTip(tr("Undo last drawing"));
-    clear_act->setStatusTip(tr("Clear all drawings"));
     zoom_in_act->setStatusTip(tr("Zoom in"));
     zoom_out_act->setStatusTip(tr("Zoom out"));
     fit_screen_act->setStatusTip(tr("Fit to screen"));
@@ -395,6 +395,8 @@ void MainWindow::init_tools_menu() {
     arrow_act->setStatusTip(tr("Arrow tool"));
     pen_act->setStatusTip(tr("Pen tool"));
     text_act->setStatusTip(tr("Text tool"));
+    undo_act->setStatusTip(tr("Undo last drawing"));
+    clear_act->setStatusTip(tr("Clear all drawings"));
 
     //Connect
     connect(export_act, &QAction::triggered, this, &MainWindow::export_images);
@@ -404,6 +406,8 @@ void MainWindow::init_tools_menu() {
     connect(arrow_act, &QAction::triggered, this, &MainWindow::arrow);
     connect(pen_act, &QAction::triggered, this, &MainWindow::pen);
     connect(text_act, &QAction::triggered, this, &MainWindow::text);
+    connect(undo_act, &QAction::triggered, this, &MainWindow::undo);
+    connect(clear_act, &QAction::triggered, this, &MainWindow::clear);
     connect(zoom_in_act, &QAction::triggered, this, &MainWindow::zoom);
     connect(move_act, &QAction::triggered, this, &MainWindow::move);
 }
@@ -445,6 +449,15 @@ void MainWindow::pen() {
 
 void MainWindow::text() {
     video_wgt->frame_wgt->set_tool(TEXT);
+}
+
+void MainWindow::undo() {
+    video_wgt->m_video_player->get_overlay()->undo(video_wgt->get_current_frame());
+
+}
+
+void MainWindow::clear() {
+    video_wgt->m_video_player->get_overlay()->clear(video_wgt->get_current_frame());
 }
 
 void MainWindow::zoom() {
