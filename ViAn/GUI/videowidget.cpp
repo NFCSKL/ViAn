@@ -591,6 +591,7 @@ void VideoWidget::next_poi_btn_clicked() {
         emit set_status_bar("Already at last POI");
     } else {
         frame_index.store(new_frame);
+        on_new_frame();
         emit set_status_bar("Jumped to next POI");
     }
 }
@@ -601,6 +602,7 @@ void VideoWidget::prev_poi_btn_clicked() {
         emit set_status_bar("Already at first POI");
     } else {
         frame_index.store(new_frame);
+        on_new_frame();
         emit set_status_bar("Jumped to previous POI");
     }
 }
@@ -633,7 +635,7 @@ void VideoWidget::on_new_frame() {
             if (frame_num == playback_slider->last_poi_end) {
                 analysis_play_btn_toggled(false);
                 analysis_play_btn->setChecked(false);
-//                stop_clicked(); TODO ???
+                play_btn->setChecked(false);
             } else {
                 next_poi_btn_clicked();
             }
