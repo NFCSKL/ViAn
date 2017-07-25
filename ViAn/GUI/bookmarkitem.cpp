@@ -66,6 +66,11 @@ int BookmarkItem::get_frame_number() {
     return bookmark->get_frame_number();
 }
 
+QString BookmarkItem::get_file_path()
+{
+    return QString::fromStdString(bookmark->m_file);
+}
+
 /**
  * @brief Bookmark::update_description
  * Sets the text description of the bookmark to the specified string,

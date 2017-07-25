@@ -82,7 +82,8 @@ HEADERS += reportgenerator.h\
     Project/Analysis/analysisinterval.h \
     Filehandler/writeable.h \
     Project/Analysis/analysisproxy.h \
-    Project/Analysis/detectionbox.h
+    Project/Analysis/detectionbox.h \
+    table.h
 
 #
 # LIBRARY

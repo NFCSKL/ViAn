@@ -12,6 +12,7 @@ public:
     ~BookmarkItem();
     Bookmark* get_bookmark();
     int get_frame_number();
+    QString get_file_path();
     void update_description(const QString &text);    
     void set_thumbnail(std::string thum_path);
     BookmarkItem* copy();
