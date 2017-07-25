@@ -6,9 +6,7 @@ AnalysisInterval::AnalysisInterval(int start, int end)
     m_end = end;
 }
 
-AnalysisInterval::AnalysisInterval()
-{
-}
+AnalysisInterval::AnalysisInterval() {}
 
 /**
  * @brief POI::read

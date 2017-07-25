@@ -52,7 +52,6 @@ void VideoPlayer::on_update_speed(int speed_steps) {
 void VideoPlayer::playback_loop() {
     QTime frame_rate_timer, loop_timer;
     frame_rate_timer.start();
-    loop_timer.start();
 
     while (m_is_playing->load()) {
         // Handle events from controller
@@ -63,7 +62,6 @@ void VideoPlayer::playback_loop() {
         // Make sure playback sticks to the correct frame rate
         if (frame_rate_timer.elapsed() < m_delay * speed_multiplier) continue;
         frame_rate_timer.restart();
-        loop_timer.restart();
 
         if (!m_capture.read(frame)) {
             m_is_playing->store(false);
@@ -73,7 +71,6 @@ void VideoPlayer::playback_loop() {
         ++current_frame;
         display_index();
         display(frame.clone(), current_frame);
-        qDebug() << loop_timer.elapsed();
     }
     playback_stopped();
 }

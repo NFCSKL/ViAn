@@ -34,8 +34,17 @@ void Analysis::write(QJsonObject &json){
     json["POI:s"] = json_POIs;
 }
 
-std::vector<cv::Rect> Analysis::get_detections_on_frame(int frame_num)
+SAVE_TYPE Analysis::get_save_type() const
 {
+    return DETECTION;
+}
+
+ANALYSIS_TYPE Analysis::get_type() const
+{
+    return type;
+}
+
+std::vector<cv::Rect> Analysis::get_detections_on_frame(int frame_num) {
     std::vector<cv::Rect> res;
     for (auto it = m_intervals.begin(); it != m_intervals.end(); it++) {
         POI* ai = static_cast<POI*>(*it);
