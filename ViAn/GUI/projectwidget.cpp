@@ -264,6 +264,8 @@ void ProjectWidget::save_project() {
         RecentProject rp;
         rp.load_recent();
         rp.update_recent(m_proj->getName(), m_proj->full_path());
+        qDebug() << m_proj->getName().c_str();
+        qDebug() << m_proj->full_path().c_str();
         emit set_status_bar("Project saved");
     }
 }

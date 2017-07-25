@@ -42,8 +42,12 @@ void ReportGenerator::create_report() {
 
         // Make sure there is bookmarks to put in report.
         //4. ADD IMAGES FROM BOOKMARK FOLDER        
-        std::vector<std::pair<std::string,std::string>> table_contents = add_bookmarks(active_document,selection, m_ref_disp);
-        add_pic_ref(table_contents);
+        QAxObject* fig_table = active_document->querySubObject("TablesOfFigures");
+        make_doc(fig_table, "fig_table");
+        auto img_ref = add_bookmarks(active_document,selection, m_ref_disp);
+        QAxObject* tables = add_table(active_document,selection, img_ref.size()+1,2);
+        QAxObject* table = tables->querySubObject("Item(int)",1);
+        add_pic_ref(table,img_ref);
         //5. SAVE AND CLOSE FILE
         QString file_path = save_report(active_document);
         close_report(doc, word);
@@ -127,8 +131,8 @@ QString ReportGenerator::calculate_time(int ms) {
  * to the document.
  * @param selection, the selector in the active document.
  */
-std::vector<std::pair<std::string, std::string > > ReportGenerator::add_bookmarks(QAxObject* active_document,QAxObject* selection, RefDisp bookmark_list) {
-    std::vector<std::pair<std::string, std::string> > image_refs;
+std::vector<std::pair<QString, QString> > ReportGenerator::add_bookmarks(QAxObject* active_document,QAxObject* selection, RefDisp bookmark_list) {
+    std::vector<std::pair<QString,QString>> image_refs;
     int fig_num = 1;
     for (int i = 0; i != bookmark_list.size(); i++) { // for each category, make a paragraph of bookmarks
         qDebug() << "beg loop "<< i;
@@ -136,43 +140,31 @@ std::vector<std::pair<std::string, std::string > > ReportGenerator::add_bookmark
         std::vector<BookmarkItem*> bm_disp = bookmark_list.at(i).second;
         int rows = std::min(bm_ref.size(),bm_disp.size());
         qDebug() << "rows" << rows;
-        QAxObject* tables = add_table(active_document,selection, rows,2);
-        QAxObject* table = tables->querySubObject("Item(int)",1);
         for(size_t j = 0; j != rows; ++j){ // while images on both sides
             BookmarkItem* bm_left = bm_ref.at(j);
-            BookmarkItem* bm_right = bm_disp.at(j);
-            QAxObject* left_cell_text = table->querySubObject("Cell(int,int)", j+1, 1)->querySubObject("Range");
-            QAxObject* right_cell_text = table->querySubObject("Cell(int,int)", j+1, 2)->querySubObject("Range");
-            left_cell_text->dynamicCall("InsertAfter(QString Text)",
-                                        QString::fromStdString("Figur " + std::to_string(fig_num++) + ": ")+
-                                                               bm_left->getDescription());
-            right_cell_text->dynamicCall("InsertAfter(QString Text)",
-                                         QString::fromStdString("Figur " + std::to_string(fig_num++) +": ")+
-                                                               bm_right->getDescription());
-            QString ref_txt = QString::fromStdString(
-                        "Figur" + std::to_string(fig_num++) + ": ") +
-                    bm_left->getDescription();
-            QString disp_txt = QString::fromStdString(
-                        "Figur" + std::to_string(fig_num++) + ": ") + bm_right->getDescription();
+            BookmarkItem* bm_right = bm_disp.at(j);;
 
-            image_refs.push_back(std::make_pair(ref_txt.toStdString(),disp_txt.toStdString()));
+            QString ref = get_bookmark_fig_txt(bm_left,fig_num++);
+            QString disp = get_bookmark_fig_txt(bm_right,fig_num++);
+            image_refs.push_back(std::make_pair(ref,disp));
+
             add_bookmark_pair(selection, bm_left, bm_right);
         }
 
         // Add paragraphs between images
         add_paragraph(selection);
     }
-    qDebug() << "UTE";
+    qDebug() << "add_bookmarks_done";
     return image_refs;
 }
 
 void ReportGenerator::add_bookmark_pair(QAxObject *selection, BookmarkItem *bm_ref, BookmarkItem* bm_disp)
 {
-    add_bookmark(selection, bm_ref->get_bookmark(), 0);
-    add_bookmark(selection, bm_disp->get_bookmark(), 1);
+    add_img(selection, bm_ref->get_bookmark(), 2);
+    add_img(selection, bm_disp->get_bookmark(), 2);
 }
 
-void ReportGenerator::add_bookmark(QAxObject *selection, Bookmark *bm, int alignment)
+void ReportGenerator::add_img(QAxObject *selection, Bookmark *bm, int alignment)
 {
     QAxObject* shapes = selection->querySubObject( "InlineShapes" );
     QString img_path = QString::fromStdString(bm->m_file);
@@ -184,6 +176,13 @@ void ReportGenerator::add_bookmark(QAxObject *selection, Bookmark *bm, int align
                  img_path, false, true);
     resize_picture(img_path, inline_shape);
 }
+
+void ReportGenerator::add_entry_to_cell(QAxObject *table, QString entry,int row, int col)
+{
+    QAxObject* cell_text = table->querySubObject("Cell(int,int)", row, col)->querySubObject("Range");
+    cell_text->dynamicCall("SetText(QString Text)", entry);
+}
+
 void ReportGenerator::make_doc(QAxObject *obj, QString file_name)
 {
     QDir dir;
@@ -194,14 +193,36 @@ void ReportGenerator::make_doc(QAxObject *obj, QString file_name)
        out << obj->generateDocumentation();
        file1.close();
 }
+
+QString ReportGenerator::get_bookmark_fig_txt(BookmarkItem *bm, int fig_num)
+{
+    return QString::fromStdString("Figur" + std::to_string(fig_num) + ": ") + bm->getDescription();
+
+}
 QAxObject* ReportGenerator::add_table(QAxObject *active_document, QAxObject *selection, int rows, int cols)
 {
     QAxObject* rng = selection->querySubObject("Range");
     QAxObject* tables = active_document->querySubObject("Tables");
     //make_doc(table);
-    QVariant table = tables->dynamicCall("Add(QVariant,int,int)",rng->asVariant(), rows,cols,1,1);
-    //tables->dynamicCall("set_Style(QVariant, QString)", table,QString::fromStdString("Table Professional"));
+    QAxObject* table = tables->querySubObject("Add(QVariant,int,int)",rng->asVariant(), rows,cols,1,1);
+    QVariant style(36);
+    table->dynamicCall("AutoFormat(QVariant)", style);
     return tables;
+}
+
+void ReportGenerator::add_pic_ref(QAxObject* table, std::vector<std::pair<QString,QString>> table_contents)
+{
+    add_entry_to_cell(table, QString::fromStdString("Referens"), 1,1);
+    add_entry_to_cell(table, QString::fromStdString("Omstritt"), 1,2);
+    int row = 2;
+    int col = 1;
+    auto str_it = table_contents.begin();
+    while(str_it != table_contents.end()){
+        add_entry_to_cell(table,str_it->first,row,col++);
+        add_entry_to_cell(table,str_it->second,row++,col);
+        col = 1;
+        str_it++;
+    }
 }
 
 /**

@@ -24,14 +24,20 @@ private:
     QAxObject* word;   
     std::vector<Bookmark*> all_bookmarks;
     const double IMAGE_WIDTH_REFERENCE = 272.0;
+
+    static void make_doc(QAxObject* obj, QString file_name);
+
+    QString get_bookmark_fig_txt(BookmarkItem *bm, int fig_num);
     QString get_bookmark_descr(Bookmark *bm);
-    void create_list_of_names();
-    void make_doc(QAxObject* obj, QString file_name);
-    std::vector<std::pair<std::string, std::string> > add_bookmarks(QAxObject *active_document, QAxObject* selection, RefDisp bookmark_list);
+    std::vector<std::pair<QString,QString>> add_bookmarks(QAxObject *active_document, QAxObject* selection, RefDisp bookmark_list);
     void add_bookmark_pair(QAxObject* selection, BookmarkItem* bm1, BookmarkItem* bm2);
-    void add_bookmark(QAxObject* selection, Bookmark *bm, int alignment);
+    void add_img(QAxObject* selection, Bookmark *bm, int alignment);
+
+    void add_entry_to_cell(QAxObject* table, QString entry, int row, int col);
     QAxObject *add_table(QAxObject *active_document, QAxObject* selection, int rows, int cols);
-    void add_pic_ref(std::vector<std::pair<std::string, std::string> >  table_contents);
+    void add_pic_ref(QAxObject *table, std::vector<std::pair<QString, QString> > table_contents);
+
+
     QString save_report(QAxObject* active_document);
     void close_report(QAxObject* doc, QAxObject*  word);
     void resize_picture(QString pic_path, QAxObject* inline_shape);
