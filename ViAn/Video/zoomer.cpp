@@ -1,4 +1,5 @@
 #include "zoomer.h"
+#include <QDebug>
 
 Zoomer::Zoomer() {
     anchor = QPoint(0,0);
@@ -26,6 +27,7 @@ void Zoomer::set_scale_factor(double scale_factor) {
  * @param p2 end point
  */
 void Zoomer::set_zoom_rect(QPoint p1, QPoint p2) {
+    qDebug() << p1 << p2;
     cv::Rect _tmp = cv::Rect(cv::Point(anchor.x() + p1.x() / m_scale_factor, anchor.y() + p1.y() / m_scale_factor),
                   cv::Point(anchor.x() + p2.x() / m_scale_factor, anchor.y() + p2.y() / m_scale_factor));
 

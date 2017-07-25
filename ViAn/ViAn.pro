@@ -51,10 +51,10 @@ SOURCES += main.cpp \
 #
 # TEST
 #
-SOURCES += Test/test_video_player.cpp\
+SOURCES +=\
     Test/test_report_generator.cpp
 
-HEADERS += Test/test_video_player.h \
+HEADERS += \
     Test/test_report_generator.h \
     GUI/TreeItems/itemtypes.h \
     GUI/Toolbars/maintoolbar.h \
@@ -123,7 +123,7 @@ RESOURCES += resources.qrc
 # VIDEOPLAYER
 # OPENCV
 #
-SOURCES += Video/video_player.cpp \
+SOURCES += \
     Video/overlay.cpp \
     Video/analysisoverlay.cpp \
     Video/shapes/arrow.cpp \
@@ -136,7 +136,7 @@ SOURCES += Video/video_player.cpp \
     Video/shapes/zoomrectangle.cpp \
     Video/shapes/analysarea.cpp \
     Video/framemanipulator.cpp
-HEADERS += Video/video_player.h \
+HEADERS += \
     Video/overlay.h \
     Video/analysisoverlay.h \
     Video/shapes/arrow.h \

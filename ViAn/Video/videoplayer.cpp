@@ -3,7 +3,10 @@
 #include <QDebug>
 #include <QTime>
 
-VideoPlayer::VideoPlayer(QObject *parent) : QObject(parent) {}
+VideoPlayer::VideoPlayer(std::atomic<int>* frame, std::atomic<bool>* is_playing, QObject *parent) : QObject(parent) {
+    m_frame = frame;
+    m_is_playing = is_playing;
+}
 
 /**
  * @brief VideoPlayer::on_load_video
@@ -12,54 +15,32 @@ VideoPlayer::VideoPlayer(QObject *parent) : QObject(parent) {}
  * @param video_path    :   Path to the video
  */
 void VideoPlayer::on_load_video(std::string video_path){
-    m_is_playing = false;
+    current_frame = -1;
+    m_is_playing->store(false);
+    m_frame->store(0);
 
-    capture.open(video_path);
-    if (!capture.isOpened()) return;
+    m_capture.open(video_path);
+    if (!m_capture.isOpened()) return;
+    load_video_info();
+    emit video_info(m_video_width, m_video_height, m_frame_rate, m_last_frame);
+    m_delay = 1000 / m_frame_rate;
 
-    m_delay = 1000 / capture.get(CV_CAP_PROP_FPS);
-    last_frame = capture.get(CV_CAP_PROP_FRAME_COUNT) - 1;
-    set_frame(0);
+    set_frame();
 }
 
 /**
- * @brief VideoPlayer::on_play
- * Sets the playback status according to play
+ * @brief VideoPlayer::on_update_speed
+ * Updates the playback speed.
+ * @param speed_steps   :   Steps to increase/decrease
  */
-void VideoPlayer::on_play_pause(bool play){
-    if (!play) {
-        m_is_playing = false;
-        return;
+void VideoPlayer::on_update_speed(int speed_steps) {
+    if (speed_steps > 0) {
+        speed_multiplier = 1.0 / (speed_steps * 2);
+    } else if (speed_steps < 0) {
+        speed_multiplier = std::abs(speed_steps) * 2;
+    } else {
+        speed_multiplier = 1;
     }
-
-    if (m_is_playing) return;
-    m_is_playing = true;
-    playback_loop();
-}
-
-/**
- * @brief VideoPlayer::on_stop
- */
-void VideoPlayer::on_stop(){
-    m_is_playing = false;
-    set_frame(0);
-}
-
-/**
- * @brief VideoPlayer::on_set_frame
- * Updates the playback position if there are no more events on the event queue
- * @param frame_index   :   index of the frame that should be displayed
- */
-void VideoPlayer::on_set_frame(int frame_index) {
-    if (!QCoreApplication::hasPendingEvents()) set_frame(frame_index);
-}
-
-void VideoPlayer::on_step_forward() {
-    on_set_frame(current_frame + 1);
-}
-
-void VideoPlayer::on_step_backward() {
-    on_set_frame(current_frame - 1);
 }
 
 /**
@@ -69,31 +50,65 @@ void VideoPlayer::on_step_backward() {
  * It emits both the current frame and its index back to the controller object.
  */
 void VideoPlayer::playback_loop() {
-    QTime frame_rate_timer;
+    QTime frame_rate_timer, loop_timer;
     frame_rate_timer.start();
+    loop_timer.start();
 
-    while (m_is_playing) {
+    while (m_is_playing->load()) {
         // Handle events from controller
         QCoreApplication::processEvents();
+        if (m_frame->load() != current_frame) set_frame();
+        if (!m_is_playing->load()) break;
 
         // Make sure playback sticks to the correct frame rate
-        if (frame_rate_timer.elapsed() < m_delay) continue;
+        if (frame_rate_timer.elapsed() < m_delay * speed_multiplier) continue;
         frame_rate_timer.restart();
+        loop_timer.restart();
 
-        if (!capture.read(frame)) {
-            m_is_playing = false;
+        if (!m_capture.read(frame)) {
+            m_is_playing->store(false);
             continue;
         }
-        display(frame.clone());
-        display_index(++current_frame);
+        ++*m_frame;
+        ++current_frame;
+        display_index();
+        display(frame.clone(), current_frame);
+        qDebug() << loop_timer.elapsed();
     }
-    m_is_playing = false;
+    playback_stopped();
 }
 
-void VideoPlayer::set_frame(int frame_index) {
-    if (frame_index < 0 || frame_index > last_frame) return;
-    capture.set(CV_CAP_PROP_POS_FRAMES, frame_index);
-    capture.read(frame);
-    current_frame = frame_index;
-    display(frame.clone());
+/**
+ * @brief VideoPlayer::set_frame
+ * Moves the playback to the frame indicated by the number on top of the frame_stack.
+ */
+void VideoPlayer::set_frame() {
+    int frame_index = m_frame->load();
+    if (frame_index >= 0 && frame_index <= m_last_frame) {
+        m_capture.set(CV_CAP_PROP_POS_FRAMES, frame_index);
+        m_capture.read(frame);
+
+        current_frame = frame_index;
+        display(frame.clone(), current_frame);
+    }
+}
+
+/**
+ * @brief VideoPlayer::check_events
+ * Slot function for when the playback loop is not running
+ */
+void VideoPlayer::check_events() {
+    if (m_is_playing->load()) playback_loop();
+    if (m_frame->load() != current_frame) set_frame();
+}
+
+/**
+ * @brief VideoPlayer::load_video_info
+ * Reads video information from the capture object.
+ */
+void VideoPlayer::load_video_info() {
+    m_video_width = m_capture.get(CV_CAP_PROP_FRAME_WIDTH);
+    m_video_height = m_capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+    m_frame_rate = m_capture.get(CV_CAP_PROP_FPS);
+    m_last_frame = m_capture.get(CV_CAP_PROP_FRAME_COUNT) - 1;
 }
