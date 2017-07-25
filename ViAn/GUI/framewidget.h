@@ -6,9 +6,11 @@
 #include <QImage>
 #include <QMouseEvent>
 #include <QSize>
-#include "Video/shapes/zoomrectangle.h"
+
 #include "opencv2/opencv.hpp"
 #include "opencv2/videoio/videoio.hpp"
+
+#include "Video/shapes/zoomrectangle.h"
 #include "Project/Analysis/analysisproxy.h"
 
 enum click_tool {NONE, ZOOM, MOVE};
@@ -50,8 +52,7 @@ signals:
     void zoom_points(QPoint, QPoint);
     void trigger_zoom_out();
 public slots:
-    void draw_image(cv::Mat image);
-    void draw_from_playback(cv::Mat frame);
+    void on_new_image(cv::Mat image, int frame_index);
     void toggle_zoom(bool value);
     void set_scroll_area_size(QSize size);
     void set_analysis(AnalysisProxy *);
@@ -63,7 +64,7 @@ public slots:
     void update();
 protected:
     QImage _qimage;
-    cv::Mat _tmp;
+    cv::Mat _tmp_frame;
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
