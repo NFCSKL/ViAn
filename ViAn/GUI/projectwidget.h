@@ -9,10 +9,13 @@
 #include "Project/project.h"
 #include "TreeItems/itemtypes.h"
 #include <stack>
+#include "Project/Analysis/analysis.h"
+#include "Project/Analysis/tag.h"
 
 class Project;
 class VideoItem;
 class FolderItem;
+class AnalysisProxy;
 class ProjectWidget : public QTreeWidget
 {
     Q_OBJECT
@@ -29,8 +32,10 @@ signals:
     void marked_video(VideoProject* vid_proj, int frame = 0);
     void proj_path(std::string);
     void load_bookmarks(VideoProject* vid_proj);
-    void marked_analysis(Analysis*);
-    void marked_tag(Analysis*);
+
+    void marked_analysis(AnalysisProxy*);
+    void marked_basic_analysis(BasicAnalysis*);
+
     void set_detections(bool);
     void enable_poi_btns(bool, bool);
     void enable_tag_btn(bool);
@@ -38,16 +43,17 @@ signals:
     void set_tag_slider(bool);
     void set_status_bar(QString);
     void begin_analysis(std::string, std::string, QTreeWidgetItem*);
+    void update_frame();
 
 public slots:
     void new_project(void);
     void add_project(const QString project_name, const QString project_path);
     void add_video();
     void start_analysis(VideoProject*);
-    void add_tag(VideoProject*, Analysis *tag);
+    void add_basic_analysis(VideoProject*, BasicAnalysis *tag);
     void set_tree_item_name(QTreeWidgetItem *item, QString);
     void save_project();
-    void open_project();
+    void open_project(QString project_path="");
     void close_project();
     void remove_project();
     void dragEnterEvent(QDragEnterEvent *event);

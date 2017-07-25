@@ -27,12 +27,12 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
     option.subControls = QStyle::SC_SliderGroove;
     painter.drawComplexControl(QStyle::CC_Slider, option);
     QRect groove_rect = style()->subControlRect(QStyle::CC_Slider, &option, QStyle::SC_SliderGroove, this);
+    double c = (double)(groove_rect.right()-groove_rect.left())/maximum();
+    QBrush brush = Qt::yellow;
 
-    if (m_show_pois) {
-        QBrush brush = Qt::yellow;
-
+    if ((m_show_pois||m_show_tags)&& show_on_slider) {
+        if(m_show_tags) brush = Qt::red;
         //Get one frames width on the slider
-        double c = (double)(groove_rect.right()-groove_rect.left())/maximum();
 
         for (auto it = rects.begin(); it != rects.end(); ++it) {
             double first_frame = (double)(*it).first;
@@ -43,25 +43,35 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
             double second = (groove_rect.left()+second_frame*c);
 
             //Draw the rects, +1 so it's not too small
+            //QRect(int x, int y, int width, int height)
             QRect rect(first, groove_rect.top(), 1+second-first, groove_rect.height());
             painter.fillRect(rect, brush);
         }
-    } else if (m_show_tags) {
-        double c = (double)(groove_rect.right()-groove_rect.left())/maximum();
-        for (auto frame : frames) {
-            double first = (groove_rect.left()+(double)frame*c);
+    }
+    if (show_interval) {
+        brush = Qt::black;
+        double first = (groove_rect.left()+(double)interval_first*c);
+        double second = (groove_rect.left()+(double)interval_second*c);
+        if (interval_first != -1 && interval_second != -1 && interval_first <= interval_second) {
+            QRect rect(first, groove_rect.top()+groove_rect.height()/3, 1+second-first, groove_rect.height()/3);
+            painter.fillRect(rect, brush);
+        }
+        if (interval_first != -1) {
             QRect rect(first, groove_rect.top(), 1, groove_rect.height());
-            painter.fillRect(rect, Qt::red);
+            painter.fillRect(rect, brush);
+        }
+        if (interval_second != -1) {
+            QRect rect(second, groove_rect.top(), 1, groove_rect.height());
+            painter.fillRect(rect, brush);
         }
     }
-    if (interval != -1) {
-        double c = (double)(groove_rect.right()-groove_rect.left())/maximum();
-        double first = (groove_rect.left()+(double)interval*c);
-        QRect rect(first, groove_rect.top(), 1, groove_rect.height());
-        painter.fillRect(rect, Qt::black);
-    }
+
     option.subControls = QStyle::SC_SliderHandle;
     painter.drawComplexControl(QStyle::CC_Slider, option);
+}
+
+void AnalysisSlider::update(){
+    repaint();
 }
 
 /**
@@ -69,27 +79,34 @@ void AnalysisSlider::paintEvent(QPaintEvent *ev) {
  * Adds all POIs to the slider
  * @param analysis
  */
-void AnalysisSlider::set_analysis(Analysis* analysis) {
+void AnalysisSlider::set_basic_analysis(BasicAnalysis* analysis) {
     rects.clear();
     if (analysis != nullptr) {
-        for (auto p : analysis->POIs) {
-            add_slider_interval(p->start_frame, p->end_frame);
+        for (auto p : analysis->get_intervals()) {
+            add_slider_interval(p->get_start(), p->get_end());
         }
     }
-}
-
-void AnalysisSlider::set_tag(Analysis *analysis) {
-    this->frames.clear();
-    for (auto frame : analysis->frames) {
-        this->frames.push_back(frame);
-    }
-
     repaint();
 }
 
-void AnalysisSlider::set_interval(int frame) {
-    interval = frame;
-    repaint();
+void AnalysisSlider::set_interval(int start, int end) {
+    interval_first = start;
+    interval_second = end;
+}
+
+void AnalysisSlider::clear_interval() {
+    interval_first = -1;
+    interval_second = -1;
+}
+
+int AnalysisSlider::set_interval_first() {
+    interval_first = value();
+    return interval_first;
+}
+
+int AnalysisSlider::set_interval_second() {
+    interval_second = value();
+    return interval_second;
 }
 
 /**
@@ -199,7 +216,6 @@ bool AnalysisSlider::is_in_POI(int frame) {
  */
 void AnalysisSlider::set_show_pois(bool show_pois) {
     m_show_pois = show_pois;
-    repaint();
 }
 
 /**
@@ -208,7 +224,14 @@ void AnalysisSlider::set_show_pois(bool show_pois) {
  */
 void AnalysisSlider::set_show_tags(bool show_tags) {
     m_show_tags = show_tags;
-    repaint();
+}
+
+void AnalysisSlider::set_show_on_slider(bool show) {
+    show_on_slider = show;
+}
+
+void AnalysisSlider::set_show_interval(bool show) {
+    show_interval = show;
 }
 
 /**

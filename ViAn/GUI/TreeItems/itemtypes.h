@@ -3,9 +3,11 @@
 
 #include "Project/videoproject.h"
 #include <QTreeWidgetItem>
+#include "Project/Analysis/tag.h"
+#include "Project/Analysis/analysisproxy.h"
+
 
 enum ITEM_TYPE {VIDEO_ITEM, ANALYSIS_ITEM, FOLDER_ITEM, TAG_ITEM};
-
 
 class VideoProject;
 class TreeItem : public QTreeWidgetItem {
@@ -18,13 +20,15 @@ public:
 
 
 class AnalysisItem : public TreeItem {
-    Analysis m_analysis;
+    AnalysisProxy* m_analysis = nullptr;
+    bool finished = false;
 public:
-    AnalysisItem(Analysis analysis);
+    AnalysisItem(AnalysisProxy* analysis);
     AnalysisItem();
     ~AnalysisItem();
-    void set_analysis(Analysis analysis);
-    Analysis *get_analysis();
+    void set_analysis(AnalysisProxy* analysis);
+    AnalysisProxy *get_analysis();
+    bool is_finished() const;
     void remove();
     void rename();
 };
@@ -39,10 +43,10 @@ public:
 
 
 class TagItem : public TreeItem {
-    Analysis* m_tag;
+    Tag* m_tag;
 public:
-    TagItem(Analysis *tag);
-    Analysis *get_tag();
+    TagItem(Tag *tag);
+    Tag *get_tag();
     void remove();
     void rename();
 };

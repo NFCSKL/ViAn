@@ -10,7 +10,7 @@
 #include "bookmark.h"
 #include "video.h"
 #include "project.h"
-#include "Project/Analysis/analysismeta.h"
+#include "Project/Analysis/analysisproxy.h"
 #include "Project/report.h"
 #include <stack>
 
@@ -24,14 +24,16 @@ class Bookmark;
 class VideoProject : public Saveable{
     friend class VideoProjectTest;
     std::map<ID,Bookmark*> m_bookmarks;
-    std::map<ID,Analysis*> m_analyses;
     std::string m_tree_index = "";
+    std::map<ID,BasicAnalysis*> m_analyses;
+
     Overlay* m_overlay = new Overlay();
     Video* video = nullptr;
     Project* m_project = nullptr;
     ID m_bm_cnt = 0;  // Bookmark id counter
     ID m_ana_cnt = 0; // Analysis id counter
 public:
+
     VideoProject(Video* v); //Needs to have a video
     VideoProject();
     ~VideoProject();
@@ -41,7 +43,7 @@ public:
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
 
-    ID add_analysis(Analysis* analysis);
+    ID add_analysis(BasicAnalysis* analysis);
     ID add_bookmark(Bookmark* bookmark);
 
     void set_tree_index(std::stack<int> tree_index);
@@ -56,8 +58,9 @@ public:
     Video* get_video();
     Overlay* get_overlay();
     std::map<ID,Bookmark*> get_bookmarks();
-    std::map<ID,Analysis*> get_analyses();
-    Analysis *get_analysis(const int &id);
+    std::map<ID,BasicAnalysis*> get_analyses();
+    BasicAnalysis *get_analysis(const int &id);
+
 };
 
 

@@ -5,7 +5,8 @@
 #include <QSlider>
 #include <vector>
 #include <set>
-#include "Project/Analysis/analysis.h"
+#include "Project/Analysis/basicanalysis.h"
+#include "Project/Analysis/tag.h"
 
 
 class AnalysisSlider : public QSlider {
@@ -14,6 +15,8 @@ class AnalysisSlider : public QSlider {
     bool m_was_paused = false;
     bool m_show_pois = false;
     bool m_show_tags = false;
+    bool show_on_slider = true;
+    bool show_interval = true;
 
     //Change this to set how many frames the POI buttons should ignore
     const int JUMP_INTERVAL = 0;
@@ -23,6 +26,8 @@ public:
 
     int last_poi_end = -1;
     int interval = -1;
+    int interval_first = -1;
+    int interval_second = -1;
 
     void set_blocked(bool value);
     bool is_blocked();
@@ -33,14 +38,21 @@ public:
     int get_next_poi_end(int frame);
     int get_prev_poi_start(int curr_frame);
     bool is_in_POI(int frame);
+    int set_interval_first();
+    int set_interval_second();
 protected:
     void paintEvent(QPaintEvent *ev);
 public slots:
-    void set_analysis(Analysis* analysis);
-    void set_tag(Analysis* analysis);
-    void set_interval(int frame);
+    void set_basic_analysis(BasicAnalysis *analysis);
+
+    void update();
+
+    void set_interval(int start, int end);
+    void clear_interval(void);
     void set_show_pois(bool);
     void set_show_tags(bool);
+    void set_show_on_slider(bool);
+    void set_show_interval(bool);
     void clear_slider();
 
 private:

@@ -17,7 +17,6 @@ TEMPLATE = app
 # GENERAL
 #
 SOURCES += main.cpp \
-    Project/Analysis/analysismeta.cpp \
     GUI/TreeItems/itemtypes.cpp \
     GUI/Toolbars/maintoolbar.cpp \
     GUI/Toolbars/drawingtoolbar.cpp \
@@ -37,17 +36,26 @@ SOURCES += main.cpp \
     Project/projecttreestate.cpp \
     GUI/tagdialog.cpp \
     imageexporter.cpp \
-    GUI/frameexporterdialog.cpp
+    GUI/frameexporterdialog.cpp \
+    Project/Analysis/tag.cpp \
+    Video/videocontroller.cpp \
+    Video/videoplayer.cpp \
+    GUI/recentprojectdialog.cpp \
+    Project/recentproject.cpp \
+    Project/Analysis/basicanalysis.cpp \
+    Project/Analysis/analysisinterval.cpp \
+    Filehandler/writeable.cpp \
+    Project/Analysis/analysisproxy.cpp \
+    Project/Analysis/detectionbox.cpp
 
 #
 # TEST
 #
-SOURCES += Test/test_video_player.cpp\
+SOURCES +=\
     Test/test_report_generator.cpp
 
-HEADERS += Test/test_video_player.h \
+HEADERS += \
     Test/test_report_generator.h \
-    Project/Analysis/analysismeta.h \
     GUI/TreeItems/itemtypes.h \
     GUI/Toolbars/maintoolbar.h \
     GUI/Toolbars/drawingtoolbar.h \
@@ -67,7 +75,17 @@ HEADERS += Test/test_video_player.h \
     Project/projecttreestate.h \
     GUI/tagdialog.h \
     imageexporter.h \
-    GUI/frameexporterdialog.h
+    GUI/frameexporterdialog.h \
+    Project/Analysis/tag.h \
+    Video/videocontroller.h \
+    Video/videoplayer.h \
+    GUI/recentprojectdialog.h \
+    Project/recentproject.h \
+    Project/Analysis/basicanalysis.h \
+    Project/Analysis/analysisinterval.h \
+    Filehandler/writeable.h \
+    Project/Analysis/analysisproxy.h \
+    Project/Analysis/detectionbox.h
 
 #
 # LIBRARY
@@ -106,7 +124,7 @@ RESOURCES += resources.qrc
 # VIDEOPLAYER
 # OPENCV
 #
-SOURCES += Video/video_player.cpp \
+SOURCES += \
     Video/overlay.cpp \
     Video/analysisoverlay.cpp \
     Video/shapes/arrow.cpp \
@@ -119,7 +137,7 @@ SOURCES += Video/video_player.cpp \
     Video/shapes/zoomrectangle.cpp \
     Video/shapes/analysarea.cpp \
     Video/framemanipulator.cpp
-HEADERS += Video/video_player.h \
+HEADERS += \
     Video/overlay.h \
     Video/analysisoverlay.h \
     Video/shapes/arrow.h \
@@ -180,7 +198,6 @@ SOURCES += Project/Test/projecttestsuite.cpp \
     Project/videoproject.cpp \
     Project/bookmark.cpp \
     Project/Analysis/analysis.cpp \
-    Project/Analysis/ooi.cpp \
     Project/Analysis/poi.cpp
 
 
@@ -191,7 +208,6 @@ HEADERS +=Project/Test/projecttestsuite.h \
     Project/bookmark.h  \
     Project/report.h \
     Project/Analysis/analysis.h \
-    Project/Analysis/ooi.h \
     Project/Analysis/poi.h
 
 

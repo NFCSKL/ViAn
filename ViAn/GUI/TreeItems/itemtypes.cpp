@@ -38,13 +38,12 @@ void VideoItem::set_video_project(VideoProject *vid_proj) {
     setText(0, QString::fromStdString(vid_proj->get_video()->get_name()));
 }
 
-
-
-AnalysisItem::AnalysisItem(Analysis analysis) : TreeItem(ANALYSIS_ITEM) {
+AnalysisItem::AnalysisItem(AnalysisProxy* analysis) : TreeItem(ANALYSIS_ITEM) {
     m_analysis = analysis;
+    finished = true;
     const QIcon folder_icon("../ViAn/Icons/analysis.png");
     setIcon(0, folder_icon);
-    setText(0, QString::fromStdString(m_analysis.get_name()));
+    setText(0, QString::fromStdString(m_analysis->get_name()));
 }
 
 AnalysisItem::AnalysisItem() : TreeItem(ANALYSIS_ITEM) {
@@ -55,21 +54,24 @@ AnalysisItem::AnalysisItem() : TreeItem(ANALYSIS_ITEM) {
 
 AnalysisItem::~AnalysisItem() {}
 
-void AnalysisItem::set_analysis(Analysis analysis) {
+void AnalysisItem::set_analysis(AnalysisProxy *analysis) {
     m_analysis = analysis;
+    finished = true;
 }
 
-Analysis* AnalysisItem::get_analysis() {
-    return &m_analysis;
+bool AnalysisItem::is_finished() const {
+    return finished;
+}
+
+AnalysisProxy* AnalysisItem::get_analysis() {
+    return m_analysis;
 }
 
 void AnalysisItem::remove(){}
 
 void AnalysisItem::rename(){
-    m_analysis.set_name(text(0).toStdString());
+//    m_analysis->set_name(text(0).toStdString());
 }
-
-
 
 FolderItem::FolderItem() : TreeItem(FOLDER_ITEM) {
     setFlags(flags() | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled);
@@ -81,11 +83,7 @@ void FolderItem::remove() {}
 
 void FolderItem::rename(){}
 
-
-
-TagItem::TagItem(Analysis* tag) : TreeItem(TAG_ITEM) {
-    qDebug() << flags();
-//    setFlags(flags() & ~Qt::ItemIsSelectable  & ~Qt::ItemIsDragEnabled & ~Qt::ItemIsDropEnabled);
+TagItem::TagItem(Tag *tag) : TreeItem(TAG_ITEM) {
     m_tag = tag;
     setText(0, QString::fromStdString(tag->get_name()));
     const QIcon folder_icon("../ViAn/Icons/tag.png");
@@ -95,10 +93,10 @@ TagItem::TagItem(Analysis* tag) : TreeItem(TAG_ITEM) {
 void TagItem::remove(){}
 
 void TagItem::rename() {
-    m_tag->set_name(text(0).toStdString());
+//    m_tag->set_name(text(0).toStdString());
 }
 
-Analysis* TagItem::get_tag() {
+Tag *TagItem::get_tag() {
     return m_tag;
 }
 
