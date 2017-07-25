@@ -31,6 +31,7 @@ private:
     int current_frame = 0;
     int prev_frame_idx;
     int POI_end;
+    double m_scale_factor = 1;
 
     std::pair<int, int> m_interval = std::make_pair(0, 0);
 public:
@@ -65,6 +66,7 @@ signals:
 public slots:
     void set_current_time(int time);
     void set_total_time(int time);
+    void set_scale_factor(double);
     void play_clicked(void);
     void stop_clicked(void);
     void next_frame_clicked(void);
@@ -110,6 +112,7 @@ private:
     QLabel* current_time;
     QLabel* total_time;
     QLineEdit* frame_line_edit;
+    QLabel* zoom_label;
 
     QShortcut* remove_frame_act;
 

@@ -63,6 +63,8 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
     connect(this, &VideoWidget::prev_video_frame, m_video_player, &video_player::previous_frame);
 
     connect(this, SIGNAL(set_detections_on_frame(int)), frame_wgt, SLOT(set_detections_on_frame(int)));
+    connect(m_video_player, SIGNAL(scale_factor(double)), frame_wgt, SLOT(set_scale_factor(double)));
+    connect(m_video_player, SIGNAL(scale_factor(double)), this, SLOT(set_scale_factor(double)));
 }
 
 VideoProject *VideoWidget::get_current_video_project(){
@@ -133,6 +135,8 @@ void VideoWidget::set_btn_icons() {
     zoom_out_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_out.png"), "", this);
     fit_btn = new QPushButton(QIcon("../ViAn/Icons/fit_screen.png"), "", this);
     move_btn = new QPushButton(QIcon("../ViAn/Icons/move.png"), "", this);
+    zoom_label = new QLabel;
+    zoom_label->setText("100%");
     set_start_interval_btn = new QPushButton(QIcon("../ViAn/Icons/start_interval.png"), "", this);
     set_end_interval_btn = new QPushButton(QIcon("../ViAn/Icons/end_interval.png"), "", this);
     zoom_in_btn->setCheckable(true);
@@ -295,6 +299,7 @@ void VideoWidget::add_btns_to_layouts() {
     zoom_btns->addWidget(zoom_out_btn);
     zoom_btns->addWidget(fit_btn);
     zoom_btns->addWidget(move_btn);
+    zoom_btns->addWidget(zoom_label);
 
     control_row->addLayout(zoom_btns);
 
@@ -400,6 +405,11 @@ void VideoWidget::set_current_time(int time) {
  */
 void VideoWidget::set_total_time(int time) {
     total_time->setText(convert_time(time));
+}
+
+void VideoWidget::set_scale_factor(double scale_factor) {
+    m_scale_factor = scale_factor;
+    zoom_label->setText(QString::number(100*m_scale_factor) +"%");
 }
 
 void VideoWidget::on_bookmark_clicked() {
