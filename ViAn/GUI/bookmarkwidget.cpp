@@ -63,13 +63,6 @@ void BookmarkWidget::generate_report()
     processing_thread = new QThread;    
     ReportGenerator* rp_gen = new ReportGenerator(m_path,rp_cont);
     rp_gen->create_report();
-    // Move reportgenerator to other thread
-//    rp_gen->moveToThread(processing_thread);
-//    connect(processing_thread, &QThread::finished, rp_gen, &ReportGenerator::deleteLater);
-//    connect(rp_gen, &ReportGenerator::done, processing_thread, &QThread::quit);
-//    connect(processing_thread, &QThread::started, rp_gen, &ReportGenerator::create_report);
-//    qDebug() << "rpgen";
-//    processing_thread->start();
 }
 
 BookmarkCategory* BookmarkWidget::add_to_container(BookmarkItem *bm_item, std::pair<int, string> *container) {

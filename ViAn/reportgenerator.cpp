@@ -108,8 +108,11 @@ void ReportGenerator::create_bookmark_table(QAxObject* para, ReportContainer rp_
     int cell_row = 2;
     for (int i = 0; i != rp_cont.size(); i++) { // for each category, make a paragraph of bookmarks
 
+        QAxObject* _tmp_title = table->querySubObject("Cell(int,int)", cell_row, 1);
+        QAxObject* _tmp_title2 = table->querySubObject("Cell(int,int)", cell_row, 2);
+        _tmp_title->dynamicCall("Merge(IDispatch*)", _tmp_title2->asVariant());
+
         cell_add_text(table, rp_cont.at(i).first, cell_row,1);
-        cell_add_text(table, rp_cont.at(i).first, cell_row,2);
 
         std::vector<BookmarkItem*> bm_ref = rp_cont.at(i).second.first;
         std::vector<BookmarkItem*> bm_disp = rp_cont.at(i).second.second;
