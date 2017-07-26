@@ -9,6 +9,7 @@
 #include "dirent.h"
 #include "GUI/bookmarkitem.h"
 #include <ctime>
+enum TABLE_STYLE {NO_BORDER = 0, BORDER=36};
 using RefDisp = std::vector<std::pair<std::vector<BookmarkItem*>,std::vector<BookmarkItem*>>>;
 class ReportGenerator : public QObject {
     Q_OBJECT
@@ -32,7 +33,7 @@ private:
     void create_bookmark_table(QAxObject *para, RefDisp bookmark_list);
 
 
-    QAxObject* add_table(QAxObject* range, int rows, int cols, int style=36);
+    QAxObject* add_table(QAxObject* range, int rows, int cols, TABLE_STYLE style= NO_BORDER);
     QAxObject* get_cell(QAxObject* table, int row, int cols);
 
     void resize_picture(QString pic_path, QAxObject* inline_shape);
