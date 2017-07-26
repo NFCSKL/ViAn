@@ -29,10 +29,10 @@ private:
     QString get_bookmark_fig_txt(BookmarkItem *bm, int fig_num);
     QString get_bookmark_descr(BookmarkItem *bm);
 
-    void create_bookmark_table(QAxObject *active_document, QAxObject *selection, RefDisp bookmark_list);
+    void create_bookmark_table(QAxObject *para, RefDisp bookmark_list);
 
 
-    QAxObject* add_table(QAxObject *active_document, QAxObject* range, int rows, int cols);
+    QAxObject* add_table(QAxObject *active_document, QAxObject* range, int rows, int cols, int style=36);
     QAxObject* make_table(QAxObject *active_document, QAxObject* range, RefDisp bookmark_list);
     QAxObject* get_cell(QAxObject* table, int row, int cols);
 

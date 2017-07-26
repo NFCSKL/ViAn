@@ -44,7 +44,10 @@ SOURCES += main.cpp \
     Project/Analysis/analysisinterval.cpp \
     Filehandler/writeable.cpp \
     Project/Analysis/analysisproxy.cpp \
-    Project/Analysis/detectionbox.cpp
+    Project/Analysis/detectionbox.cpp \
+    AxReport/axtable.cpp \
+    AxReport/axrange.cpp \
+    AxReport/axcell.cpp
 
 
 #
@@ -83,7 +86,10 @@ HEADERS += reportgenerator.h\
     Filehandler/writeable.h \
     Project/Analysis/analysisproxy.h \
     Project/Analysis/detectionbox.h \
-    table.h
+    table.h \
+    AxReport/axtable.h \
+    AxReport/axrange.h \
+    AxReport/axcell.h
 
 #
 # LIBRARY

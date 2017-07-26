@@ -28,23 +28,23 @@ void ReportGenerator::create_report() {
     //1. START APPLICATION
     qDebug() << "startat rapport";
     if(!word->isNull()){
+        //make_doc(word);
         qDebug() << "startat word";
-        //2.OPEN THE DOCUMENT;
+        //2.OPEN THE DOCUMENT
         QAxObject* doc = word->querySubObject("Documents");
         doc->dynamicCall("Add()");
-        QAxObject* active_doc = word->querySubObject("ActiveDocument");
-//        QAxObject* range = para->querySubObject("Range");
+        word->setProperty("Visible",false); // second bool to hide application when opened.
 
         //3.GET TO THE CONTENTS
-        //QAxObject* active_document = word->querySubObject("ActiveDocument");
-//        QAxObject* active_window = active_document->querySubObject( "ActiveWindow" );
-//        QAxObject* selection = active_window->querySubObject( "Selection" );
+        QAxObject* active_document = word->querySubObject("ActiveDocument");
+        QAxObject* active_window = active_document->querySubObject( "ActiveWindow" );
+        QAxObject* selection = active_window->querySubObject( "Selection" );
 
         // Make sure there is bookmarks to put in report.
         //4. ADD IMAGES FROM BOOKMARK FOLDER
-        create_bookmark_table(active_doc, m_ref_disp);
+        create_bookmark_table(active_document,selection, m_ref_disp);
         //5. SAVE AND CLOSE FILE
-        QString file_path = save_report(active_doc);
+        QString file_path = save_report(active_document);
         close_report(doc, word);
     }else{
         qWarning("could not find Word instance");
@@ -61,6 +61,12 @@ QString ReportGenerator::get_bookmark_descr(BookmarkItem *bm)
     if (!bm_description.isEmpty()) {
         description = QString("Description: %1").arg(bm_description);
     }
+//    selection->dynamicCall( "InsertParagraphAfter()" );
+//    selection->dynamicCall("InsertAfter(const QString&)", time);
+//    selection->dynamicCall( "InsertParagraphAfter()" );
+//    selection->dynamicCall("InsertAfter(const QString&)", frame_nr);
+//    selection->dynamicCall( "InsertParagraphAfter()" );
+//    selection->dynamicCall("InsertAfter(const QString&)", description);
     return description;
 }
 
@@ -106,40 +112,41 @@ QString ReportGenerator::calculate_time(int ms) {
  * to the document.
  * @param selection, the selector in the active document.
  */
-void ReportGenerator::create_bookmark_table(QAxObject* para, RefDisp bookmark_list) {
+void ReportGenerator::create_bookmark_table(QAxObject* active_document,QAxObject* selection, RefDisp bookmark_list) {
 
-    QAxObject* table = make_table(para, para->querySubObject("Range(int,int)",0,0),bookmark_list);
+    QAxObject* table = add_table(active_document, selection->querySubObject("Range"),
+                                 bookmark_list.size()+1,2,36);
     cell_add_text(table, QString::fromStdString("Referens"), 1,1);
     cell_add_text(table, QString::fromStdString("Omstritt"), 1,2);
-    int cell_row = 1;
     for (int i = 0; i != bookmark_list.size(); i++) { // for each category, make a paragraph of bookmarks
         qDebug() << "beg loop "<< i;
         std::vector<BookmarkItem*> bm_ref = bookmark_list.at(i).first;
         std::vector<BookmarkItem*> bm_disp = bookmark_list.at(i).second;
+        qDebug() << "cellrefdisp";
+        QAxObject* cell_ref = table->querySubObject("Cell(int,int)",i+1,1);
+        QAxObject* cell_disp = table->querySubObject("Cell(int,int)", i+1, 2);
 
-        QAxObject* cell_ref = table->querySubObject("Cell(int,int)", cell_row,1);
-        QAxObject* cell_disp = table->querySubObject("Cell(int,int)", cell_row, 2);
-
-        cell_insert_category(para, cell_ref, bm_ref);
-        cell_insert_category(para, cell_disp, bm_disp);
-        cell_row++;
-        qDebug() << cell_row;
+        cell_insert_category(active_document, cell_ref, bm_ref);
+        cell_insert_category(active_document, cell_disp, bm_disp);
     }
     qDebug() << "add_bookmarks_done";
 }
 
 void ReportGenerator::cell_insert_category(QAxObject *active_document, QAxObject* cell, std::vector<BookmarkItem *> bm_list)
 {
-    qDebug() << "insert_cat";
     int cell_row = 1;
     int max_row = bm_list.size();
     QAxObject* range = cell->querySubObject("Range");
-    QAxObject* table = add_table(active_document, range, max_row+1, 1, 36);
+    QAxObject* table = add_table(active_document, range, max_row+5, 1, 36);
+    qDebug() << "inserttxt, cat";
     cell_add_text(table, QString::fromStdString("CategoryName"), cell_row++,1);
+    cell_row++;
+    qDebug() << "cell row" <<cell_row;
     for(size_t j = 0; j != bm_list.size(); ++j){ // while images on both sides
         BookmarkItem* bm = bm_list.at(j);
-        cell_add_img(table, bm->get_file_path(), cell_row, 1);
+        qDebug() << bm->getDescription() << ":descr:"<<cell_row;
         cell_add_text(table, bm->getDescription(),cell_row,1);
+        cell_add_img(table, bm->get_file_path(), cell_row, 1);
         cell_row++;
     }
     qDebug() << "exit insert cat";
@@ -147,12 +154,15 @@ void ReportGenerator::cell_insert_category(QAxObject *active_document, QAxObject
 
 void ReportGenerator::cell_add_img(QAxObject *table, QString file_name, int row, int col)
 {
+    qDebug() << "cell add img";
     QAxObject* cell = table->querySubObject("Cell(int,int)",row,col);
     //QAxObject* shapes = selection->querySubObject( "InlineShapes" );
     QAxObject* range = cell->querySubObject("Range");
     QAxObject* shapes = range->querySubObject("InlineShapes");
     //Fix to make path work with windows word
     //application when spaces are involved
+    make_doc(range,"cell_range");
+    make_doc(shapes, "shapes_img");
     file_name.replace("/", "\\\\");
     QAxObject* inline_shape = shapes->querySubObject(
                 "AddPicture(const QString&,bool,bool,QVariant)",
@@ -162,6 +172,7 @@ void ReportGenerator::cell_add_img(QAxObject *table, QString file_name, int row,
 
 void ReportGenerator::cell_add_text(QAxObject *table, QString entry,int row, int col)
 {
+    qDebug() << "cell add text";
     QAxObject* range = table->querySubObject("Cell(int,int)", row, col)->querySubObject("Range");
     range->dynamicCall("InsertAfter(QString Text)", entry);
 }
@@ -185,11 +196,9 @@ QString ReportGenerator::get_bookmark_fig_txt(BookmarkItem *bm, int fig_num)
 QAxObject* ReportGenerator::add_table(QAxObject *active_document, QAxObject *range, int rows, int cols, int style)
 {
     QAxObject* tables = active_document->querySubObject("Tables");
-    make_doc(tables, "tables");
+    //make_doc(table);
     QAxObject* table = tables->querySubObject("Add(QVariant,int,int)",range->asVariant(), rows,cols,1,1);
-    //table->dynamicCall("AutoFormat(QVariant)", QVariant(style));
-    table->dynamicCall("SetTitle(QString)", "Title");
-    //qDebug()<< table->dynamicCall();
+    table->dynamicCall("AutoFormat(QVariant)", QVariant(style));
     return table;
 }
 
@@ -229,6 +238,7 @@ QString ReportGenerator::save_report(QAxObject* active_document) {
     std::string dt = date_time_generator();
     std::string proj_name = m_path.substr(0, m_path.find_last_of("/")); // Strip away last "/"
     proj_name = proj_name.substr(proj_name.find_last_of("/"), proj_name.size());
+    qDebug() << proj_name.c_str();
     std::string path = m_path.append(proj_name).append("_").append(dt).append(".docx");
     active_document->dynamicCall("SaveAs (const QString&)", QString::fromStdString(path));
     return QString::fromStdString(path);
