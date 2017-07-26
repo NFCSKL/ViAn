@@ -32,16 +32,16 @@ private:
     void create_bookmark_table(QAxObject *para, RefDisp bookmark_list);
 
 
-    QAxObject* add_table(QAxObject *active_document, QAxObject* range, int rows, int cols, int style=36);
-    QAxObject* make_table(QAxObject *active_document, QAxObject* range, RefDisp bookmark_list);
+    QAxObject* add_table(QAxObject* range, int rows, int cols, int style=36);
     QAxObject* get_cell(QAxObject* table, int row, int cols);
 
     void resize_picture(QString pic_path, QAxObject* inline_shape);
 
-    void cell_insert_category(QAxObject *active_document, QAxObject* cell, std::vector<BookmarkItem *> bm_list);
+    void cell_insert_category(QAxObject* cell, std::vector<BookmarkItem *> bm_list);
     void cell_add_bookmark();
-    void cell_add_text(QAxObject* table, QString entry, int row, int col);
+    void cell_add_text(QAxObject* range, QString entry, int row, int col);
     void cell_add_img(QAxObject* table, QString file_name, int row, int col);
+
     QString save_report(QAxObject* active_document);
     void close_report(QAxObject* doc, QAxObject*  word);
 

@@ -107,35 +107,42 @@ QString ReportGenerator::calculate_time(int ms) {
  * @param selection, the selector in the active document.
  */
 void ReportGenerator::create_bookmark_table(QAxObject* para, RefDisp bookmark_list) {
-
-    QAxObject* table = make_table(para, para->querySubObject("Range(int,int)",0,0),bookmark_list);
+    QAxObject* range = para->querySubObject("Range(int,int)",0,0);
+    QAxObject* table = add_table(range,bookmark_list.size()+20,2,36);
+//    range->dynamicCall("MoveEnd(int)",-2);
+//    range->dynamicCall("Collapse(int)",1);
     cell_add_text(table, QString::fromStdString("Referens"), 1,1);
     cell_add_text(table, QString::fromStdString("Omstritt"), 1,2);
-    int cell_row = 1;
+    int cell_row = 2;
     for (int i = 0; i != bookmark_list.size(); i++) { // for each category, make a paragraph of bookmarks
         qDebug() << "beg loop "<< i;
         std::vector<BookmarkItem*> bm_ref = bookmark_list.at(i).first;
         std::vector<BookmarkItem*> bm_disp = bookmark_list.at(i).second;
 
         QAxObject* cell_ref = table->querySubObject("Cell(int,int)", cell_row,1);
-        QAxObject* cell_disp = table->querySubObject("Cell(int,int)", cell_row, 2);
-
-        cell_insert_category(para, cell_ref, bm_ref);
-        cell_insert_category(para, cell_disp, bm_disp);
+        QAxObject* cell_disp = table->querySubObject("Cell(int,int)", cell_row, 2);       
+        add_table(cell_ref->querySubObject("Range"),2,2);
+        add_table(cell_disp->querySubObject("Range"),2,2);
+//        cell_insert_category(cell_ref, bm_ref);
+//        range->dynamicCall("Collapse(QVariant&)",QVariant(1));
+//        cell_insert_category(cell_disp, bm_disp);
+//        range->dynamicCall("Collapse(QVariant&)",QVariant(1));
         cell_row++;
         qDebug() << cell_row;
     }
     qDebug() << "add_bookmarks_done";
 }
 
-void ReportGenerator::cell_insert_category(QAxObject *active_document, QAxObject* cell, std::vector<BookmarkItem *> bm_list)
+void ReportGenerator::cell_insert_category(QAxObject* cell, std::vector<BookmarkItem *> bm_list)
 {
-    qDebug() << "insert_cat";
-    int cell_row = 1;
+    QAxObject* cell_range = cell->querySubObject("Range");
+    int cell_row = 2;
     int max_row = bm_list.size();
-    QAxObject* range = cell->querySubObject("Range");
-    QAxObject* table = add_table(active_document, range, max_row+1, 1, 36);
-    cell_add_text(table, QString::fromStdString("CategoryName"), cell_row++,1);
+    //QAxObject* range = cell->querySubObject("Range");
+    QAxObject* table = add_table(cell_range, max_row+10, 1, 36);
+    qDebug() << "tabl inserted";
+    cell_add_text(table, QString::fromStdString("Category"), 1,1);
+    cell_add_text(table, QString::fromStdString("Category"), 1,2);
     for(size_t j = 0; j != bm_list.size(); ++j){ // while images on both sides
         BookmarkItem* bm = bm_list.at(j);
         cell_add_img(table, bm->get_file_path(), cell_row, 1);
@@ -160,7 +167,7 @@ void ReportGenerator::cell_add_img(QAxObject *table, QString file_name, int row,
     resize_picture(file_name, inline_shape);
 }
 
-void ReportGenerator::cell_add_text(QAxObject *table, QString entry,int row, int col)
+void ReportGenerator::cell_add_text(QAxObject* table,QString entry,int row, int col)
 {
     QAxObject* range = table->querySubObject("Cell(int,int)", row, col)->querySubObject("Range");
     range->dynamicCall("InsertAfter(QString Text)", entry);
@@ -182,25 +189,15 @@ QString ReportGenerator::get_bookmark_fig_txt(BookmarkItem *bm, int fig_num)
     return QString::fromStdString("Figur" + std::to_string(fig_num) + ": ") + bm->getDescription();
 }
 
-QAxObject* ReportGenerator::add_table(QAxObject *active_document, QAxObject *range, int rows, int cols, int style)
+QAxObject* ReportGenerator::add_table(QAxObject *range, int rows, int cols, int style)
 {
-    QAxObject* tables = active_document->querySubObject("Tables");
+    range->dynamicCall("Collapse(int)",1);
+    QAxObject* tables = range->querySubObject("Tables");
     make_doc(tables, "tables");
     QAxObject* table = tables->querySubObject("Add(QVariant,int,int)",range->asVariant(), rows,cols,1,1);
-    //table->dynamicCall("AutoFormat(QVariant)", QVariant(style));
+    table->dynamicCall("AutoFormat(QVariant)", QVariant(style));
     table->dynamicCall("SetTitle(QString)", "Title");
-    //qDebug()<< table->dynamicCall();
     return table;
-}
-
-QAxObject *ReportGenerator::make_table(QAxObject *active_document,QAxObject *range, RefDisp bookmark_list)
-{
-    int rows = 1; // Starts at 1 for title
-    for(auto cat : bookmark_list){
-        rows++; // Cell here Should use special format
-        rows += std::max(cat.first.size(), cat.second.size());
-    }
-    return add_table(active_document,range,rows,2);
 }
 
 /**
