@@ -82,7 +82,7 @@ void FrameProcessor::on_fit_screen(){
  * Slot function for resizing the frame to its original size
  */
 void FrameProcessor::on_original_size() {
-    m_zoomer.set_scale_factor(1);
+    m_zoomer.reset();
     set_scale_factor(1);
     set_anchor(QPoint(0,0));
     process_frame();

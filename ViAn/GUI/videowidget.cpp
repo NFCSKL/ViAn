@@ -163,6 +163,7 @@ void VideoWidget::set_btn_icons() {
     original_size_btn = new QPushButton(QIcon("../ViAn/Icons/move.png"), "", this);
     zoom_label = new QLabel;
     zoom_label->setText("100%");
+    zoom_label->setMinimumWidth(40);
     set_start_interval_btn = new QPushButton(QIcon("../ViAn/Icons/start_interval.png"), "", this);
     set_end_interval_btn = new QPushButton(QIcon("../ViAn/Icons/end_interval.png"), "", this);
     play_btn->setCheckable(true);
@@ -465,7 +466,7 @@ void VideoWidget::set_total_time(int time) {
 
 void VideoWidget::set_scale_factor(double scale_factor) {
     m_scale_factor = scale_factor;
-    zoom_label->setText(QString::number(100*m_scale_factor) +"%");
+    zoom_label->setText(QString::number(((int)(10000*m_scale_factor))/(double)100) +"%");
 }
 
 void VideoWidget::on_bookmark_clicked() {
