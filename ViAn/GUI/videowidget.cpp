@@ -717,6 +717,7 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int frame) {
 
         //TODO
         //m_video_player->load_video(m_vid_proj->get_video()->file_path, m_vid_proj->get_overlay());
+        frame_wgt->set_overlay(m_vid_proj->get_overlay());
         set_status_bar("Video loaded");
         play_btn->setChecked(false);
         playback_slider->set_interval(-1, -1);

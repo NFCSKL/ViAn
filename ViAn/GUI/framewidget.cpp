@@ -56,14 +56,33 @@ void FrameWidget::set_show_detections(bool show) {
     show_detections = show;
 }
 
+void FrameWidget::set_overlay(Overlay* overlay) {
+    video_overlay = overlay;
+}
+
+Overlay* FrameWidget::get_overlay() {
+    return video_overlay;
+}
+
 void FrameWidget::update(){
     repaint();
 }
 
 void FrameWidget::set_tool(SHAPES tool) {
+    std::cout << "Tool aquired" << std::endl;
     if (m_vid_proj != nullptr) {
-        emit send_tool(tool);
+        //emit send_tool(tool);
         this->tool = tool;
+        video_overlay->set_tool(tool);
+    }
+}
+
+void FrameWidget::set_overlay_color(QColor color) {
+    std::cout << "Color set" << std::endl;
+    if (m_vid_proj != nullptr) {
+        //emit send_tool(tool);
+        this->overlay_color = color;
+        video_overlay->set_colour(color);
     }
 }
 
@@ -73,6 +92,7 @@ cv::Mat FrameWidget::get_mat() const {
 
 void FrameWidget::on_new_image(cv::Mat frame, int frame_index) {
     current_frame = frame;
+    current_frame_nr = frame_index;
     switch (frame.type()) {
         case CV_8UC1:
             cvtColor(frame, _tmp_frame, CV_GRAY2RGB);
@@ -90,6 +110,7 @@ void FrameWidget::on_new_image(cv::Mat frame, int frame_index) {
     _qimage = QImage(_tmp_frame.data, _tmp_frame.cols, _tmp_frame.rows, _tmp_frame.cols*3, QImage::Format_RGB888);
     setFixedSize(_qimage.size());
     set_detections_on_frame(frame_index);
+    video_overlay->draw_overlay(frame, frame_index);
     repaint();
 }
 
@@ -150,6 +171,7 @@ void FrameWidget::resizeEvent(QResizeEvent *event) {
 void FrameWidget::mousePressEvent(QMouseEvent *event) {
     switch (tool) {
     case NONE:
+        std::cout << "none" << std::endl;
         break;
     case ZOOM:
         if (event->button() == Qt::RightButton) {
@@ -163,7 +185,9 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
         }
         break;
     default:
-        emit mouse_pressed(event->pos());
+        video_overlay->mouse_pressed(event->pos(), current_frame_nr);
+        //video_overlay->draw_overlay(get_mat(), current_frame_nr);
+        on_new_image(current_frame, current_frame_nr);
         break;
     }
 }
@@ -189,7 +213,9 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
         }
         break;
     default:
-        emit mouse_released(event->pos());
+        video_overlay->mouse_released(event->pos(), current_frame_nr);
+        //video_overlay->draw_overlay(get_mat(), current_frame_nr);
+        on_new_image(current_frame, current_frame_nr);
         break;
     }
 }
@@ -210,7 +236,9 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
         }
         break;
     default:
-        emit mouse_moved(event->pos());
+        video_overlay->mouse_moved(event->pos(), current_frame_nr);
+        //video_overlay->draw_overlay(get_mat(), current_frame_nr);
+        //on_new_image(current_frame, current_frame_nr);
         break;
     }
 }

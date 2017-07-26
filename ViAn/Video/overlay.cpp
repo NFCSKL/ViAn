@@ -13,6 +13,7 @@ Overlay::Overlay() {}
  */
 void Overlay::draw_overlay(cv::Mat &frame, int frame_nr) {
     if (show_overlay) {
+        std::cout << overlays[frame_nr].overlay.size() << std::endl;
         for (auto it = overlays[frame_nr].overlay.begin(); it != overlays[frame_nr].drawn; it++) {
             frame = (*it)->draw(frame);
         }
@@ -138,6 +139,7 @@ void Overlay::empty_undo_list(int frame_nr) {
  * @param frame_nr
  */
 void Overlay::add_drawing(Shape* shape, int frame_nr) {
+    std::cout << "added" << std::endl;
     overlays[frame_nr].overlay.push_back(shape);
     overlays[frame_nr].drawn = overlays[frame_nr].overlay.end();
 }
@@ -150,6 +152,7 @@ void Overlay::add_drawing(Shape* shape, int frame_nr) {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void Overlay::mouse_pressed(QPoint pos, int frame_nr) {
+    std::cout << "pressed" << std::endl;
     if (show_overlay) {
         switch (current_shape) {
             case RECTANGLE:

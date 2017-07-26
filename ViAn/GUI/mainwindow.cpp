@@ -85,7 +85,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     QAction* toggle_draw_toolbar = draw_toolbar->toggleViewAction();
     addToolBar(draw_toolbar);
     connect(main_toolbar->toggle_draw_toolbar_act, &QAction::triggered, toggle_draw_toolbar, &QAction::trigger);   
-    connect(draw_toolbar, SIGNAL(set_color(QColor)), video_wgt->m_video_player, SLOT(set_overlay_colour(QColor)));
+    connect(draw_toolbar, SIGNAL(set_color(QColor)), video_wgt->frame_wgt, SLOT(set_overlay_color(QColor)));
     connect(draw_toolbar, SIGNAL(set_overlay_tool(SHAPES)), video_wgt->frame_wgt, SLOT(set_tool(SHAPES)));
     connect(draw_toolbar->undo_tool_act, &QAction::triggered, this, &MainWindow::undo);
     connect(draw_toolbar->clear_tool_act, &QAction::triggered, this, &MainWindow::clear);
@@ -293,7 +293,7 @@ void MainWindow::init_view_menu() {
     connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_interval);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
-    //connect(drawing_act, &QAction::toggled, video_wgt->m_video_player->get_overlay(), &Overlay::set_showing_overlay); TODO
+    //connect(drawing_act, &QAction::toggled, video_wgt->frame_wgt->get_overlay(), &Overlay::set_showing_overlay);
 }
 
 /**
@@ -460,15 +460,15 @@ void MainWindow::text() {
 }
 
 void MainWindow::undo() {
-    video_wgt->m_video_player->get_overlay()->undo(video_wgt->get_current_frame());
+    video_wgt->frame_wgt->get_overlay()->undo(video_wgt->get_current_frame());
 }
 
 void MainWindow::redo() {
-    video_wgt->m_video_player->get_overlay()->redo(video_wgt->get_current_frame());
+    video_wgt->frame_wgt->get_overlay()->redo(video_wgt->get_current_frame());
 }
 
 void MainWindow::clear() {
-    video_wgt->m_video_player->get_overlay()->clear(video_wgt->get_current_frame());
+    video_wgt->frame_wgt->get_overlay()->clear(video_wgt->get_current_frame());
 }
 
 void MainWindow::zoom() {

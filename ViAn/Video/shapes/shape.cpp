@@ -31,6 +31,7 @@ Shape::Shape(SHAPES s, QColor col, QPoint pos) {
  */
 void Shape::update_drawing_pos(QPoint pos) {
     // Call handle_new_pos first because it might need the old draw_end value.
+    std::cout << "update" << std::endl;
     handle_new_pos(pos);
     draw_end = qpoint_to_point(pos);
 }

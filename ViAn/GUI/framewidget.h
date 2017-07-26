@@ -24,9 +24,14 @@ class FrameWidget : public QWidget
     std::vector<cv::Rect> ooi_rects;
 
     SHAPES tool = NONE;
+    QColor overlay_color = Qt::red;
     cv::Mat current_frame;
     Analysis* m_analysis = nullptr;
     VideoProject* m_vid_proj = nullptr;
+    Overlay* video_overlay;
+
+    int current_frame_nr = 0;
+
     // Zoom
     QPoint zoom_start_pos, zoom_end_pos, prev_pos;
     bool draw_zoom_rect = false;
@@ -38,7 +43,9 @@ class FrameWidget : public QWidget
 public:
     explicit FrameWidget(QWidget *parent = nullptr);
 
-    cv::Mat get_mat() const;    
+    cv::Mat get_mat() const;
+    void set_overlay(Overlay *overlay);
+    Overlay* get_overlay();
 
 signals:
     void video_pressed(QPoint pos);
@@ -65,6 +72,7 @@ public slots:
     void set_detections(bool);
     void set_show_detections(bool);
     void set_tool(SHAPES tool);
+    void set_overlay_color(QColor color);
     void update();
 protected:
     QImage _qimage;
