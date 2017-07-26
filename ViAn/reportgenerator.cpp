@@ -26,10 +26,8 @@ ReportGenerator::~ReportGenerator() {
  */
 void ReportGenerator::create_report() {
     //1. START APPLICATION
-    qDebug() << "startat rapport";
     if(!word->isNull()){
-        qDebug() << "startat word";
-        //2.OPEN THE DOCUMENT;
+        //2. CREATE AND OPEN THE DOCUMENT;
         QAxObject* doc = word->querySubObject("Documents");
         doc->dynamicCall("Add()");
         QAxObject* active_doc = word->querySubObject("ActiveDocument");
@@ -41,7 +39,6 @@ void ReportGenerator::create_report() {
     }else{
         qWarning("could not find Word instance");
     }
-    qDebug() << "report finished!";
 }
 
 QString ReportGenerator::get_bookmark_descr(BookmarkItem *bm)
@@ -99,77 +96,124 @@ QString ReportGenerator::calculate_time(int ms) {
  * @param selection, the selector in the active document.
  */
 void ReportGenerator::create_bookmark_table(QAxObject* para, ReportContainer rp_cont) {
+        // Space to use for table
     QAxObject* range = para->querySubObject("Range(int,int)",0,0);
+
+    //Table should have room for categories, their titles and its own title
     QAxObject* table = add_table(range,rp_cont.size()*2+1,2,BORDER);
 
-    cell_add_text(table, QString::fromStdString("Referens"), 1,1);
-    cell_add_text(table, QString::fromStdString("Omstritt"), 1,2);
+    //Add title text
+    cell_add_text(table, QString::fromStdString("Omstritt"), 1,1);
+    cell_add_text(table, QString::fromStdString("Referens"), 1,2);
 
+    //Table indexed from 1, begin after title.
     int cell_row = 2;
     for (int i = 0; i != rp_cont.size(); i++) { // for each category, make a paragraph of bookmarks
-
+        //Acess duplicate category title cells and merge them together
         QAxObject* _tmp_title = table->querySubObject("Cell(int,int)", cell_row, 1);
         QAxObject* _tmp_title2 = table->querySubObject("Cell(int,int)", cell_row, 2);
         _tmp_title->dynamicCall("Merge(IDispatch*)", _tmp_title2->asVariant());
-
+        // Write category name
         cell_add_text(table, rp_cont.at(i).first, cell_row,1);
 
+        // Go to next table row
+        cell_row++;
+
+        // Access Disputed and reference bookmarks
         std::vector<BookmarkItem*> bm_ref = rp_cont.at(i).second.first;
         std::vector<BookmarkItem*> bm_disp = rp_cont.at(i).second.second;
 
-        cell_row++;
+        // Acess cells to be used for storing disp and ref bookmarks
         QAxObject* cell_ref = table->querySubObject("Cell(int,int)", cell_row, 1);
         QAxObject* cell_disp = table->querySubObject("Cell(int,int)", cell_row, 2);
 
+        // Insert categories into reference and disputed cells.
         cell_insert_category(cell_ref, bm_ref);
         cell_insert_category(cell_disp, bm_disp);
 
+        // Go to next table row
         cell_row++;
-        qDebug() << cell_row;
     }
-    qDebug() << "add_bookmarks_done";
 }
-
+/**
+ * @brief ReportGenerator::cell_insert_category
+ * @param cell
+ * @param bm_list
+ * Inserts a nested table into range, container a category
+ */
 void ReportGenerator::cell_insert_category(QAxObject* cell, std::vector<BookmarkItem *> bm_list)
 {
+    // Access field to use for category table
     QAxObject* cell_range = cell->querySubObject("Range");
+    // Table indexed from 1, no title so start at 1.
     int cell_row = 1;
-    int max_row = bm_list.size();
-    if(max_row == 0) return; // Empty Category
-    //QAxObject* range = cell->querySubObject("Range");
-    qDebug() << "insert_cat";
+    // Number of rows required for Category list
+    int max_row = bm_list.size();    
+    // If empty category, no bookmarks to add => return
+    if(max_row == 0) return;
+    // Create table for category list, requires max_row > 0
     QAxObject* table = add_table(cell_range, max_row, 1);
-    qDebug() << "tabl inserted";
-    for(size_t j = 0; j != bm_list.size(); ++j){ // while images on both sides
+
+    // For every bookmark
+    for(size_t j = 0; j != bm_list.size(); ++j){
+        // Access Bookmark
         BookmarkItem* bm = bm_list.at(j);
+        // Add Its image to current cell
         cell_add_img(table, bm->get_file_path(), cell_row, 1);
+        // Add Its text to current cell
         cell_add_text(table, get_bookmark_descr(bm),cell_row,1);
+        // Go to next cell
         cell_row++;
     }
-    qDebug() << "exit insert cat";
 }
-
+/**
+ * @brief ReportGenerator::cell_add_img
+ * @param table
+ * @param file_name
+ * @param row
+ * @param col
+ * Adds image to cell
+ */
 void ReportGenerator::cell_add_img(QAxObject *table, QString file_name, int row, int col)
 {
+    // Access cell to add image to
     QAxObject* cell = table->querySubObject("Cell(int,int)",row,col);
-    //QAxObject* shapes = selection->querySubObject( "InlineShapes" );
+    // Access area to add image to
     QAxObject* range = cell->querySubObject("Range");
+    // Access list of shapes
     QAxObject* shapes = range->querySubObject("InlineShapes");
     //Fix to make path work with windows word
     //application when spaces are involved
     file_name.replace("/", "\\\\");
+    // Add image and scale it to fit cell
     QAxObject* inline_shape = shapes->querySubObject(
                 "AddPicture(const QString&,bool,bool,QVariant)",
                  file_name, false, true, range->asVariant());
-    //resize_picture(file_name, inline_shape);
 }
-
+/**
+ * @brief ReportGenerator::cell_add_text
+ * @param table
+ * @param entry
+ * @param row
+ * @param col
+ * Appends text to range
+ */
 void ReportGenerator::cell_add_text(QAxObject* table,QString entry,int row, int col)
 {
+    // Access area to add text to
     QAxObject* range = table->querySubObject("Cell(int,int)", row, col)->querySubObject("Range");
+    // Add it to end of area
     range->dynamicCall("InsertAfter(QString Text)", entry);
 }
 
+/**
+ * @brief ReportGenerator::make_doc
+ * @param obj
+ * @param file_name
+ *
+ * Creates documentation for a given QAxObject*,
+ * this function is extremely useful for using word object API.
+ */
 void ReportGenerator::make_doc(QAxObject *obj, QString file_name)
 {
     QDir dir;
@@ -180,18 +224,20 @@ void ReportGenerator::make_doc(QAxObject *obj, QString file_name)
        out << obj->generateDocumentation();
        file1.close();
 }
-
-QString ReportGenerator::get_bookmark_fig_txt(BookmarkItem *bm, int fig_num)
-{
-    return QString::fromStdString("Figur" + std::to_string(fig_num) + ": ") + bm->getDescription();
-}
-
+/**
+ * @brief ReportGenerator::add_table
+ * @param range
+ * @param rows
+ * @param cols
+ * @param style
+ * @return Table*
+ * Add table to given range with given style
+ */
 QAxObject* ReportGenerator::add_table(QAxObject *range, int rows, int cols, TABLE_STYLE style)
 {
     range->dynamicCall("Collapse(int)",1); // Don't touch this, magically works
     QAxObject* tables = range->querySubObject("Tables");
     make_doc(tables, "tables");
-    qDebug() << "Rows: " << rows << "Cols:" << cols;
     QAxObject* table = tables->querySubObject("Add(QVariant,int,int)",range->asVariant(), rows,cols,1,1);
     table->dynamicCall("AutoFormat(QVariant)", QVariant(style));
     table->dynamicCall("SetTitle(QString)", "Title");

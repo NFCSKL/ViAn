@@ -26,10 +26,13 @@ public:
     ~ReportGenerator();
     void create_report();    
 private:
+    /**
+     * Creates documentation for a given QAxObject*,
+     * this function is extremely useful for using word object API.
+     */
     static void make_doc(QAxObject* obj, QString file_name);
     void add_paragraph(QAxObject* selection);
 
-    QString get_bookmark_fig_txt(BookmarkItem *bm, int fig_num);
     QString get_bookmark_descr(BookmarkItem *bm);
 
     void create_bookmark_table(QAxObject *para, ReportContainer bookmark_list);

@@ -47,9 +47,7 @@ void BookmarkWidget::generate_report()
     ReportContainer rp_cont;
     for(int i = 0; i != bm_list->count(); ++i){
         QListWidgetItem* item = bm_list->item(i);
-        qDebug() << "looking for container";
         if (item->type() == CONTAINER) {
-            qDebug() << "found container";
             BookmarkCategory* _tmp_cat = dynamic_cast<BookmarkCategory*>(item);
             QString cat_name = QString::fromStdString(_tmp_cat->get_name());
 
