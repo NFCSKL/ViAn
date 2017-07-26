@@ -16,7 +16,7 @@ class ReportGenerator : public QObject {
     std::string m_path;
     QAxObject* word;
     std::vector<Bookmark*> all_bookmarks;
-    const double IMAGE_WIDTH_REFERENCE = 272.0;
+    const double IMAGE_WIDTH_REFERENCE = 136.0;
     RefDisp m_ref_disp;
 public:
     friend class test_report_generator;

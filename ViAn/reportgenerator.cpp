@@ -54,14 +54,14 @@ void ReportGenerator::create_report() {
 
 QString ReportGenerator::get_bookmark_descr(BookmarkItem *bm)
 {
-    QString frame_nr = QString("Frame number: %1").arg(bm->get_frame_number());
-    QString time = QString("Time: %1").arg(calculate_time(bm->get_bookmark()->get_time()));
+    QString frame_nr = QString("Bildnummer %1").arg(bm->get_frame_number());
+    QString time = QString("Tidstämpel: %1").arg(calculate_time(bm->get_bookmark()->get_time()));
     QString bm_description = QString::fromStdString(bm->get_bookmark()->get_description());
     QString description = "";
     if (!bm_description.isEmpty()) {
-        description = QString("Description: %1").arg(bm_description);
+        description = QString("Beskrivning: %1").arg(bm_description);
     }
-    return description;
+    return time + QString("\n") + frame_nr + QString("\n") + description;
 }
 
 
@@ -78,11 +78,11 @@ void ReportGenerator::resize_picture(QString pic_path, QAxObject* inline_shape) 
     QImage image = QImage(pic_path);
     int const original_height = image.height();
     int const original_width = image.width();
-
+    double img_width = inline_shape->property("Width").toDouble();
     //Scale all images to have same width but keep aspect ratio
-    double multiply_factor = IMAGE_WIDTH_REFERENCE/original_width;
+    double multiply_factor = img_width/original_width;
     inline_shape->dynamicCall( "Height", (multiply_factor*original_height));
-    inline_shape->dynamicCall( "Width", IMAGE_WIDTH_REFERENCE);
+    inline_shape->dynamicCall( "Width", img_width);
 }
 
 /**
@@ -114,7 +114,8 @@ void ReportGenerator::create_bookmark_table(QAxObject* para, RefDisp bookmark_li
     cell_add_text(table, QString::fromStdString("Referens"), 1,1);
     cell_add_text(table, QString::fromStdString("Omstritt"), 1,2);    
     int cell_row = 2;
-    for (int i = 0; i != bookmark_list.size(); i++) { // for each category, make a paragraph of bookmarks        
+    for (int i = 0; i != bookmark_list.size(); i++) { // for each category, make a paragraph of bookmarks
+        qDebug() << "Category: " << i;
         std::vector<BookmarkItem*> bm_ref = bookmark_list.at(i).first;
         std::vector<BookmarkItem*> bm_disp = bookmark_list.at(i).second;
 
@@ -138,13 +139,15 @@ void ReportGenerator::cell_insert_category(QAxObject* cell, std::vector<Bookmark
     QAxObject* cell_range = cell->querySubObject("Range");
     int cell_row = 1;
     int max_row = bm_list.size();
+    if(max_row == 0) return; // Empty Category
     //QAxObject* range = cell->querySubObject("Range");
+    qDebug() << "insert_cat";
     QAxObject* table = add_table(cell_range, max_row, 1);
     qDebug() << "tabl inserted";
     for(size_t j = 0; j != bm_list.size(); ++j){ // while images on both sides
         BookmarkItem* bm = bm_list.at(j);
         cell_add_img(table, bm->get_file_path(), cell_row, 1);
-        cell_add_text(table, bm->getDescription(),cell_row,1);
+        cell_add_text(table, get_bookmark_descr(bm),cell_row,1);
         cell_row++;
     }
     qDebug() << "exit insert cat";
@@ -162,7 +165,7 @@ void ReportGenerator::cell_add_img(QAxObject *table, QString file_name, int row,
     QAxObject* inline_shape = shapes->querySubObject(
                 "AddPicture(const QString&,bool,bool,QVariant)",
                  file_name, false, true, range->asVariant());
-    resize_picture(file_name, inline_shape);
+    //resize_picture(file_name, inline_shape);
 }
 
 void ReportGenerator::cell_add_text(QAxObject* table,QString entry,int row, int col)
@@ -192,6 +195,7 @@ QAxObject* ReportGenerator::add_table(QAxObject *range, int rows, int cols, TABL
     range->dynamicCall("Collapse(int)",1); // Don't touch this, magically works
     QAxObject* tables = range->querySubObject("Tables");
     make_doc(tables, "tables");
+    qDebug() << "Rows: " << rows << "Cols:" << cols;
     QAxObject* table = tables->querySubObject("Add(QVariant,int,int)",range->asVariant(), rows,cols,1,1);
     table->dynamicCall("AutoFormat(QVariant)", QVariant(style));
     table->dynamicCall("SetTitle(QString)", "Title");
