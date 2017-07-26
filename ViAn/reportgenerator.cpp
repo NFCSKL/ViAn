@@ -50,7 +50,7 @@ QString ReportGenerator::get_bookmark_descr(BookmarkItem *bm)
     if (!bm_description.isEmpty()) {
         description = QString("Beskrivning: %1").arg(bm_description);
     }
-    return time + QString("\n") + frame_nr + QString("\n") + description;
+    return time + QString("\v") + frame_nr + QString("\v") + description;
 }
 
 
