@@ -44,6 +44,9 @@ private:
 
     std::pair<int, int> m_interval = std::make_pair(0, 0);
 
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+
 public:
     explicit VideoWidget(QWidget *parent = nullptr);
 
@@ -141,7 +144,7 @@ private:
     QPushButton* zoom_in_btn;
     QPushButton* zoom_out_btn;
     QPushButton* fit_btn;
-    QPushButton* move_btn;
+    QPushButton* original_size_btn;
     QPushButton* set_start_interval_btn;
     QPushButton* set_end_interval_btn;
 

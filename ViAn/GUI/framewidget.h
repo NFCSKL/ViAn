@@ -29,6 +29,7 @@ class FrameWidget : public QWidget
     Analysis* m_analysis = nullptr;
     // Zoom
     QPoint zoom_start_pos, zoom_end_pos, prev_pos;
+    QPoint anchor = QPoint(0,0);
     bool draw_zoom_rect = false;
     bool do_zoom = false;
     bool do_zoom_out = false;
@@ -60,6 +61,7 @@ public slots:
     void set_detections_on_frame(int);
     void set_detections(bool);
     void set_show_detections(bool);
+    void set_anchor(QPoint);
     void set_scale_factor(double scale_factor);
     void update();
 protected:
