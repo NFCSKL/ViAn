@@ -13,8 +13,9 @@ Overlay::Overlay() {}
  */
 void Overlay::draw_overlay(cv::Mat &frame, int frame_nr) {
     if (show_overlay) {
-        std::cout << overlays[frame_nr].overlay.size() << std::endl;
+        std::cout << "size " << overlays[frame_nr].overlay.size() << std::endl;
         for (auto it = overlays[frame_nr].overlay.begin(); it != overlays[frame_nr].drawn; it++) {
+            //std::cout << "in for" << std::endl;
             frame = (*it)->draw(frame);
         }
     }
@@ -193,6 +194,7 @@ void Overlay::mouse_pressed(QPoint pos, int frame_nr) {
  * @param frame_nr Number of the frame currently shown in the video.
  */
 void Overlay::mouse_released(QPoint pos, int frame_nr) {
+    std::cout << "released" << std::endl;
     update_drawing_position(pos, frame_nr);
 }
 

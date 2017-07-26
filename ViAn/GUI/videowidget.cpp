@@ -659,6 +659,7 @@ void VideoWidget::on_new_frame() {
     }
     current_frame = frame_num;
 
+
     set_current_time(frame_num / m_frame_rate);
     frame_line_edit->setText(QString::number(frame_num));
 

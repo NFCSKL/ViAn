@@ -91,6 +91,7 @@ cv::Mat FrameWidget::get_mat() const {
 }
 
 void FrameWidget::on_new_image(cv::Mat frame, int frame_index) {
+    std::cout << "NEw FRAME" << std::endl;
     current_frame = frame;
     current_frame_nr = frame_index;
     switch (frame.type()) {
@@ -238,7 +239,7 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
     default:
         video_overlay->mouse_moved(event->pos(), current_frame_nr);
         //video_overlay->draw_overlay(get_mat(), current_frame_nr);
-        //on_new_image(current_frame, current_frame_nr);
+        on_new_image(current_frame, current_frame_nr);
         break;
     }
 }
