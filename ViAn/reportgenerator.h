@@ -10,17 +10,19 @@
 #include "GUI/bookmarkitem.h"
 #include <ctime>
 enum TABLE_STYLE {NO_BORDER = 0, BORDER=36};
-using RefDisp = std::vector<std::pair<std::vector<BookmarkItem*>,std::vector<BookmarkItem*>>>;
+using RefDisp = std::pair<std::vector<BookmarkItem*>,std::vector<BookmarkItem*>>;
+using Category = std::pair<QString,RefDisp>;
+using ReportContainer = std::vector<Category>;
 class ReportGenerator : public QObject {
     Q_OBJECT
     std::string m_path;
     QAxObject* word;
     std::vector<Bookmark*> all_bookmarks;
     const double IMAGE_WIDTH_REFERENCE = 136.0;
-    RefDisp m_ref_disp;
+    ReportContainer m_rep_cont;
 public:
     friend class test_report_generator;
-    explicit ReportGenerator(std::string proj_path,RefDisp RefDisp);
+    explicit ReportGenerator(std::string proj_path,ReportContainer report_container);
     ~ReportGenerator();
     void create_report();    
 private:
@@ -30,7 +32,7 @@ private:
     QString get_bookmark_fig_txt(BookmarkItem *bm, int fig_num);
     QString get_bookmark_descr(BookmarkItem *bm);
 
-    void create_bookmark_table(QAxObject *para, RefDisp bookmark_list);
+    void create_bookmark_table(QAxObject *para, ReportContainer bookmark_list);
 
 
     QAxObject* add_table(QAxObject* range, int rows, int cols, TABLE_STYLE style= NO_BORDER);

@@ -6,9 +6,9 @@
  * @param proj, the current project that we are creating document for.
  * @param file_handler, the file_handler that is used to get path information for saving.
  */
-ReportGenerator::ReportGenerator(std::string proj_path, RefDisp ref_disp) {
+ReportGenerator::ReportGenerator(std::string proj_path, ReportContainer report_container) {
     m_path = proj_path;
-    m_ref_disp = ref_disp;
+    m_rep_cont = report_container;
     word = new QAxObject("Word.Application");
 }
 
@@ -33,16 +33,8 @@ void ReportGenerator::create_report() {
         QAxObject* doc = word->querySubObject("Documents");
         doc->dynamicCall("Add()");
         QAxObject* active_doc = word->querySubObject("ActiveDocument");
-//        QAxObject* range = para->querySubObject("Range");
-
-        //3.GET TO THE CONTENTS
-        //QAxObject* active_document = word->querySubObject("ActiveDocument");
-//        QAxObject* active_window = active_document->querySubObject( "ActiveWindow" );
-//        QAxObject* selection = active_window->querySubObject( "Selection" );
-
-        // Make sure there is bookmarks to put in report.
         //4. ADD IMAGES FROM BOOKMARK FOLDER
-        create_bookmark_table(active_doc, m_ref_disp);
+        create_bookmark_table(active_doc, m_rep_cont);
         //5. SAVE AND CLOSE FILE
         QString file_path = save_report(active_doc);
         close_report(doc, word);
@@ -106,21 +98,22 @@ QString ReportGenerator::calculate_time(int ms) {
  * to the document.
  * @param selection, the selector in the active document.
  */
-void ReportGenerator::create_bookmark_table(QAxObject* para, RefDisp bookmark_list) {
+void ReportGenerator::create_bookmark_table(QAxObject* para, ReportContainer rp_cont) {
     QAxObject* range = para->querySubObject("Range(int,int)",0,0);
-    QAxObject* table = add_table(range,bookmark_list.size()*2+1,2,BORDER);
-//    range->dynamicCall("MoveEnd(int)",-2);
-//    range->dynamicCall("Collapse(int)",1);
-    cell_add_text(table, QString::fromStdString("Referens"), 1,1);
-    cell_add_text(table, QString::fromStdString("Omstritt"), 1,2);    
-    int cell_row = 2;
-    for (int i = 0; i != bookmark_list.size(); i++) { // for each category, make a paragraph of bookmarks
-        qDebug() << "Category: " << i;
-        std::vector<BookmarkItem*> bm_ref = bookmark_list.at(i).first;
-        std::vector<BookmarkItem*> bm_disp = bookmark_list.at(i).second;
+    QAxObject* table = add_table(range,rp_cont.size()*2+1,2,BORDER);
 
-        cell_add_text(table, QString::fromStdString("Category"), cell_row,1);
-        cell_add_text(table, QString::fromStdString("Category"), cell_row,2);
+    cell_add_text(table, QString::fromStdString("Referens"), 1,1);
+    cell_add_text(table, QString::fromStdString("Omstritt"), 1,2);
+
+    int cell_row = 2;
+    for (int i = 0; i != rp_cont.size(); i++) { // for each category, make a paragraph of bookmarks
+
+        cell_add_text(table, rp_cont.at(i).first, cell_row,1);
+        cell_add_text(table, rp_cont.at(i).first, cell_row,2);
+
+        std::vector<BookmarkItem*> bm_ref = rp_cont.at(i).second.first;
+        std::vector<BookmarkItem*> bm_disp = rp_cont.at(i).second.second;
+
         cell_row++;
         QAxObject* cell_ref = table->querySubObject("Cell(int,int)", cell_row, 1);
         QAxObject* cell_disp = table->querySubObject("Cell(int,int)", cell_row, 2);

@@ -44,25 +44,24 @@ void BookmarkWidget::add_new_folder() {
 
 void BookmarkWidget::generate_report()
 {
-    RefDisp ref_disp;
+    ReportContainer rp_cont;
     for(int i = 0; i != bm_list->count(); ++i){
-        std::vector<BookmarkItem*> bm_disp,bm_ref = {};
         QListWidgetItem* item = bm_list->item(i);
+        qDebug() << "looking for container";
         if (item->type() == CONTAINER) {
+            qDebug() << "found container";
             BookmarkCategory* _tmp_cat = dynamic_cast<BookmarkCategory*>(item);
-            std::vector<BookmarkItem*> temp = _tmp_cat->get_references();
-            qDebug() << "ref";
-            bm_ref.insert(bm_ref.end(),temp.begin(), temp.end());
-            temp = _tmp_cat->get_disputed();
-            qDebug() << "disp";
-            bm_disp.insert(bm_disp.end(),temp.begin(), temp.end());
-            ref_disp.push_back(std::make_pair(bm_disp,bm_ref));
-        }    
+            QString cat_name = QString::fromStdString(_tmp_cat->get_name());
+
+            std::vector<BookmarkItem*> _temp_ref = _tmp_cat->get_references();
+            std::vector<BookmarkItem*> _temp_disp = _tmp_cat->get_disputed();
+
+            RefDisp ref_disp = std::make_pair(_temp_ref, _temp_disp);
+            rp_cont.push_back(std::make_pair(cat_name, ref_disp));
+        }
     }
     processing_thread = new QThread;    
-    qDebug() << "refdispsize" << ref_disp.size();
-    ReportGenerator* rp_gen = new ReportGenerator(m_path,ref_disp);
-    qDebug() << "rpgen";
+    ReportGenerator* rp_gen = new ReportGenerator(m_path,rp_cont);
     rp_gen->create_report();
     // Move reportgenerator to other thread
 //    rp_gen->moveToThread(processing_thread);
