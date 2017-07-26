@@ -155,5 +155,4 @@ void Bookmark::write(QJsonObject& json){
  * Removes the exported image, if there is one.
  */
 void Bookmark::remove_exported_image() {
-    delete_saveable();
 }

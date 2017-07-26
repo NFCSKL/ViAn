@@ -6,8 +6,11 @@ AnalysisInterval::AnalysisInterval(int start, int end)
     m_end = end;
 }
 
-AnalysisInterval::AnalysisInterval()
+AnalysisInterval::AnalysisInterval() {}
+
+AnalysisInterval::~AnalysisInterval()
 {
+
 }
 
 /**
@@ -16,7 +19,6 @@ AnalysisInterval::AnalysisInterval()
  * @param json
  */
 void AnalysisInterval::read(const QJsonObject& json) {
-
     this->m_start = json["start"].toInt();
     this->m_end = json["end"].toInt();
 }
