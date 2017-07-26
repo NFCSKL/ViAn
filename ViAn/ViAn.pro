@@ -33,10 +33,13 @@ SOURCES += main.cpp \
     GUI/analysiswidget.cpp \
     GUI/manipulatordialog.cpp \
     Video/frameprocessor.cpp \
+    Project/projecttreestate.cpp \
     GUI/tagdialog.cpp \
     imageexporter.cpp \
     GUI/frameexporterdialog.cpp \
     Project/Analysis/tag.cpp \
+    Video/videocontroller.cpp \
+    Video/videoplayer.cpp \
     GUI/recentprojectdialog.cpp \
     Project/recentproject.cpp \
     Project/Analysis/basicanalysis.cpp \
@@ -45,14 +48,13 @@ SOURCES += main.cpp \
     Project/Analysis/analysisproxy.cpp \
     Project/Analysis/detectionbox.cpp
 
-
 #
 # TEST
 #
-SOURCES += Test/test_video_player.cpp\
+SOURCES +=\
     Test/test_report_generator.cpp
 
-HEADERS += Test/test_video_player.h \
+HEADERS += \
     Test/test_report_generator.h \
     GUI/TreeItems/itemtypes.h \
     GUI/Toolbars/maintoolbar.h \
@@ -70,10 +72,13 @@ HEADERS += Test/test_video_player.h \
     GUI/analysiswidget.h \
     GUI/manipulatordialog.h \
     Video/frameprocessor.h \
+    Project/projecttreestate.h \
     GUI/tagdialog.h \
     imageexporter.h \
     GUI/frameexporterdialog.h \
     Project/Analysis/tag.h \
+    Video/videocontroller.h \
+    Video/videoplayer.h \
     GUI/recentprojectdialog.h \
     Project/recentproject.h \
     Project/Analysis/basicanalysis.h \
@@ -119,7 +124,7 @@ RESOURCES += resources.qrc
 # VIDEOPLAYER
 # OPENCV
 #
-SOURCES += Video/video_player.cpp \
+SOURCES += \
     Video/overlay.cpp \
     Video/analysisoverlay.cpp \
     Video/shapes/arrow.cpp \
@@ -132,7 +137,7 @@ SOURCES += Video/video_player.cpp \
     Video/shapes/zoomrectangle.cpp \
     Video/shapes/analysarea.cpp \
     Video/framemanipulator.cpp
-HEADERS += Video/video_player.h \
+HEADERS += \
     Video/overlay.h \
     Video/analysisoverlay.h \
     Video/shapes/arrow.h \
