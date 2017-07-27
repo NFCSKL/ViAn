@@ -2,10 +2,8 @@
 #define ANALYSISITEM_H
 #include "treeitem.h"
 #include "Project/Analysis/analysisproxy.h"
-#include "itemstates.h"
 class AnalysisItem : public TreeItem {
     AnalysisProxy* m_analysis = nullptr;
-    VideoState state;
     bool finished = false;
 public:
     AnalysisItem(AnalysisProxy* analysis);

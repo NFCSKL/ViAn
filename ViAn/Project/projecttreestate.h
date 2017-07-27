@@ -2,7 +2,7 @@
 #define PROJECTTREESTATE_H
 #include "Filehandler/saveable.h"
 #include "Filehandler/saveable.h"
-#include "GUI/Project/projectwidget.h"
+#include "GUI/projectwidget.h"
 #include "GUI/TreeItems/folderitem.h"
 #include "GUI/TreeItems/videoitem.h"
 class ProjectWidget;

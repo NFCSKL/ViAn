@@ -1,7 +1,7 @@
 #ifndef AXCELL_H
 #define AXCELL_H
 #include <QAxObject>
-#include <GUI/bookmarkitem.h>
+#include <GUI/Bookmark/bookmarkitem.h>
 #include "axrange.h"
 #include "axtable.h"
 class AxCell

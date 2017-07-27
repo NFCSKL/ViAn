@@ -1,7 +1,7 @@
 #ifndef ANALYSISWIDGET_H
 #define ANALYSISWIDGET_H
 
-#include "GUI/Video/videowidget.h"
+#include "GUI/videowidget.h"
 #include <QWidget>
 #include <QTreeWidgetItem>
 #include <ctime>

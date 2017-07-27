@@ -1,5 +1,4 @@
 #include "tagitem.h"
-#include "itemstates.h"
 TagItem::TagItem(Tag *tag) : TreeItem(TAG_ITEM) {
     m_tag = tag;
     setText(0, QString::fromStdString(tag->get_name()));

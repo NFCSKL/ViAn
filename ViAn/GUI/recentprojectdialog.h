@@ -11,7 +11,7 @@
 #include <QLabel>
 
 #include "Project/recentproject.h"
-#include "GUI/Project/projectdialog.h"
+#include "GUI/projectdialog.h"
 
 class RecentProjectDialog : public QDialog {
     Q_OBJECT

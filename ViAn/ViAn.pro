@@ -24,7 +24,6 @@ SOURCES += main.cpp \
     GUI/drawscrollarea.cpp \
     Video/zoomer.cpp \
     GUI/Analysis/analysisslider.cpp \
-    GUI/Project/projectdialog.cpp \
     Project/Test/videoprojecttest.cpp \
     GUI/Bookmark/bookmarkcategory.cpp \
     imagegenerator.cpp \
@@ -36,11 +35,9 @@ SOURCES += main.cpp \
     Project/projecttreestate.cpp \
     GUI/Analysis/tagdialog.cpp \
     imageexporter.cpp \
-    GUI/Video/frameexporterdialog.cpp \
     Project/Analysis/tag.cpp \
     Video/videocontroller.cpp \
     Video/videoplayer.cpp \
-    GUI/Project/recentprojectdialog.cpp \
     Project/recentproject.cpp \
     Project/Analysis/basicanalysis.cpp \
     Project/Analysis/analysisinterval.cpp \
@@ -50,12 +47,18 @@ SOURCES += main.cpp \
     AxReport/axtable.cpp \
     AxReport/axrange.cpp \
     AxReport/axcell.cpp \
-    GUI/TreeItems/tagitem.cpp \
     GUI/TreeItems/videoitem.cpp \
-    GUI/TreeItems/analysisitem.cpp \
     GUI/TreeItems/treeitem.cpp \
+    GUI/recentprojectdialog.cpp \
+    GUI/projectwidget.cpp \
+    GUI/projectdialog.cpp \
     GUI/TreeItems/folderitem.cpp \
-    GUI/TreeItems/itemstates.cpp
+    GUI/TreeItems/tagitem.cpp \
+    GUI/TreeItems/analysisitem.cpp \
+    GUI/fpsdialog.cpp \
+    GUI/frameexporterdialog.cpp \
+    GUI/framewidget.cpp \
+    GUI/videowidget.cpp
 
 #
 # TEST
@@ -71,7 +74,6 @@ HEADERS += reportgenerator.h\
     GUI/drawscrollarea.h \
     Video/zoomer.h \
     GUI/Analysis/analysisslider.h \
-    GUI/Project/projectdialog.h \
     Project/Test/videoprojecttest.h \
     GUI/Bookmark/bookmarkcategory.h \
     imagegenerator.h \
@@ -83,11 +85,9 @@ HEADERS += reportgenerator.h\
     Project/projecttreestate.h \
     GUI/Analysis/tagdialog.h \
     imageexporter.h \
-    GUI/Video/frameexporterdialog.h \
     Project/Analysis/tag.h \
     Video/videocontroller.h \
     Video/videoplayer.h \
-    GUI/Project/recentprojectdialog.h \
     Project/recentproject.h \
     Project/Analysis/basicanalysis.h \
     Project/Analysis/analysisinterval.h \
@@ -102,7 +102,13 @@ HEADERS += reportgenerator.h\
     GUI/TreeItems/analysisitem.h \
     GUI/TreeItems/treeitem.h \
     GUI/TreeItems/folderitem.h \
-    GUI/TreeItems/itemstates.h
+    GUI/projectdialog.h \
+    GUI/projectwidget.h \
+    GUI/recentprojectdialog.h \
+    GUI/fpsdialog.h \
+    GUI/frameexporterdialog.h \
+    GUI/framewidget.h \
+    GUI/videowidget.h
 
 #
 # LIBRARY
@@ -115,20 +121,12 @@ HEADERS += Library/customdialog.h
 #
 SOURCES += GUI/mainwindow.cpp \
     GUI/Bookmark/bookmarkitem.cpp \
-    GUI/Video/fpsdialog.cpp \
-    GUI/Video/videowidget.cpp \
-    GUI/Video/framewidget.cpp \
-    GUI/Project/projectwidget.cpp \
     GUI/Bookmark/bookmarkwidget.cpp
 
 
 HEADERS  += GUI/mainwindow.h \
     GUI/action.h \
     GUI/Bookmark/bookmarkitem.h \
-    GUI/Video/fpsdialog.h \
-    GUI/Video/videowidget.h \
-    GUI/Video/framewidget.h \
-    GUI/Project/projectwidget.h \
     GUI/Bookmark/bookmarkwidget.h
 
 FORMS    +=

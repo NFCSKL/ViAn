@@ -2,10 +2,8 @@
 #define TAGITEM_H
 #include "treeitem.h"
 #include "Project/Analysis/tag.h"
-#include "itemstates.h"
 class TagItem : public TreeItem {
     Tag* m_tag;
-    VideoState state;
 public:
     TagItem(Tag *tag);
     Tag *get_tag();

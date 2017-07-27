@@ -14,12 +14,12 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame, std::atomic<bool>* is_playing,
  * It also emits the first frame back to the controller
  * @param video_path    :   Path to the video
  */
-void VideoPlayer::on_load_video(std::string video_path){
+void VideoPlayer::on_load_video(Video *video){
     current_frame = -1;
     m_is_playing->store(false);
-    m_frame->store(0);
+    m_frame->store(video->state.frame);
 
-    m_capture.open(video_path);
+    m_capture.open(video->file_path);
     if (!m_capture.isOpened()) return;
     load_video_info();
     emit video_info(m_video_width, m_video_height, m_frame_rate, m_last_frame);

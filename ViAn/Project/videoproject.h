@@ -26,14 +26,12 @@ class VideoProject : public Saveable{
     std::map<ID,Bookmark*> m_bookmarks;
     std::string m_tree_index = "";
     std::map<ID,BasicAnalysis*> m_analyses;
-
     Overlay* m_overlay = new Overlay();
     Video* video = nullptr;
     Project* m_project = nullptr;
     ID m_bm_cnt = 0;  // Bookmark id counter
     ID m_ana_cnt = 0; // Analysis id counter
 public:
-
     VideoProject(Video* v); //Needs to have a video
     VideoProject();
     ~VideoProject();

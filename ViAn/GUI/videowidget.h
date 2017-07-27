@@ -72,7 +72,7 @@ signals:
     void start_analysis(VideoProject*);
     void add_basic_analysis(VideoProject*, BasicAnalysis*);
     void set_status_bar(QString);
-    void load_video(std::string video_path);
+    void load_video(Video* video);
 public slots:
     void set_current_time(int time);
     void set_total_time(int time);
@@ -97,7 +97,7 @@ public slots:
     void on_playback_slider_value_changed(void);
     void on_playback_slider_moved(void);
     void fit_clicked(void);
-    void load_marked_video(VideoProject* vid_proj, int frame);
+    void load_marked_video(VideoProject* vid_proj);
     void update_bar_pos(int change_x, int change_y);
     void set_current_frame_size(QSize size);
     void on_bookmark_clicked(void);
@@ -178,7 +178,6 @@ private:
     void init_speed_slider();
     void add_btns_to_layouts();
     void connect_btns();
-
     void init_playback_slider();
 private slots:
     void stop_btn_clicked(void);

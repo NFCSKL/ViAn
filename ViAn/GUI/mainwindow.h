@@ -18,12 +18,12 @@
 #include "action.h"
 
 #include "Analysis/AnalysisController.h"
-#include "GUI/Project/recentprojectdialog.h"
+#include "GUI/recentprojectdialog.h"
 #include "Project/Analysis/analysisproxy.h"
 
 
-#include "Video/videowidget.h"
-#include "Project/projectwidget.h"
+#include "videowidget.h"
+#include "projectwidget.h"
 #include "Analysis/analysiswidget.h"
 #include "Bookmark/bookmarkwidget.h"
 #include "statusbar.h"

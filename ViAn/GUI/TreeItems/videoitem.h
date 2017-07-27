@@ -2,10 +2,8 @@
 #define VIDEOITEM_H
 #include "treeitem.h"
 #include "Project/videoproject.h"
-#include "itemstates.h"
 class VideoItem : public TreeItem {
-    VideoProject* m_vid_proj;
-    VideoState* state;
+    VideoProject* m_vid_proj = nullptr;
 public:
     VideoItem(VideoProject* video_project);
     VideoItem();
