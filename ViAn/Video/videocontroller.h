@@ -7,7 +7,7 @@
 #include <QPoint>
 #include <QSize>
 #include <QTimer>
-
+#include <atomic>
 #include <opencv2/core/core.hpp>
 
 #include "Video/frameprocessor.h"

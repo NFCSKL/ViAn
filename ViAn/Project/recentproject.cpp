@@ -1,7 +1,7 @@
 #include "recentproject.h"
 
 const std::string RecentProject::FILE_NAME = "recent_projects";
-const std::string RecentProject::PATH = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/ViAn";
+const std::string RecentProject::PATH = /*QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() */+ "C:/ViAn";
 
 RecentProject::RecentProject(){}
 
