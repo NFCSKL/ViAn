@@ -47,10 +47,7 @@ SOURCES += main.cpp \
     Project/Analysis/analysisinterval.cpp \
     Filehandler/writeable.cpp \
     Project/Analysis/analysisproxy.cpp \
-    Project/Analysis/detectionbox.cpp \
-    AxReport/axtable.cpp \
-    AxReport/axrange.cpp \
-    AxReport/axcell.cpp
+    Project/Analysis/detectionbox.cpp
 
 #
 # TEST
