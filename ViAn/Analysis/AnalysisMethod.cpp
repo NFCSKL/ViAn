@@ -4,6 +4,15 @@
 #include "opencv2/videoio/videoio.hpp"
 
 /**
+ * @brief AnalysisMethod::abort_analysis
+ * Sets the necessary bools to abort an analysis.
+ */
+AnalysisMethod::AnalysisMethod(AnalysisSettings *settings)
+{
+    m_settings = settings;
+    sample_freq = settings->SAMPLE_RATE;
+}
+/**
  * @brief AnalysisMethod::set_include_exclude_area
  * Sets an exlusion frame that will be used to exclude detections in a specific area of each frame.
  * @param points for the polygon that defines the exclusion area.
@@ -30,7 +39,6 @@ void AnalysisMethod::set_include_exclude_area(std::vector<cv::Point> points, boo
     exclude_frame = img;
 }
 
-
 /**
  * @brief AnalysisMethod::sample_current_frame
  * Checks if the current frame is to be analysed.
@@ -53,12 +61,12 @@ Analysis AnalysisMethod::run_analysis() {
     std::vector<DetectionBox> detections;
     num_frames = capture.get(CV_CAP_PROP_FRAME_COUNT);
     POI* m_POI = new POI();
-    while(!aborted && capture.read(frame)) {
+    while(!aborted && capture.read(frame)) {        
         // do frame analysis
+        if(m_settings->use_bounding_box) frame = frame(m_settings->getBounding_box());
         if (sample_current_frame() || current_frame_index == num_frames-1) {
             if (scaling_needed)
-                scale_frame();
-
+                scale_frame();            
             detections = analyse_frame();
 
             // This if statement handles the sorting of OOIs detected
@@ -112,10 +120,7 @@ int AnalysisMethod::get_progress() {
 
 }
 
-/**
- * @brief AnalysisMethod::abort_analysis
- * Sets the necessary bools to abort an analysis.
- */
+
 void AnalysisMethod::abort_analysis() {
     aborted = true;
     paused = false;

@@ -11,8 +11,10 @@
  * is done using background subtraction with OpenCV.
  */
 class MotionDetection : public AnalysisMethod {
+    MotionDetSettings* m_settings;
 public:
-    MotionDetection(std::string source_file);
+
+    MotionDetection(std::string source_file, MotionDetSettings *settings);
     ~MotionDetection();
 
 private:
@@ -31,6 +33,8 @@ private:
     const int BACKGROUND_HISTORY = 500;
     const int MOG2_THRESHOLD = 50;
     const bool DETECT_SHADOWS = false;
+
+
 
 
 signals:

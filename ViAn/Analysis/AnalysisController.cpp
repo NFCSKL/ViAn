@@ -19,7 +19,7 @@
 AnalysisController::AnalysisController(QObject* parent) : QThread(parent) {
 }
 
-void AnalysisController::new_analysis(std::string save_path, std::string video_path, AnalysisSettings settings) {
+void AnalysisController::new_analysis(std::string save_path, std::string video_path, AnalysisSettings* settings) {
     m_save_path = save_path;
     m_video_path = video_path;
     setup_analysis(video_path, settings);
@@ -31,13 +31,13 @@ void AnalysisController::new_analysis(std::string save_path, std::string video_p
  * @param file_path     path to the video file to be analysed
  * @param type          analysis type
  */
-void AnalysisController::setup_analysis(std::string video_path, AnalysisSettings settings) {
-    switch (settings.type) {
+void AnalysisController::setup_analysis(std::string video_path, AnalysisSettings* settings) {
+    switch (settings->getType()) {
     case MOTION_DETECTION:
-        method = new MotionDetection(video_path, dynamic_cast<MotionDetSettings>settings);
+        method = new MotionDetection(video_path, dynamic_cast<MotionDetSettings*>(settings));
         break;
     default:
-        method = new MotionDetection(video_path);
+        method = new MotionDetection(video_path, dynamic_cast<MotionDetSettings*>(settings));
         break;
     }
     QObject::connect(method, SIGNAL(send_progress(int)),

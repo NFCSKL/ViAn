@@ -53,6 +53,7 @@ bool Saveable::save_saveable(const std::string &full_path, const Saveable::SAVE_
     save_file.write(save_format == JSON         // Choose written format
             ? save_doc.toJson()
             : save_doc.toBinaryData());
+    m_full_path = save_file.fileName().toStdString();
     return true;
 }
 

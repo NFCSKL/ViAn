@@ -45,7 +45,7 @@ void AnalysisWidget::start_analysis(std::string save_path, std::string video_pat
  */
 void AnalysisWidget::perform_analysis(tuple<std::string, std::string, QTreeWidgetItem*> analys) {
     emit add_analysis_bar();
-    an_col->new_analysis(get<0>(analys), get<1>(analys), MOTION_DETECTION);
+    an_col->new_analysis(get<0>(analys), get<1>(analys), new MotionDetSettings());
     start = std::clock();
     an_col->start();
 }

@@ -8,14 +8,15 @@
 #include "opencv2/core/core.hpp"
 #include "opencv2/videoio/videoio.hpp"
 #include "Project/Analysis/analysis.h"
-
+#include "analysissettings.h"
 class AnalysisMethod : public QThread {
     Q_OBJECT
 public:
+    AnalysisMethod(AnalysisSettings* settings);
     void abort_analysis();
     void pause_analysis();
     void set_include_exclude_area(std::vector<cv::Point> points, bool exclude_polygon);
-
+    void set_analysis_area(cv::Rect area);
     virtual void setup_analysis() = 0;
     virtual std::vector<DetectionBox> analyse_frame() = 0;
 
@@ -46,6 +47,7 @@ protected:
     cv::VideoCapture capture;       // Video source
     cv::Mat frame, exclude_frame;   // The frame fetched last
     Analysis m_analysis;
+    AnalysisSettings* m_settings;
 
     bool do_exclusion = false;
     bool scaling_needed = false;

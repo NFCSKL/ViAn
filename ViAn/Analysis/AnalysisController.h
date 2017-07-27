@@ -14,9 +14,9 @@ private:
 public:
     AnalysisController(QObject* parent = 0);
     void run() override;
-    void new_analysis(std::string save_path, std::string video_path, AnalysisSettings settings);
+    void new_analysis(std::string save_path, std::string video_path, AnalysisSettings *settings);
 private:
-    void setup_analysis(std::string video_path, AnalysisSettings settings);
+    void setup_analysis(std::string video_path, AnalysisSettings *settings);
     AnalysisMethod* method;
 signals:
     void analysis_done(AnalysisProxy);
