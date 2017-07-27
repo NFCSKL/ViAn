@@ -1,7 +1,7 @@
 #include "videowidget.h"
 #include "utility.h"
-#include "drawscrollarea.h"
-#include "tagdialog.h"
+#include "GUI/drawscrollarea.h"
+#include "GUI/Analysis/tagdialog.h"
 
 #include <QTime>
 #include <QDebug>
@@ -9,7 +9,7 @@
 #include <QScrollBar>
 #include <QProgressDialog>
 
-#include "GUI/frameexporterdialog.h"
+#include "GUI/Video/frameexporterdialog.h"
 #include "Video/video_player.h"
 #include "Analysis/AnalysisController.h"
 #include "imageexporter.h"

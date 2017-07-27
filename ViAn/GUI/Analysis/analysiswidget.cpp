@@ -1,7 +1,7 @@
 #include "analysiswidget.h"
 #include "Analysis/AnalysisController.h"
-#include "TreeItems/itemtypes.h"
-#include "videowidget.h"
+#include "GUI/TreeItems/analysisitem.h"
+#include "GUI/Video/videowidget.h"
 #include <QDebug>
 #include <QTreeWidgetItem>
 #include <tuple>

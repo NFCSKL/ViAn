@@ -1,12 +1,12 @@
 #ifndef ANALYSISWIDGET_H
 #define ANALYSISWIDGET_H
 
-#include "videowidget.h"
+#include "GUI/Video/videowidget.h"
 #include <QWidget>
 #include <QTreeWidgetItem>
 #include <ctime>
 #include "Analysis/AnalysisController.h"
-
+#include "GUI/TreeItems/videoitem.h"
 
 class AnalysisWidget : public QWidget
 {

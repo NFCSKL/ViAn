@@ -1,6 +1,6 @@
 #include "projectwidget.h"
 #include "projectdialog.h"
-#include "TreeItems/itemtypes.h"
+#include "GUI/TreeItems/analysisitem.h"
 #include <QFileDialog>
 #include <QHeaderView>
 #include <QDebug>
@@ -270,8 +270,6 @@ void ProjectWidget::insert_to_path_index(VideoProject *vid_proj) {
         }
     }
 }
-
-
 
 /**
  * @brief ProjectWidget::update_index_paths

@@ -18,14 +18,14 @@
 #include "action.h"
 
 #include "Analysis/AnalysisController.h"
-#include "GUI/recentprojectdialog.h"
+#include "GUI/Project/recentprojectdialog.h"
 #include "Project/Analysis/analysisproxy.h"
 
 
-#include "videowidget.h"
-#include "projectwidget.h"
-#include "analysiswidget.h"
-#include "bookmarkwidget.h"
+#include "Video/videowidget.h"
+#include "Project/projectwidget.h"
+#include "Analysis/analysiswidget.h"
+#include "Bookmark/bookmarkwidget.h"
 #include "statusbar.h"
 
 using namespace std;

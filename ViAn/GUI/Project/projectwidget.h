@@ -7,15 +7,16 @@
 #include <QDropEvent>
 #include <QMimeData>
 #include "Project/project.h"
-#include "TreeItems/itemtypes.h"
+#include "GUI/TreeItems/tagitem.h"
 #include <stack>
 #include "Project/Analysis/analysis.h"
 #include "Project/Analysis/tag.h"
-
+#include "Project/videoproject.h"
 class Project;
 class VideoItem;
 class FolderItem;
 class AnalysisProxy;
+class VideoProject;
 class ProjectWidget : public QTreeWidget
 {
     Q_OBJECT

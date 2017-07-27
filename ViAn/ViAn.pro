@@ -18,30 +18,29 @@ TEMPLATE = app
 #
 SOURCES += main.cpp \
     reportgenerator.cpp \
-    GUI/TreeItems/itemtypes.cpp \
     GUI/Toolbars/maintoolbar.cpp \
     GUI/Toolbars/drawingtoolbar.cpp \
     utility.cpp \
     GUI/drawscrollarea.cpp \
     Video/zoomer.cpp \
-    GUI/analysisslider.cpp \
-    GUI/projectdialog.cpp \
+    GUI/Analysis/analysisslider.cpp \
+    GUI/Project/projectdialog.cpp \
     Project/Test/videoprojecttest.cpp \
-    GUI/bookmarkcategory.cpp \
+    GUI/Bookmark/bookmarkcategory.cpp \
     imagegenerator.cpp \
-    GUI/bookmarklist.cpp \
+    GUI/Bookmark/bookmarklist.cpp \
     GUI/statusbar.cpp \
-    GUI/analysiswidget.cpp \
+    GUI/Analysis/analysiswidget.cpp \
     GUI/manipulatordialog.cpp \
     Video/frameprocessor.cpp \
     Project/projecttreestate.cpp \
-    GUI/tagdialog.cpp \
+    GUI/Analysis/tagdialog.cpp \
     imageexporter.cpp \
-    GUI/frameexporterdialog.cpp \
+    GUI/Video/frameexporterdialog.cpp \
     Project/Analysis/tag.cpp \
     Video/videocontroller.cpp \
     Video/videoplayer.cpp \
-    GUI/recentprojectdialog.cpp \
+    GUI/Project/recentprojectdialog.cpp \
     Project/recentproject.cpp \
     Project/Analysis/basicanalysis.cpp \
     Project/Analysis/analysisinterval.cpp \
@@ -50,7 +49,13 @@ SOURCES += main.cpp \
     Project/Analysis/detectionbox.cpp \
     AxReport/axtable.cpp \
     AxReport/axrange.cpp \
-    AxReport/axcell.cpp
+    AxReport/axcell.cpp \
+    GUI/TreeItems/tagitem.cpp \
+    GUI/TreeItems/videoitem.cpp \
+    GUI/TreeItems/analysisitem.cpp \
+    GUI/TreeItems/treeitem.cpp \
+    GUI/TreeItems/folderitem.cpp \
+    GUI/TreeItems/itemstates.cpp
 
 #
 # TEST
@@ -60,40 +65,44 @@ SOURCES +=\
 
 HEADERS += reportgenerator.h\
     Test/test_report_generator.h \
-    GUI/TreeItems/itemtypes.h \
     GUI/Toolbars/maintoolbar.h \
     GUI/Toolbars/drawingtoolbar.h \
     utility.h \
     GUI/drawscrollarea.h \
     Video/zoomer.h \
-    GUI/analysisslider.h \
-    GUI/projectdialog.h \
+    GUI/Analysis/analysisslider.h \
+    GUI/Project/projectdialog.h \
     Project/Test/videoprojecttest.h \
-    GUI/bookmarkcategory.h \
+    GUI/Bookmark/bookmarkcategory.h \
     imagegenerator.h \
-    GUI/bookmarklist.h \
+    GUI/Bookmark/bookmarklist.h \
     GUI/statusbar.h \
-    GUI/analysiswidget.h \
+    GUI/Analysis/analysiswidget.h \
     GUI/manipulatordialog.h \
     Video/frameprocessor.h \
     Project/projecttreestate.h \
-    GUI/tagdialog.h \
+    GUI/Analysis/tagdialog.h \
     imageexporter.h \
-    GUI/frameexporterdialog.h \
+    GUI/Video/frameexporterdialog.h \
     Project/Analysis/tag.h \
     Video/videocontroller.h \
     Video/videoplayer.h \
-    GUI/recentprojectdialog.h \
+    GUI/Project/recentprojectdialog.h \
     Project/recentproject.h \
     Project/Analysis/basicanalysis.h \
     Project/Analysis/analysisinterval.h \
     Filehandler/writeable.h \
     Project/Analysis/analysisproxy.h \
     Project/Analysis/detectionbox.h \
-    table.h \
     AxReport/axtable.h \
     AxReport/axrange.h \
-    AxReport/axcell.h
+    AxReport/axcell.h \
+    GUI/TreeItems/tagitem.h \
+    GUI/TreeItems/videoitem.h \
+    GUI/TreeItems/analysisitem.h \
+    GUI/TreeItems/treeitem.h \
+    GUI/TreeItems/folderitem.h \
+    GUI/TreeItems/itemstates.h
 
 #
 # LIBRARY
@@ -105,22 +114,22 @@ HEADERS += Library/customdialog.h
 # GUI
 #
 SOURCES += GUI/mainwindow.cpp \
-    GUI/bookmarkitem.cpp \
-    GUI/fpsdialog.cpp \
-    GUI/videowidget.cpp \
-    GUI/framewidget.cpp \
-    GUI/projectwidget.cpp \
-    GUI/bookmarkwidget.cpp
+    GUI/Bookmark/bookmarkitem.cpp \
+    GUI/Video/fpsdialog.cpp \
+    GUI/Video/videowidget.cpp \
+    GUI/Video/framewidget.cpp \
+    GUI/Project/projectwidget.cpp \
+    GUI/Bookmark/bookmarkwidget.cpp
 
 
 HEADERS  += GUI/mainwindow.h \
     GUI/action.h \
-    GUI/bookmarkitem.h \
-    GUI/fpsdialog.h \
-    GUI/videowidget.h \
-    GUI/framewidget.h \
-    GUI/projectwidget.h \
-    GUI/bookmarkwidget.h
+    GUI/Bookmark/bookmarkitem.h \
+    GUI/Video/fpsdialog.h \
+    GUI/Video/videowidget.h \
+    GUI/Video/framewidget.h \
+    GUI/Project/projectwidget.h \
+    GUI/Bookmark/bookmarkwidget.h
 
 FORMS    +=
 

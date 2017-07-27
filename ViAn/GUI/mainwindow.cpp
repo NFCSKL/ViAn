@@ -18,7 +18,7 @@
 #include "Toolbars/maintoolbar.h"
 #include "Toolbars/drawingtoolbar.h"
 #include "manipulatordialog.h"
-#include "GUI/frameexporterdialog.h"
+#include "GUI/Video/frameexporterdialog.h"
 
 
 /**

@@ -13,10 +13,10 @@
 #include <vector>
 #include <atomic>
 #include "framewidget.h"
-#include "analysisslider.h"
+#include "GUI/Analysis/analysisslider.h"
 #include "Video/video_player.h"
 #include "Project/videoproject.h"
-#include "drawscrollarea.h"
+#include "GUI/drawscrollarea.h"
 #include "Project/Analysis/tag.h"
 #include "Video/videocontroller.h"
 class VideoWidget : public QWidget
