@@ -1,7 +1,7 @@
 #include "videowidget.h"
 #include "utility.h"
-#include "drawscrollarea.h"
-#include "tagdialog.h"
+#include "GUI/drawscrollarea.h"
+#include "GUI/Analysis/tagdialog.h"
 
 #include <QTime>
 #include <QDebug>
@@ -695,13 +695,18 @@ void VideoWidget::fit_clicked() {
  * Slot function for loading a new video
  * @param vid_proj
  */
-void VideoWidget::load_marked_video(VideoProject* vid_proj, int frame) {
+void VideoWidget::load_marked_video(VideoProject* vid_proj) {
+    int frame = -1;
     if (!video_btns_enabled) enable_video_btns();
-
     if (m_vid_proj != vid_proj) {
+        Video* video = vid_proj->get_video();
+        if(m_vid_proj != nullptr){
+            Video* old = m_vid_proj->get_video();
+            old->state.frame = frame_index.load();
+        }
         m_vid_proj = vid_proj;
-        load_video(vid_proj->get_video()->file_path);
-        playback_slider->setValue(frame);
+        load_video(video);
+        playback_slider->setValue(video->state.frame);
 
         m_interval = make_pair(0,0);
 

@@ -7,11 +7,11 @@
 #include <QPoint>
 #include <QSize>
 #include <QTimer>
-
+#include <atomic>
 #include <opencv2/core/core.hpp>
 
 #include "Video/frameprocessor.h"
-
+#include "Project/video.h"
 class VideoController : public QThread {
     Q_OBJECT
     QTimer* frame_timer;
@@ -22,7 +22,7 @@ public:
 
 signals:
     // TO VIDEO PLAYER
-    void load_video(std::string video_path);
+    void load_video(Video* video);
 
     void update_speed(int steps);
 

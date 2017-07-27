@@ -5,13 +5,13 @@
 #include <QCoreApplication>
 
 #include <stack>
-
+#include "Project/video.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/videoio/videoio.hpp>
 #include <opencv2/video/video.hpp>
 #include <opencv2/core/core.hpp>
-
+#include <atomic>
 class VideoPlayer : public QObject
 {
     Q_OBJECT
@@ -46,7 +46,7 @@ signals:
     void playback_stopped(void);
 
 public slots:
-    void on_load_video(std::string);
+    void on_load_video(Video* video);
     void on_update_speed(int speed_steps);
     void set_frame();
     void check_events(void);

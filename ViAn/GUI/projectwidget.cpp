@@ -1,6 +1,6 @@
 #include "projectwidget.h"
 #include "projectdialog.h"
-#include "TreeItems/itemtypes.h"
+#include "GUI/TreeItems/analysisitem.h"
 #include <QFileDialog>
 #include <QHeaderView>
 #include <QDebug>
@@ -271,8 +271,6 @@ void ProjectWidget::insert_to_path_index(VideoProject *vid_proj) {
     }
 }
 
-
-
 /**
  * @brief ProjectWidget::update_index_paths
  * Stores GUI information of each tree item into its data member
@@ -372,7 +370,7 @@ void ProjectWidget::tree_item_clicked(QTreeWidgetItem* item, const int& col) {
     switch(item->type()){
     case VIDEO_ITEM: {
         VideoItem* vid_item = dynamic_cast<VideoItem*>(item);
-        emit marked_video(vid_item->get_video_project(), -1);
+        emit marked_video(vid_item->get_video_project());
         emit set_detections(false);
         emit set_poi_slider(false);
         emit set_tag_slider(false);
@@ -539,9 +537,7 @@ void ProjectWidget::save_project() {
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
     tree_state.save_state(m_proj->getDir() + "treestate");
-
     m_proj->save_project();
-
     RecentProject rp;
     rp.load_recent();
     rp.update_recent(m_proj->getName(), m_proj->full_path());
