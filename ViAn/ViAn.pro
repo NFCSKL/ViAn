@@ -58,7 +58,8 @@ SOURCES += main.cpp \
     GUI/fpsdialog.cpp \
     GUI/frameexporterdialog.cpp \
     GUI/framewidget.cpp \
-    GUI/videowidget.cpp
+    GUI/videowidget.cpp \
+    Analysis/analysissettings.cpp
 
 #
 # TEST
@@ -108,7 +109,9 @@ HEADERS += reportgenerator.h\
     GUI/fpsdialog.h \
     GUI/frameexporterdialog.h \
     GUI/framewidget.h \
-    GUI/videowidget.h
+    GUI/videowidget.h \
+    Analysis/analysissettings.h \
+    Analysis/analysismethod.h
 
 #
 # LIBRARY
@@ -229,10 +232,9 @@ HEADERS +=Project/Test/projecttestsuite.h \
 #
 # ANALYSIS
 #
-SOURCES += Analysis/AnalysisMethod.cpp\
-    Analysis/MotionDetection.cpp \
-    Analysis/AnalysisController.cpp
+SOURCES += Analysis/analysismethod.cpp\
+    Analysis/motiondetection.cpp \
+    Analysis/analysiscontroller.cpp
 
-HEADERS +=Analysis/AnalysisMethod.h\
-    Analysis/MotionDetection.h \
-    Analysis/AnalysisController.h
+HEADERS += Analysis/motiondetection.h \
+    Analysis/analysiscontroller.h
