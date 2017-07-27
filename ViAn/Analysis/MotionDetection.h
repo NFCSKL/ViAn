@@ -18,11 +18,12 @@ public:
 private:
     cv::Mat foreground_mask, background, blurred_frame, diff_frame, result, prev_frame, dilation_kernel;
     cv::Ptr<cv::BackgroundSubtractor> background_subtractor;
-    const cv::Size BLUR_SIZE = cv::Size(31,31);
+
 
     void setup_analysis() override;
     std::vector<DetectionBox> analyse_frame() override;
 
+    const cv::Size BLUR_SIZE = cv::Size(31,31);
     const int DILATION_DEGREE = 16;
     const int SMALLEST_OBJECT_SIZE = 500;
     const int DETECTION_THRESHOLD = 25;

@@ -4,7 +4,7 @@
 #include <QThread>
 #include "Project/Analysis/analysisproxy.h"
 #include "Analysis/AnalysisMethod.h"
-
+#include "analysissettings.h"
 class AnalysisController : public QThread {
     Q_OBJECT
 
@@ -14,9 +14,9 @@ private:
 public:
     AnalysisController(QObject* parent = 0);
     void run() override;
-    void new_analysis(std::string save_path, std::string video_path, ANALYSIS_TYPE type);
+    void new_analysis(std::string save_path, std::string video_path, AnalysisSettings settings);
 private:
-    void setup_analysis(std::string video_path, ANALYSIS_TYPE type);
+    void setup_analysis(std::string video_path, AnalysisSettings settings);
     AnalysisMethod* method;
 signals:
     void analysis_done(AnalysisProxy);
