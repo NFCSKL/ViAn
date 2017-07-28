@@ -7,8 +7,6 @@
  */
 MotionDetection::MotionDetection(std::string source_file, MotionDetSettings* settings) : AnalysisMethod(settings)
 {
-    cv::namedWindow("test_window");
-    cv::namedWindow("2");
     m_settings = settings;
     m_analysis.type = MOTION_DETECTION;
     capture.open(source_file);

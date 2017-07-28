@@ -130,9 +130,6 @@ Analysis AnalysisMethod::run_analysis() {
  * @return Progression of analysis in whole percent.
  */
 int AnalysisMethod::get_progress(int start_frame) {
-    qDebug() << (current_frame_index-start_frame)/num_frames;
-    qDebug() << num_frames;
-    qDebug() << ((double)(current_frame_index-start_frame)/(double)num_frames) * 100;
     return ((double)(current_frame_index-start_frame)/(double)num_frames) * 100;
 
 }

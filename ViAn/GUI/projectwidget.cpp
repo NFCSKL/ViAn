@@ -89,7 +89,6 @@ void ProjectWidget::add_video() {
  * Start analysis on the selected video
  */
 void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
-    qDebug() << "start analysis";
     AnalysisItem* ana = new AnalysisItem();
     VideoItem* v_item = get_video_item(vid_proj);
     if (vid_proj == nullptr) return;
@@ -98,7 +97,6 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* set
     v_item->setExpanded(true);
     QTreeWidgetItem* item = dynamic_cast<QTreeWidgetItem*>(ana);    
     emit begin_analysis(m_proj->getDir(), vid_proj->get_video()->file_path, item, settings);
-    qDebug() << "analysis sent";
 }
 
 /**

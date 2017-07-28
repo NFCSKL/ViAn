@@ -76,7 +76,6 @@ int VideoWidget::get_current_video_length(){
 
 void VideoWidget::quick_analysis(AnalysisSettings * settings)
 {
-    qDebug() << "qucik analysis, vid_wgt";
     emit start_analysis(m_vid_proj, settings);
 }
 
@@ -511,15 +510,6 @@ void VideoWidget::play_btn_toggled(bool status) {
     } else {
         play_btn->setIcon(QIcon("../ViAn/Icons/play.png"));
         set_status_bar("Pause");
-    }
-}
-
-void VideoWidget::analysis_btn_clicked() {
-    qDebug() << "clicked";
-    if (m_vid_proj != nullptr) {
-        //emit start_analysis(m_vid_proj);
-    } else {
-        emit set_status_bar("No video selected");
     }
 }
 

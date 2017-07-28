@@ -78,7 +78,6 @@ public slots:
     void set_current_time(int time);
     void set_total_time(int time);
     void play_btn_toggled(bool status);
-    void analysis_btn_clicked(void);
     void tag_frame(void);
     void remove_tag_frame(void);
     void new_tag_clicked();

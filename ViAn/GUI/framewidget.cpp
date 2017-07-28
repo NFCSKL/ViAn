@@ -189,6 +189,7 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
         settings->setBounding_box(cv::Rect(rect_start.x(), rect_start.y(),
                                            rect_end.x(),rect_end.y()));
         emit quick_analysis(settings);
+        qDebug () << "TODO:analysis rect needs scaling";
         tool = NONE;
         mark_rect = false;
         break;

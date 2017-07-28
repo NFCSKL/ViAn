@@ -20,7 +20,6 @@ AnalysisWidget::AnalysisWidget(QWidget *parent) {
  * Puts the analysis in the queue and if the was empty starts the analysis directly
  */
 void AnalysisWidget::start_analysis(std::string save_path, std::string video_path, QTreeWidgetItem* item, AnalysisSettings *settings) {
-    qDebug() << "starting analysis";
     std::size_t index = video_path.find_last_of('/') + 1;
     std::string vid_name = video_path.substr(index);
     index = vid_name.find_last_of('.');
@@ -45,7 +44,6 @@ void AnalysisWidget::start_analysis(std::string save_path, std::string video_pat
  * Takes in a tuple consisting of <savepath, videopath, video to be analysed>
  */
 void AnalysisWidget::perform_analysis(tuple<std::string, std::string, QTreeWidgetItem*, AnalysisSettings*> analys) {
-    qDebug() <<"perform analysis";
     emit add_analysis_bar();
     MotionDetSettings* settings = new MotionDetSettings(*get<3>(analys));
     an_col->new_analysis(get<0>(analys), get<1>(analys),settings);
