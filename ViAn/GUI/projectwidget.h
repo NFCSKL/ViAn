@@ -12,6 +12,7 @@
 #include "Project/Analysis/analysis.h"
 #include "Project/Analysis/tag.h"
 #include "Project/videoproject.h"
+#include "Analysis/analysissettings.h"
 class Project;
 class VideoItem;
 class FolderItem;
@@ -43,14 +44,14 @@ signals:
     void set_poi_slider(bool);
     void set_tag_slider(bool);
     void set_status_bar(QString);
-    void begin_analysis(std::string, std::string, QTreeWidgetItem*);
+    void begin_analysis(std::string, std::string, QTreeWidgetItem*, AnalysisSettings*);
     void update_frame();
 
 public slots:
     void new_project(void);
     void add_project(const QString project_name, const QString project_path);
     void add_video();
-    void start_analysis(VideoProject*);
+    void start_analysis(VideoProject*, AnalysisSettings*settings = nullptr);
     void add_basic_analysis(VideoProject*, BasicAnalysis *tag);
     void set_tree_item_name(QTreeWidgetItem *item, QString);
     void save_project();

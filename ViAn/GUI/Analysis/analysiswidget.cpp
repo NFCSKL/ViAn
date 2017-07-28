@@ -19,13 +19,14 @@ AnalysisWidget::AnalysisWidget(QWidget *parent) {
  * @param item          : video to be analysed
  * Puts the analysis in the queue and if the was empty starts the analysis directly
  */
-void AnalysisWidget::start_analysis(std::string save_path, std::string video_path, QTreeWidgetItem* item) {
+void AnalysisWidget::start_analysis(std::string save_path, std::string video_path, QTreeWidgetItem* item, AnalysisSettings *settings) {
+    qDebug() << "starting analysis";
     std::size_t index = video_path.find_last_of('/') + 1;
     std::string vid_name = video_path.substr(index);
     index = vid_name.find_last_of('.');
     vid_name = vid_name.substr(0,index);
 
-    tuple<std::string, std::string, QTreeWidgetItem*> analys (save_path+vid_name+"-motion-analysis", video_path, item);
+    tuple<std::string, std::string, QTreeWidgetItem*, AnalysisSettings*> analys (save_path+vid_name+"-motion-analysis", video_path, item, settings);
     if (!analysis_queue.empty()) {
         analysis_queue.push_back(analys);
         std::string name = "Queued #"+to_string(analysis_queue.size()-1);
@@ -43,9 +44,11 @@ void AnalysisWidget::start_analysis(std::string save_path, std::string video_pat
  * Actually starts the analysis
  * Takes in a tuple consisting of <savepath, videopath, video to be analysed>
  */
-void AnalysisWidget::perform_analysis(tuple<std::string, std::string, QTreeWidgetItem*> analys) {
+void AnalysisWidget::perform_analysis(tuple<std::string, std::string, QTreeWidgetItem*, AnalysisSettings*> analys) {
+    qDebug() <<"perform analysis";
     emit add_analysis_bar();
-    an_col->new_analysis(get<0>(analys), get<1>(analys), new MotionDetSettings());
+    MotionDetSettings* settings = new MotionDetSettings(*get<3>(analys));
+    an_col->new_analysis(get<0>(analys), get<1>(analys),settings);
     start = std::clock();
     an_col->start();
 }

@@ -7,6 +7,8 @@
  */
 MotionDetection::MotionDetection(std::string source_file, MotionDetSettings* settings) : AnalysisMethod(settings)
 {
+    cv::namedWindow("test_window");
+    cv::namedWindow("2");
     m_settings = settings;
     m_analysis.type = MOTION_DETECTION;
     capture.open(source_file);
@@ -37,50 +39,56 @@ std::vector<DetectionBox> MotionDetection::analyse_frame(){
     std::vector<std::vector<cv::Point> > contours;
 
     // Updates background model
-    blurred_frame = frame.clone();
-    cv::GaussianBlur(blurred_frame, blurred_frame, BLUR_SIZE, 0);
-    background_subtractor->apply(blurred_frame, foreground_mask,-1);
+    blurred_frame = analysis_frame.clone();
+    //cv::GaussianBlur(blurred_frame, blurred_frame, m_settings->BLUR_SIZE, 0);
+    background_subtractor->apply(blurred_frame, foreground_mask,-1);   
 
     cv::threshold(foreground_mask, foreground_mask, m_settings->DETECTION_THRESHOLD, m_settings->GRAYSCALE_WHITE, cv::THRESH_BINARY);
-    cv::dilate(foreground_mask, foreground_mask, dilation_kernel);
+    cv::morphologyEx(foreground_mask, result, cv::MORPH_OPEN, dilation_kernel);
 
 
     /* Creates an additional foreground mask and uses
      * that combined with the MOG2 foreground mask to
      * assert motion.
-     */
-    if (!prev_frame.empty()) {
-        cv::Mat gray_frame = frame.clone();
-        cv::cvtColor(gray_frame, gray_frame, CV_RGB2GRAY);
-        // Get differences between current and previous frame
-        cv::absdiff(prev_frame,gray_frame,diff_frame);
-        // Filters out everything but the detections
-        cv::GaussianBlur(diff_frame, diff_frame, BLUR_SIZE, 0);
-        cv::threshold(diff_frame, diff_frame, m_settings->DETECTION_THRESHOLD, m_settings->GRAYSCALE_WHITE, cv::THRESH_BINARY);
-        cv::dilate(diff_frame, diff_frame, dilation_kernel);
-        // ANDs the foreground masks
-        cv::bitwise_and(diff_frame, foreground_mask, result);
-        gray_frame.release();
-    } else {
-        // diff_prev is empty for the first analysed frame.
-        result = foreground_mask.clone();
-    }
+//     */
+//    if (!prev_frame.empty()) {
+//        cv::Mat gray_frame = frame.clone();
+//        cv::cvtColor(gray_frame, gray_frame, CV_RGB2GRAY);
+//        // Get differences between current and previous frame
+//        cv::absdiff(prev_frame,gray_frame,diff_frame);
+//        // Filters out everything but the detections
+//        //cv::GaussianBlur(diff_frame, diff_frame, BLUR_SIZE, 0);
+//        cv::threshold(diff_frame, diff_frame, m_settings->DETECTION_THRESHOLD, m_settings->GRAYSCALE_WHITE, cv::THRESH_BINARY);
+//        cv::dilate(diff_frame, diff_frame, dilation_kernel);
+//        // ANDs the foreground masks
+//        cv::bitwise_and(diff_frame, foreground_mask, result);
+//        gray_frame.release();
+//    } else {
+//        // diff_prev is empty for the first analysed frame.
+//        result = foreground_mask.clone();
+//    }
 
-    prev_frame = frame.clone();
+    prev_frame = analysis_frame.clone();
     cv::cvtColor(prev_frame, prev_frame, CV_RGB2GRAY);
 
     //This code excludes the area of the frame that has been given by exclude_frame.
     if (do_exclusion) {
         cv::bitwise_and(result, exclude_frame, result);
     }
-
     // Creates OOIs from the detected countours.
     cv::findContours(result.clone(), contours, cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
     for (std::vector<cv::Point> contour : contours) {
         if (cv::contourArea(contour) > m_settings->SMALLEST_OBJECT_SIZE) {
             cv::Rect rect = cv::boundingRect(contour);
+            if(m_settings->use_bounding_box){
+                cv::Rect slice_rect = m_settings->getBounding_box();
+                cv::Rect rect_to_original (rect.tl()+slice_rect.tl(), slice_rect.tl() + rect.br());
+                rect = rect_to_original;
+
+            }
             OOIs.push_back(DetectionBox(rect));
-        }
+
+        }        
     }    
     return OOIs;
 }

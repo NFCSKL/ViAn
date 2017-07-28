@@ -59,12 +59,26 @@ Analysis AnalysisMethod::run_analysis() {
     }
     calculate_scaling_factor();
     std::vector<DetectionBox> detections;
-    num_frames = capture.get(CV_CAP_PROP_FRAME_COUNT);
-    POI* m_POI = new POI();
-    while(!aborted && capture.read(frame)) {        
+    num_frames = capture.get(CV_CAP_PROP_FRAME_COUNT);    
+    POI* m_POI = new POI();    
+    // If Interval is use, start analysis at frame
+    int end_frame = num_frames -1;
+    int start_frame = m_settings->interval.get_start();
+    if( m_settings->use_interval){
+        capture.set(CV_CAP_PROP_POS_FRAMES, start_frame);
+        end_frame = m_settings->interval.get_end();
+        num_frames = end_frame - start_frame;
+        current_frame_index = start_frame -1;
+    }
+    while(!aborted && capture.read(original_frame) &&
+          !(m_settings->use_interval && current_frame_index <= end_frame)) {
+
+        // Slice frame if bounding box should be used
+        if(m_settings->use_bounding_box) analysis_frame = original_frame(m_settings->getBounding_box());
+        else analysis_frame = original_frame;
+
         // do frame analysis
-        if(m_settings->use_bounding_box) frame = frame(m_settings->getBounding_box());
-        if (sample_current_frame() || current_frame_index == num_frames-1) {
+        if (sample_current_frame() || current_frame_index == end_frame) {
             if (scaling_needed)
                 scale_frame();            
             detections = analyse_frame();
@@ -98,7 +112,7 @@ Analysis AnalysisMethod::run_analysis() {
             paused = false;
         }
 
-        emit send_progress(get_progress());
+        emit send_progress(get_progress(start_frame));
         ++current_frame_index;
     }
     // Makes sure that a POI that stretches to the end of the
@@ -115,8 +129,11 @@ Analysis AnalysisMethod::run_analysis() {
  * @brief AnalysisMethod::get_progress
  * @return Progression of analysis in whole percent.
  */
-int AnalysisMethod::get_progress() {
-    return current_frame_index*100/num_frames;
+int AnalysisMethod::get_progress(int start_frame) {
+    qDebug() << (current_frame_index-start_frame)/num_frames;
+    qDebug() << num_frames;
+    qDebug() << ((double)(current_frame_index-start_frame)/(double)num_frames) * 100;
+    return ((double)(current_frame_index-start_frame)/(double)num_frames) * 100;
 
 }
 
@@ -168,7 +185,7 @@ void AnalysisMethod::calculate_scaling_factor() {
  */
 void AnalysisMethod::scale_frame() {
     cv::Size size(scaled_width,scaled_height);
-    cv::Mat dst(size,frame.type());
-    cv::resize(frame,dst,size); //resize frame
-    frame = dst;
+    cv::Mat dst(size,analysis_frame.type());
+    cv::resize(analysis_frame,dst,size); //resize frame
+    analysis_frame = dst;
 }

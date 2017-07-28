@@ -45,8 +45,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     // Initialize analysis widget
     analysis_wgt = new AnalysisWidget();
-    connect(video_wgt, SIGNAL(start_analysis(VideoProject*)), project_wgt, SLOT(start_analysis(VideoProject*)));
-    connect(project_wgt, SIGNAL(begin_analysis(std::string,std::string,QTreeWidgetItem*)), analysis_wgt, SLOT(start_analysis(std::string,std::string,QTreeWidgetItem*)));
+    connect(video_wgt, SIGNAL(start_analysis(VideoProject*, AnalysisSettings*)), project_wgt, SLOT(start_analysis(VideoProject*, AnalysisSettings*)));
+    connect(video_wgt->frame_wgt, SIGNAL(quick_analysis(AnalysisSettings*)), video_wgt, SLOT(quick_analysis(AnalysisSettings*)));
+    connect(project_wgt, SIGNAL(begin_analysis(std::string,std::string,QTreeWidgetItem*, AnalysisSettings*)), analysis_wgt, SLOT(start_analysis(std::string,std::string,QTreeWidgetItem*, AnalysisSettings*)));
 
 
     // Initialize bookmark widget
@@ -295,7 +296,7 @@ void MainWindow::init_analysis_menu() {
     analysis_act->setIcon(QIcon("../ViAn/Icons/analysis.png"));
     analysis_act->setStatusTip(tr("Perform analysis"));
     analysis_menu->addAction(analysis_act);
-    connect(analysis_act, &QAction::triggered, video_wgt, &VideoWidget::analysis_btn_clicked);
+    //connect(analysis_act, &QAction::triggered, video_wgt, &VideoWidget::analysis_btn_clicked);
 }
 
 void MainWindow::init_interval_menu() {

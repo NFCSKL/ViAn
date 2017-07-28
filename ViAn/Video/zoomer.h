@@ -34,7 +34,7 @@ public:
 private:
     void force_bounds();
     void update_scale();
-    void update_rect_size();
+    cv::Rect scale_rect_size(cv::Rect rect);
 };
 
 #endif // ZOOMER_H

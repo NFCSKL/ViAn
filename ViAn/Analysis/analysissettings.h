@@ -4,10 +4,11 @@
 #include <opencv2/core.hpp>
 
 class AnalysisSettings {
-    ANALYSIS_TYPE type;
-    AnalysisInterval interval;
-    cv::Rect bounding_box;
+
 public:
+    ANALYSIS_TYPE type;
+    cv::Rect bounding_box;
+    AnalysisInterval interval;
     const int SAMPLE_RATE = 1;
     bool default_settings;
     bool use_bounding_box = false;
@@ -25,29 +26,22 @@ public:
 };
 class MotionDetSettings : public AnalysisSettings{
 public:
-    const cv::Size BLUR_SIZE = cv::Size(31,31);
-    const int DILATION_DEGREE = 16;
-    const int SMALLEST_OBJECT_SIZE = 500;
-    const int DETECTION_THRESHOLD = 25;
-    const int GRAYSCALE_WHITE = 255;
-    const int BACKGROUND_HISTORY = 500;
-    const int MOG2_THRESHOLD = 50;
-    const bool DETECT_SHADOWS = false;
+    cv::Size BLUR_SIZE = cv::Size(31,31);
+    int DILATION_DEGREE = 10;
+    int SMALLEST_OBJECT_SIZE = 500;
+    int DETECTION_THRESHOLD = 25;
+    int GRAYSCALE_WHITE = 255;
+    int BACKGROUND_HISTORY = 500;
+    int MOG2_THRESHOLD = 50;
+    bool DETECT_SHADOWS = true;
+public:
+
     MotionDetSettings();
+    MotionDetSettings(AnalysisSettings& settings);
     MotionDetSettings(MotionDetSettings& settings)  = default;
     MotionDetSettings(AnalysisInterval interval,
                       cv::Rect bounding_box,
-                      int sample_rate = 1,
-                      int smallest_obj = 500);
-    MotionDetSettings(AnalysisInterval interval, cv::Rect bounding_box, int sample_rate = 1,
-                      int dilation = 16,
-                      int min_obj_size = 500,
-                      int det_treshhold = 25,
-                      int grayscale_white = 255,
-                      int backround_history = 500,
-                      int mog2_treshold = 50,
-                      bool detect_shadows = false);
-
+                      int sample_rate = 1);
 };
 
 #endif // ANALYSISSETTINGS_H

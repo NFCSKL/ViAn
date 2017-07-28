@@ -20,6 +20,7 @@ AnalysisController::AnalysisController(QObject* parent) : QThread(parent) {
 }
 
 void AnalysisController::new_analysis(std::string save_path, std::string video_path, AnalysisSettings* settings) {
+    qDebug() << "new analysis";
     m_save_path = save_path;
     m_video_path = video_path;
     setup_analysis(video_path, settings);
@@ -49,6 +50,7 @@ void AnalysisController::setup_analysis(std::string video_path, AnalysisSettings
  * Starts the analysis loop.
  */
 void AnalysisController::run() {
+    qDebug() << "run";
     method->setup_analysis();
     Analysis analysis = method->run_analysis();
     analysis.m_name = "Analysis";

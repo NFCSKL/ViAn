@@ -74,6 +74,12 @@ int VideoWidget::get_current_video_length(){
     return m_frame_length;
 }
 
+void VideoWidget::quick_analysis(AnalysisSettings * settings)
+{
+    qDebug() << "qucik analysis, vid_wgt";
+    emit start_analysis(m_vid_proj, settings);
+}
+
 /**
  * @brief VideoWidget::init_btn_layout
  * Set up the button layouts
@@ -339,14 +345,13 @@ void VideoWidget::connect_btns() {
     connect(next_frame_btn, &QPushButton::clicked, this, &VideoWidget::next_frame_clicked);
     connect(prev_frame_btn, &QPushButton::clicked, this, &VideoWidget::prev_frame_clicked);
 
-    connect(analysis_btn, &QPushButton::clicked, this, &VideoWidget::analysis_btn_clicked);
     connect(analysis_play_btn, &QPushButton::toggled, this, &VideoWidget::analysis_play_btn_toggled);
 
     connect(next_poi_btn, &QPushButton::clicked, this, &VideoWidget::next_poi_btn_clicked);
     connect(prev_poi_btn, &QPushButton::clicked, this, &VideoWidget::prev_poi_btn_clicked);
 
     connect(zoom_in_btn, &QPushButton::toggled, frame_wgt, &FrameWidget::toggle_zoom);
-
+    connect(analysis_btn, &QPushButton::clicked, frame_wgt, &FrameWidget::set_analysis_tool);
 
     connect(bookmark_btn, &QPushButton::clicked, this, &VideoWidget::on_bookmark_clicked);
     connect(tag_btn, &QPushButton::clicked, this, &VideoWidget::tag_frame);
@@ -510,8 +515,9 @@ void VideoWidget::play_btn_toggled(bool status) {
 }
 
 void VideoWidget::analysis_btn_clicked() {
+    qDebug() << "clicked";
     if (m_vid_proj != nullptr) {
-        emit start_analysis(m_vid_proj);
+        //emit start_analysis(m_vid_proj);
     } else {
         emit set_status_bar("No video selected");
     }

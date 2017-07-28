@@ -24,7 +24,7 @@ public:
     bool load_video();
 
     Analysis run_analysis();
-    int get_progress();
+    int get_progress(int start_frame);
 
 private:
     int prev_detection_frame = -1;
@@ -45,7 +45,7 @@ protected:
     float scaling_ratio = 1.0;
 
     cv::VideoCapture capture;       // Video source
-    cv::Mat frame, exclude_frame;   // The frame fetched last
+    cv::Mat analysis_frame, exclude_frame, original_frame;   // The frame fetched last
     Analysis m_analysis;
     AnalysisSettings* m_settings;
 

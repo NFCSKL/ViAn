@@ -88,15 +88,17 @@ void ProjectWidget::add_video() {
  * @param vid_proj
  * Start analysis on the selected video
  */
-void ProjectWidget::start_analysis(VideoProject* vid_proj) {
+void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
+    qDebug() << "start analysis";
     AnalysisItem* ana = new AnalysisItem();
     VideoItem* v_item = get_video_item(vid_proj);
     if (vid_proj == nullptr) return;
     v_item->addChild(ana);
     ana->setText(0, "Loading");
     v_item->setExpanded(true);
-    QTreeWidgetItem* item = dynamic_cast<QTreeWidgetItem*>(ana);
-    emit begin_analysis(m_proj->getDir(), vid_proj->get_video()->file_path, item);
+    QTreeWidgetItem* item = dynamic_cast<QTreeWidgetItem*>(ana);    
+    emit begin_analysis(m_proj->getDir(), vid_proj->get_video()->file_path, item, settings);
+    qDebug() << "analysis sent";
 }
 
 /**
@@ -120,7 +122,7 @@ void ProjectWidget::add_basic_analysis(VideoProject* vid_proj, BasicAnalysis* ta
 }
 
 /**
- * @brief ProjectWidget::set_tree_item_name
+ * @brief ProjectWidget::set_tree_item_namebei
  * @param item
  * @param name
  * Slot to set the name if an item in the project tree
