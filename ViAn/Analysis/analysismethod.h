@@ -1,6 +1,5 @@
 #ifndef ANALYSISMETHOD_H
 #define ANALYSISMETHOD_H
-
 #include <QThread>
 #include <QMutex>
 #include <QWaitCondition>
@@ -9,10 +8,33 @@
 #include "opencv2/videoio/videoio.hpp"
 #include "Project/Analysis/analysis.h"
 #include "analysissettings.h"
-class AnalysisMethod : public QThread {
-    Q_OBJECT
+#include "Project/Analysis/analysisproxy.h"
+#include "Filehandler/saveable.h"
+using Settings = std::map<std::string,int>;
+using SettingsDescr = std::map<std::string,std::string>;
+class AnalysisMethod : public QObject {
+    Q_OBJECT    
+    Settings m_settings;
+    SettingsDescr m_descriptions;
+    std::string m_save_path;
+    std::string m_source_file;
+protected:
+    AnalysisInterval interval;
+    cv::Rect bounding_box;
+    bool use_interval = false;
+    bool use_bounding_box = false;
+
+    // Implement this in subclass,
+    // using set_setting(Var,value) for all desired settings
+    virtual void init_settings() = 0;
+    // Implement this, return constant names, default value and descriptions
+    // like so std::vector<std::tuple<name,int value, description>>
+    std::string get_descr(const std::string& var_name);
+    virtual void add_setting(const std::string& var, int value_default, const std::string& descr);
+    virtual int get_setting(const std::string& var);
+    virtual void set_setting(const std::string& var, int value);
 public:
-    AnalysisMethod(AnalysisSettings* settings);
+    AnalysisMethod(const std::string &video_path, const std::string& save_path);
     void abort_analysis();
     void pause_analysis();
     void set_include_exclude_area(std::vector<cv::Point> points, bool exclude_polygon);
@@ -23,8 +45,13 @@ public:
     bool sample_current_frame();
     bool load_video();
 
-    Analysis run_analysis();
+
     int get_progress(int start_frame);
+
+    void setBounding_box(const cv::Rect &value);
+
+    AnalysisInterval getInterval() const;
+    void setInterval(const AnalysisInterval &value);
 
 private:
     int prev_detection_frame = -1;
@@ -47,7 +74,6 @@ protected:
     cv::VideoCapture capture;       // Video source
     cv::Mat analysis_frame, exclude_frame, original_frame;   // The frame fetched last
     Analysis m_analysis;
-    AnalysisSettings* m_settings;
 
     bool do_exclusion = false;
     bool scaling_needed = false;
@@ -56,9 +82,12 @@ protected:
 
     void calculate_scaling_factor();
     void scale_frame();
-
+public slots:
+    void run_analysis();
 signals:
     void send_progress(int progress);
+    void finito(void);
+    void finished_analysis(AnalysisProxy);
 };
 
 #endif // ANALYSISMETHOD_H

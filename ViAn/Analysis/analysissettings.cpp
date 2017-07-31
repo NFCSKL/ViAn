@@ -1,22 +1,26 @@
 #include "analysissettings.h"
-MotionDetSettings::MotionDetSettings(AnalysisInterval interval,
-                                     cv::Rect bounding_box,
-                                     int sample_rate) :
-    AnalysisSettings(MOTION_DETECTION, interval,bounding_box,sample_rate)
+
+AnalysisSettings::AnalysisSettings(ANALYSIS_TYPE type,
+                                   AnalysisInterval interval,
+                                   cv::Rect bounding_box,
+                                   int sample_rate)
+    : type(type),
+      SAMPLE_RATE(sample_rate)
 {
-
-
+    setInterval(interval);
+    setBounding_box(bounding_box);
 }
 
-MotionDetSettings::MotionDetSettings() : AnalysisSettings(MOTION_DETECTION)
+AnalysisSettings::AnalysisSettings(ANALYSIS_TYPE type) : type(type)
 {
-
+    default_settings = true;
 }
 
-MotionDetSettings::MotionDetSettings(AnalysisSettings &settings) : AnalysisSettings(settings)
-{
 
+AnalysisSettings::~AnalysisSettings()
+{    
 }
+
 
 cv::Rect AnalysisSettings::getBounding_box() const
 {
@@ -43,24 +47,4 @@ void AnalysisSettings::setInterval(const AnalysisInterval &value)
 {
     interval = value;
     use_interval = true;
-}
-AnalysisSettings::AnalysisSettings(ANALYSIS_TYPE type,
-                                   AnalysisInterval interval,
-                                   cv::Rect bounding_box,
-                                   int sample_rate)
-    : type(type),
-      SAMPLE_RATE(sample_rate)
-{
-    setInterval(interval);
-    setBounding_box(bounding_box);
-}
-
-AnalysisSettings::AnalysisSettings(ANALYSIS_TYPE type) : type(type)
-{
-    default_settings = true;
-}
-
-AnalysisSettings::~AnalysisSettings()
-{
-
 }

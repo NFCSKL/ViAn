@@ -13,8 +13,8 @@
 #include <chrono>
 #include <thread>
 #include "Video/shapes/shape.h"
-#include "Analysis/MotionDetection.h"
-#include "Analysis/AnalysisMethod.h"
+#include "Analysis/motiondetection.h"
+#include "Analysis/analysismethod.h"
 #include "Toolbars/maintoolbar.h"
 #include "Toolbars/drawingtoolbar.h"
 #include "manipulatordialog.h"
@@ -45,9 +45,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     // Initialize analysis widget
     analysis_wgt = new AnalysisWidget();
+
     connect(video_wgt, SIGNAL(start_analysis(VideoProject*, AnalysisSettings*)), project_wgt, SLOT(start_analysis(VideoProject*, AnalysisSettings*)));
     connect(video_wgt->frame_wgt, SIGNAL(quick_analysis(AnalysisSettings*)), video_wgt, SLOT(quick_analysis(AnalysisSettings*)));
-    connect(project_wgt, SIGNAL(begin_analysis(std::string,std::string,QTreeWidgetItem*, AnalysisSettings*)), analysis_wgt, SLOT(start_analysis(std::string,std::string,QTreeWidgetItem*, AnalysisSettings*)));
+    connect(project_wgt, SIGNAL(begin_analysis(std::string ,std::string,  QTreeWidgetItem*, AnalysisMethod*)),
+            analysis_wgt, SLOT(start_analysis(std::string ,std::string,  QTreeWidgetItem*, AnalysisMethod*)));
     connect(project_wgt, SIGNAL(new_vid_proj(VideoProject*)), analysis_wgt, SLOT(add_video_project(VideoProject*)));
 
     // Initialize bookmark widget

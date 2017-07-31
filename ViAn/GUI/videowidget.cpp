@@ -11,7 +11,7 @@
 
 #include "GUI/frameexporterdialog.h"
 #include "Video/video_player.h"
-#include "Analysis/AnalysisController.h"
+#include "Analysis/analysiscontroller.h"
 #include "imageexporter.h"
 
 #include <opencv2/videoio.hpp>

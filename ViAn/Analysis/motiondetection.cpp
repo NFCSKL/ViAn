@@ -1,28 +1,40 @@
-#include "MotionDetection.h"
+#include "motiondetection.h"
 #include <vector>
 
 /**
  * @brief MotionDetection::MotionDetection
  * @param source_file
  */
-MotionDetection::MotionDetection(std::string source_file, MotionDetSettings* settings) : AnalysisMethod(settings)
+MotionDetection::MotionDetection(std::string source_file) : AnalysisMethod(source_file)
 {
-    m_settings = settings;
     m_analysis.type = MOTION_DETECTION;
-    capture.open(source_file);
+
 }
 
 MotionDetection::~MotionDetection() {
 
 }
 
+void MotionDetection::init_settings()
+{
+    add_setting("OPEN_DEGREE", 16, "Noise filtering, higher=> less noise");
+    add_setting("SMALLEST_OBJECT_SIZE", 16, "Smallest detected object");
+    add_setting("BACKGROUND_HISTORY", 16, "Number of frames in background model");
+    add_setting("MOG2_THRESHOLD", 16, "MOG2");
+    add_setting("IGNORE_SHADOWS", 0, "Ignore reflections");
+}
+
+
 /**
  * @brief MotionDetection::setup_analysis
  * Initial setup of the analysis
  */
 void MotionDetection::setup_analysis(){
-    background_subtractor = cv::createBackgroundSubtractorMOG2(m_settings->BACKGROUND_HISTORY,m_settings->MOG2_THRESHOLD,m_settings->DETECT_SHADOWS);
-    dilation_kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(m_settings->DILATION_DEGREE,m_settings->DILATION_DEGREE));
+    background_subtractor = cv::createBackgroundSubtractorMOG2(get_setting("BACKGROUND_HISTORY"),
+                                                               get_setting("MOG2_THRESHOLD"),
+                                                               get_setting("DETECT_SHADOWS"));
+    dilation_kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(get_setting("DILATION_DEGREE"),
+                                                                         get_setting("DILATION_DEGREE")));
 }
 
 /**
@@ -41,7 +53,7 @@ std::vector<DetectionBox> MotionDetection::analyse_frame(){
     //cv::GaussianBlur(blurred_frame, blurred_frame, m_settings->BLUR_SIZE, 0);
     background_subtractor->apply(blurred_frame, foreground_mask,-1);   
 
-    cv::threshold(foreground_mask, foreground_mask, m_settings->DETECTION_THRESHOLD, m_settings->GRAYSCALE_WHITE, cv::THRESH_BINARY);
+    cv::threshold(foreground_mask, foreground_mask, DETECTION_THRESHOLD, GRAYSCALE_WHITE, cv::THRESH_BINARY);
     cv::morphologyEx(foreground_mask, result, cv::MORPH_OPEN, dilation_kernel);
 
 
@@ -76,10 +88,10 @@ std::vector<DetectionBox> MotionDetection::analyse_frame(){
     // Creates OOIs from the detected countours.
     cv::findContours(result.clone(), contours, cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
     for (std::vector<cv::Point> contour : contours) {
-        if (cv::contourArea(contour) > m_settings->SMALLEST_OBJECT_SIZE) {
+        if (cv::contourArea(contour) > get_setting("SMALLEST_OBJECT_SIZE")) {
             cv::Rect rect = cv::boundingRect(contour);
-            if(m_settings->use_bounding_box){
-                cv::Rect slice_rect = m_settings->getBounding_box();
+            if(use_bounding_box){
+                cv::Rect slice_rect = bounding_box;
                 cv::Rect rect_to_original (rect.tl()+slice_rect.tl(), slice_rect.tl() + rect.br());
                 rect = rect_to_original;
 

@@ -90,14 +90,20 @@ void ProjectWidget::add_video() {
  * Start analysis on the selected video
  */
 void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
+    qDebug() << "start_analysis_begin";
+
     AnalysisItem* ana = new AnalysisItem();
+    AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->getDir()+vid_name+"-motion-analysis" );
+    if(settings->use_bounding_box) method->setBounding_box(settings->bounding_box);
+    if(settings->use_interval) method->setInterval(settings->interval);
     VideoItem* v_item = get_video_item(vid_proj);
     if (vid_proj == nullptr) return;
     v_item->addChild(ana);
     ana->setText(0, "Loading");
     v_item->setExpanded(true);
     QTreeWidgetItem* item = dynamic_cast<QTreeWidgetItem*>(ana);    
-    emit begin_analysis(m_proj->getDir(), vid_proj->get_video()->file_path, item, settings);
+    emit begin_analysis(m_proj->getDir(), vid_proj->get_video()->file_path, item, method);
+    qDebug() << "start_analysis_end";
 }
 
 /**

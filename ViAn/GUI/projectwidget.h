@@ -12,7 +12,8 @@
 #include "Project/Analysis/analysis.h"
 #include "Project/Analysis/tag.h"
 #include "Project/videoproject.h"
-#include "Analysis/analysissettings.h"
+#include "Analysis/analysismethod.h"
+#include "Analysis/motiondetection.h"
 class Project;
 class VideoItem;
 class FolderItem;
@@ -44,7 +45,7 @@ signals:
     void set_poi_slider(bool);
     void set_tag_slider(bool);
     void set_status_bar(QString);
-    void begin_analysis(std::string, std::string, QTreeWidgetItem*, AnalysisSettings*);
+    void begin_analysis(std::string ,std::string,  QTreeWidgetItem*, AnalysisMethod*);
     void update_frame();
     void new_vid_proj(VideoProject*);
 public slots:

@@ -19,8 +19,7 @@ AnalysisWidget::AnalysisWidget(QWidget *parent) {
  * @param item          : video to be analysed
  * Puts the analysis in the queue and if the was empty starts the analysis directly
  */
-void AnalysisWidget::start_analysis(std::string save_path, std::string video_path, QTreeWidgetItem* item, AnalysisMethod *method) {
-    qDebug() << "start_analysis";
+void AnalysisWidget::start_analysis(std::string save_path, std::string video_path, QTreeWidgetItem* item) {
     std::size_t index = video_path.find_last_of('/') + 1;
     std::string vid_name = video_path.substr(index);
     index = vid_name.find_last_of('.');
@@ -28,7 +27,7 @@ void AnalysisWidget::start_analysis(std::string save_path, std::string video_pat
 
     AnalysisDialog* dialog  = new AnalysisDialog();
     dialog->show();
-    tuple<std::string, AnalysisMethod*,QTreeWidgetItem*> analys (save_path+vid_name+"-motion-analysis", method,item);
+    tuple<std::string, AnalysisMethod*, QTreeWidgetItem*> analys (save_path+vid_name+"-motion-analysis", video_path, item);
     if (!analysis_queue.empty()) {
         analysis_queue.push_back(analys);
         std::string name = "Queued #"+to_string(analysis_queue.size()-1);
@@ -38,7 +37,6 @@ void AnalysisWidget::start_analysis(std::string save_path, std::string video_pat
         perform_analysis(analys);
         current_analysis = item;
     }
-    qDebug() << "start_analysis_end";
 }
 
 /**
@@ -47,19 +45,11 @@ void AnalysisWidget::start_analysis(std::string save_path, std::string video_pat
  * Actually starts the analysis
  * Takes in a tuple consisting of <savepath, videopath, video to be analysed>
  */
-void AnalysisWidget::perform_analysis(tuple<std::string,AnalysisMethod*, QTreeWidgetItem*> analys) {
-    emit add_analysis_bar();
-    //an_col->new_analysis(get<1>(analys),get<0>(analys));
-//    start = std::clock();
-//    an_col->start();
-    AnalysisMethod* method = get<1>(analys);
-    QThread* analysis_thread = new QThread();
-    method->moveToThread(analysis_thread);
-    connect(analysis_thread, &QThread::started, method, &AnalysisMethod::run_analysis);
-    connect(method, &AnalysisMethod::finito, analysis_thread, &QThread::quit);
-    connect(method, &AnalysisMethod::finito, method, &AnalysisMethod::deleteLater);
-    connect(analysis_thread, &QThread::finished, analysis_thread, &QThread::deleteLater);
-    analysis_thread->start();
+void AnalysisWidget::perform_analysis(tuple<std::string, AnalysisMethod*, QTreeWidgetItem*> analys) {
+    emit add_analysis_bar();    
+    an_col->new_analysis(get<1>(analys),get<0>(analys));
+    start = std::clock();
+    an_col->start();
 }
 
 /**

@@ -24,24 +24,5 @@ public:
     AnalysisInterval getInterval() const;
     void setInterval(const AnalysisInterval &value);
 };
-class MotionDetSettings : public AnalysisSettings{
-public:
-    cv::Size BLUR_SIZE = cv::Size(31,31);
-    int DILATION_DEGREE = 10;
-    int SMALLEST_OBJECT_SIZE = 500;
-    int DETECTION_THRESHOLD = 25;
-    int GRAYSCALE_WHITE = 255;
-    int BACKGROUND_HISTORY = 500;
-    int MOG2_THRESHOLD = 50;
-    bool DETECT_SHADOWS = true;
-public:
-
-    MotionDetSettings();
-    MotionDetSettings(AnalysisSettings& settings);
-    MotionDetSettings(MotionDetSettings& settings)  = default;
-    MotionDetSettings(AnalysisInterval interval,
-                      cv::Rect bounding_box,
-                      int sample_rate = 1);
-};
 
 #endif // ANALYSISSETTINGS_H

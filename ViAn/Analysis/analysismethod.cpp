@@ -1,16 +1,59 @@
-#include "AnalysisMethod.h"
 #include <qdebug.h>
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/videoio/videoio.hpp"
-
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/videoio/videoio.hpp>
+#include "Analysis/analysismethod.h"
 /**
  * @brief AnalysisMethod::abort_analysis
  * Sets the necessary bools to abort an analysis.
  */
-AnalysisMethod::AnalysisMethod(AnalysisSettings *settings)
+
+void AnalysisMethod::setBounding_box(const cv::Rect &value)
 {
-    m_settings = settings;
-    sample_freq = settings->SAMPLE_RATE;
+    bounding_box = value;
+    use_bounding_box = true;
+}
+
+AnalysisInterval AnalysisMethod::getInterval() const
+{
+    return interval;
+}
+
+void AnalysisMethod::setInterval(const AnalysisInterval &value)
+{
+    interval = value;
+    use_interval = true;
+}
+
+std::string AnalysisMethod::get_descr(const std::string& var_name)
+{
+    return m_descriptions.at(var_name);
+}
+
+void AnalysisMethod::add_setting(const std::string &var, int value_default, const std::string& descr)
+{
+    m_settings[var] = value_default;
+    m_descriptions[var] = descr;
+}
+
+int AnalysisMethod::get_setting(const std::string &var)
+{
+    return m_settings.at(var);
+}
+
+void AnalysisMethod::set_setting(const std::string &var, int value)
+{
+    m_settings[var] = value;
+}
+
+AnalysisMethod::AnalysisMethod(const std::string &video_path)
+{
+    std::size_t index = video_path.find_last_of('/') + 1;
+    std::string vid_name = video_path.substr(index);
+    index = vid_name.find_last_of('.');
+    vid_name = vid_name.substr(0,index);
+
+    m_source_file = vid_name;
+    add_setting("SAMPLE_FREQUENCY",1, "How often analysis will use frame from video");
 }
 /**
  * @brief AnalysisMethod::set_include_exclude_area
@@ -18,6 +61,7 @@ AnalysisMethod::AnalysisMethod(AnalysisSettings *settings)
  * @param points for the polygon that defines the exclusion area.
  */
 void AnalysisMethod::set_include_exclude_area(std::vector<cv::Point> points, bool exclude_polygon) {
+
     if (!capture.isOpened())
         return;
 
@@ -53,9 +97,10 @@ bool AnalysisMethod::sample_current_frame() {
  * This is the main loop method for doing an analysis.
  * @return all detections from the performed analysis.
  */
-Analysis AnalysisMethod::run_analysis() {
+void AnalysisMethod::run_analysis() {
+    capture.open(m_source_file);
     if (!capture.isOpened()) {
-        return m_analysis;
+        return;
     }
     calculate_scaling_factor();
     std::vector<DetectionBox> detections;
@@ -63,18 +108,18 @@ Analysis AnalysisMethod::run_analysis() {
     POI* m_POI = new POI();    
     // If Interval is use, start analysis at frame
     int end_frame = num_frames -1;
-    int start_frame = m_settings->interval.get_start();
-    if( m_settings->use_interval){
+    int start_frame = interval.get_start();
+    if(use_interval){
         capture.set(CV_CAP_PROP_POS_FRAMES, start_frame);
-        end_frame = m_settings->interval.get_end();
+        end_frame = interval.get_end();
         num_frames = end_frame - start_frame;
         current_frame_index = start_frame -1;
     }
     while(!aborted && capture.read(original_frame) &&
-          !(m_settings->use_interval && current_frame_index <= end_frame)) {
+          !(use_interval && current_frame_index <= end_frame)) {
 
         // Slice frame if bounding box should be used
-        if(m_settings->use_bounding_box) analysis_frame = original_frame(m_settings->getBounding_box());
+        if(use_bounding_box) analysis_frame = original_frame(bounding_box);
         else analysis_frame = original_frame;
 
         // do frame analysis
@@ -122,7 +167,10 @@ Analysis AnalysisMethod::run_analysis() {
         m_analysis.add_interval(m_POI);
     }
     capture.release();
-    return m_analysis;
+    m_analysis.save_saveable("SAVE_FILE");
+    AnalysisProxy proxy(m_analysis, m_analysis.full_path());
+    emit finished_analysis(proxy);
+    emit finito();
 }
 
 /**
