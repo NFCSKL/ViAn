@@ -24,7 +24,8 @@
 VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new DrawScrollArea) {
     // Init video contoller
     v_controller = new VideoController(&frame_index, &is_playing, &new_frame,
-                                       &video_width, &video_height, &new_video, &v_sync);
+                                       &video_width, &video_height, &new_video, &v_sync,
+                                       &player_con, &player_lock, &m_video_path);
 
     //Setup playback area
     vertical_layout = new QVBoxLayout;
@@ -739,8 +740,13 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int frame) {
     if (!video_btns_enabled) enable_video_btns();
 
     if (m_vid_proj != vid_proj) {
+        player_lock.lock();
+        m_video_path = vid_proj->get_video()->file_path;
+        new_video.store(true);
+        player_lock.unlock();
+        player_con.notify_all();
+
         m_vid_proj = vid_proj;
-        load_video(vid_proj->get_video()->file_path);
         playback_slider->setValue(frame);
 
         m_interval = make_pair(0,0);

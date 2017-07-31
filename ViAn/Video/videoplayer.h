@@ -25,6 +25,10 @@ struct video_sync {
 class VideoPlayer : public QObject{
     Q_OBJECT
     cv::VideoCapture m_capture;
+    std::string* m_video_path;
+
+    std::condition_variable* m_player_con;
+    std::mutex* m_player_lock;
 
     std::atomic_int* m_frame;
     std::atomic_bool* m_new_frame;
@@ -50,7 +54,8 @@ class VideoPlayer : public QObject{
 public:
     explicit VideoPlayer(std::atomic<int>* frame_index, std::atomic<bool>* is_playing,
                          std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
-                         std::atomic_bool* new_video, video_sync* v_sync, QObject *parent = nullptr);
+                         std::atomic_bool* new_video, video_sync* v_sync, std::condition_variable* player_con,
+                         std::mutex* player_lock, std::string* video_path, QObject *parent = nullptr);
 
 signals:
     void display(cv::Mat frame, int frame_index);
@@ -59,12 +64,13 @@ signals:
     void playback_stopped(void);
 
 public slots:
-    void on_load_video(std::string);
+
     void on_update_speed(int speed_steps);
     void set_frame();
     void check_events(void);
 
 private:
+    void load_video();
     void playback_loop();
     void load_video_info();
     bool synced_read();

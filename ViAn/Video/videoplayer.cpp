@@ -5,7 +5,8 @@
 
 VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic<bool>* is_playing,
                          std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
-                         std::atomic_bool* new_video, video_sync* v_sync, QObject *parent) : QObject(parent) {
+                         std::atomic_bool* new_video, video_sync* v_sync, std::condition_variable* player_con,
+                         std::mutex* player_lock, std::string* video_path, QObject *parent) : QObject(parent) {
     m_frame = frame_index;
     m_is_playing = is_playing;
     m_new_frame = new_frame;
@@ -15,6 +16,10 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic<bool>* is_pl
     m_new_video = new_video;
 
     m_v_sync = v_sync;
+    m_player_con = player_con;
+    m_player_lock = player_lock;
+
+    m_video_path = video_path;
 }
 
 /**
@@ -23,12 +28,12 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic<bool>* is_pl
  * It also emits the first frame back to the controller
  * @param video_path    :   Path to the video
  */
-void VideoPlayer::on_load_video(std::string video_path){
+void VideoPlayer::load_video(){
     current_frame = -1;
     m_is_playing->store(false);
     m_frame->store(0);
 
-    m_capture.open(video_path);
+    m_capture.open(*m_video_path);
     if (!m_capture.isOpened()) return;
     load_video_info();
     emit video_info(m_video_width->load(), m_video_height->load(), m_frame_rate, m_last_frame);
@@ -36,7 +41,6 @@ void VideoPlayer::on_load_video(std::string video_path){
 
     m_new_video->store(true);
     m_v_sync->con_var.notify_all();
-
 
     set_frame();
 }
@@ -106,8 +110,33 @@ void VideoPlayer::set_frame() {
  * Slot function for when the playback loop is not running1
  */
 void VideoPlayer::check_events() {
-    if (m_is_playing->load()) playback_loop();
-    if (m_frame->load() != current_frame) set_frame();
+    std::chrono::duration<double> elapsed{0};
+    qDebug() << elapsed.count();
+    while (true) {
+        std::unique_lock<std::mutex> lk(*m_player_lock);
+        auto now = std::chrono::system_clock::now();
+        auto delay = std::chrono::milliseconds{static_cast<int>(m_delay * speed_multiplier)};
+        if (m_player_con->wait_until(lk, now + delay - elapsed, [&](){return m_new_video->load() || current_frame != m_frame->load();})) {
+            if (m_new_video->load()) {
+                load_video();
+            } else if (current_frame != m_frame->load()) {
+                set_frame();
+            }
+
+        } else {
+            // Timer condition triggered. Read new frame
+            if (m_is_playing->load()) {
+                std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+                if (!synced_read()) continue;
+                ++*m_frame;
+                ++current_frame;
+                display_index();
+                std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+                elapsed = end - start;
+            }
+        }
+        lk.unlock();
+    }
 }
 
 /**
@@ -127,6 +156,7 @@ bool VideoPlayer::synced_read(){
         std::lock_guard<std::mutex> lk(m_v_sync->lock);
         if (!m_capture.read(m_v_sync->frame)) {
             m_is_playing->store(false);
+            playback_stopped();
             return false;
         }
         m_new_frame->store(true);

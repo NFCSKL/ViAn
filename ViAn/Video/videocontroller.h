@@ -16,7 +16,6 @@
 #include <atomic>
 class VideoController : public QThread {
     Q_OBJECT
-    QTimer* frame_timer;
     std::atomic<int>* m_frame;
     std::atomic_int* m_width;
     std::atomic_int* m_height;
@@ -25,11 +24,17 @@ class VideoController : public QThread {
     std::atomic_bool* m_new_video;
     std::atomic_bool* m_new_frame;
 
+    std::condition_variable* m_player_con;
+    std::mutex* m_player_lock;
+
+    std::string* m_video_path;
+
     video_sync* m_v_sync;
 public:
     VideoController(std::atomic<int>* frame_index, std::atomic<bool>* is_playing,
                     std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
-                    std::atomic_bool* new_video, video_sync* v_sync);
+                    std::atomic_bool* new_video, video_sync* v_sync, std::condition_variable* player_con,
+                    std::mutex* player_lock, std::string* video_path);
 
 signals:
     // TO VIDEO PLAYER
