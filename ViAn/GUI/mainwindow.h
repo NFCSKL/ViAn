@@ -49,6 +49,7 @@ private slots:
     void gen_report(void);
     void cont_bri(void);
     void export_images();
+    void export_current_frame();
 
 public slots:
     void options(void);

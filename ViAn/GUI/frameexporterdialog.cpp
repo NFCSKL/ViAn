@@ -32,7 +32,7 @@ FrameExporterDialog::FrameExporterDialog(ImageExporter* im_exp, Video* video, st
     m_frame_input_layout->addWidget(m_total);
     // End frame layout
 
-    m_path_label = new QLabel(m_old_path_text, this);
+    m_path_label = new QLabel(m_old_path_text + "frames", this);
     m_browse_btn = new QPushButton("Browse", this);
     connect(m_browse_btn, &QPushButton::clicked, this, &FrameExporterDialog::open_path_dialog);
     // Path layout
@@ -117,8 +117,10 @@ void FrameExporterDialog::save_values() {
         return;
     }
     QString e_path = m_path_label->text() + "/" + m_video_name + "_";
+    qDebug() << e_path;
     m_exporter->set_interval(std::make_pair(m_from_box->value(), m_to_box->value()));
     m_exporter->set_export_path(e_path.toStdString());
+    qDebug() << m_video_path->text();
     m_exporter->set_file_path(m_video_path->text().toStdString());
     accept();
 }
