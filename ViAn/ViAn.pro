@@ -59,7 +59,8 @@ SOURCES += main.cpp \
     GUI/frameexporterdialog.cpp \
     GUI/framewidget.cpp \
     GUI/videowidget.cpp \
-    Analysis/analysissettings.cpp
+    Analysis/analysissettings.cpp \
+    GUI/Analysis/analysisdialog.cpp
 
 #
 # TEST
@@ -111,7 +112,8 @@ HEADERS += reportgenerator.h\
     GUI/framewidget.h \
     GUI/videowidget.h \
     Analysis/analysissettings.h \
-    Analysis/analysismethod.h
+    Analysis/analysismethod.h \
+    GUI/Analysis/analysisdialog.h
 
 #
 # LIBRARY
