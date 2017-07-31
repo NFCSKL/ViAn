@@ -13,7 +13,7 @@
 
 #include "videoplayer.h"
 #include "Video/frameprocessor.h"
-
+#include <atomic>
 class VideoController : public QThread {
     Q_OBJECT
     QTimer* frame_timer;

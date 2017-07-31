@@ -4,7 +4,8 @@
 
 FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                                zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
-                               std::atomic_bool* new_video, manipulation_settings* m_settings, video_sync* v_sync) {
+                               std::atomic_bool* new_video, manipulation_settings* m_settings, video_sync* v_sync,
+                               std::atomic_int* frame_index) {
     m_new_frame = new_frame;
 
     m_changed = changed;
@@ -15,104 +16,10 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
 
     m_width = width;
     m_height = height;
+
+    m_frame_index = frame_index;
     // NICLAS
     // cv::namedWindow("test");
-}
-
-/**
- * @brief FrameProcessor::on_set_zoom_rect
- * Slot function that updates the zoom rect
- * @param p1 : top-left corner of the rectangle
- * @param p2 : top-right corner of the rectangle
- */
-void FrameProcessor::on_set_zoom_rect(QPoint p1, QPoint p2) {
-    m_zoomer.set_zoom_rect(p1, p2);
-    process_frame();
-}
-
-/**
- * @brief FrameProcessor::on_video_info
- * Slot function that sets the frame size for the zoomer
- * @param frame_width   :   width of the frames from the currently loaded video
- * @param frame_height  : height of the frames from the currently loaded video
- */
-void FrameProcessor::on_video_info(int frame_width, int frame_height, int, int) {
-    m_rotate_direction = ROTATE_NONE;
-    m_zoomer.reset();
-    m_manipulator.reset();
-
-    m_zoomer.set_frame_size(cv::Size(frame_width, frame_height));
-    m_zoomer.fit_viewport();
-}
-
-/**
- * @brief FrameProcessor::on_set_draw_area_size
- * Slot function that updates the zoomer about the drawing area size
- * @param size  : size of the area where the frame will be shown
- */
-void FrameProcessor::on_set_draw_area_size(QSize size){
-    m_zoomer.set_viewport_size(size);
-}
-
-/**
- * @brief FrameProcessor::on_zoom_out
- * Slot function that decreases the zoom
- */
-void FrameProcessor::on_zoom_out(){
-    m_zoomer.set_scale_factor(m_zoomer.get_scale_factor() * 0.5);
-    process_frame();
-}
-
-/**
- * @brief FrameProcessor::on_fit_screen
- * Slot function for fitting the frame to the display area
- */
-void FrameProcessor::on_fit_screen(){
-    m_zoomer.fit_viewport();
-    process_frame();
-}
-
-/**
- * @brief FrameProcessor::on_rotate_right
- * Slot function that rotates the frame 90 degrees to the right
- */
-void FrameProcessor::on_rotate_right(){
-    m_rotate_direction = (m_rotate_direction + 1) % ROTATE_NUM;
-    m_zoomer.flip();
-    process_frame();
-}
-
-/**
- * @brief FrameProcessor::on_rotate_left
- * Slot function that rotates the frame 90 degrees to the left
- */
-void FrameProcessor::on_rotate_left(){
-    m_rotate_direction = (m_rotate_direction + (ROTATE_NUM - 1)) % ROTATE_NUM;
-    m_zoomer.flip();
-    process_frame();
-}
-
-/**
- * @brief FrameProcessor::on_set_bright_cont
- * Slot function that updates the brightness and contrast values
- * @param b_val
- * @param c_val
- */
-void FrameProcessor::on_set_bright_cont(int b_val, double c_val){
-    m_manipulator.set_brightness(b_val);
-    m_manipulator.set_contrast(c_val);
-    process_frame();
-}
-
-/**
- * @brief FrameProcessor::on_move_zoom_rect
- * Slot function that updates the position of the zoom rectangle
- * @param x : movement along the x-axis
- * @param y : movement along the y-axis
- */
-void FrameProcessor::on_move_zoom_rect(int x, int y) {
-    m_zoomer.move_zoom_rect(x, y);
-    process_frame();
 }
 
 /**
@@ -147,7 +54,7 @@ void FrameProcessor::check_events() {
         // A new frame has been loaded by the VideoPlayer
         if (m_new_frame->load()) {
             m_new_frame->store(false);
-
+            m_cur_frame_index = m_frame_index->load();
             m_frame = m_v_sync->frame.clone();
             process_frame();
 
@@ -194,7 +101,7 @@ void FrameProcessor::process_frame() {
     m_manipulator.apply(manipulated_frame);
 
     // Emit manipulated frame and current frame number
-    done_processing(manipulated_frame, m_frame_index);
+    done_processing(manipulated_frame, m_cur_frame_index);
 }
 
 /**
@@ -241,6 +148,9 @@ void FrameProcessor::update_zoomer_settings() {
     cv::Rect tmp = m_zoomer.get_zoom_rect();
     m_z_settings->zoom_tl = QPoint(tmp.x, tmp.y);
     m_z_settings->zoom_br = QPoint(tmp.width, tmp.height);
+
+    set_anchor(m_zoomer.get_anchor());
+    set_scale_factor(m_zoomer.get_scale_factor());
 }
 
 /**
@@ -290,4 +200,7 @@ void FrameProcessor::reset_settings() {
     cv::Rect tmp = m_zoomer.get_zoom_rect();
     m_z_settings->zoom_tl = QPoint(tmp.x, tmp.y);
     m_z_settings->zoom_br = QPoint(tmp.width, tmp.height);
+
+    set_anchor(m_zoomer.get_anchor());
+    set_scale_factor(m_zoomer.get_scale_factor());
 }

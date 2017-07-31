@@ -32,6 +32,7 @@ void VideoController::run() {
     connect(v_player, &VideoPlayer::video_info, this, &VideoController::video_info);
     connect(v_player, &VideoPlayer::playback_stopped, this, &VideoController::playback_stopped);
 
+
     frame_timer->start(5);
     exec();
     delete v_player;

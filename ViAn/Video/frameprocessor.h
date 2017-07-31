@@ -47,7 +47,8 @@ struct manipulation_settings {
 class FrameProcessor : public QObject {
     Q_OBJECT
     cv::Mat m_frame;
-    int m_frame_index;
+    int m_cur_frame_index;
+    std::atomic_int* m_frame_index;
 
     std::atomic_int* m_width;
     std::atomic_int* m_height;
@@ -73,21 +74,14 @@ class FrameProcessor : public QObject {
 public:
     FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                    zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
-                   std::atomic_bool* new_video, manipulation_settings* m_settings, video_sync* v_sync);
+                   std::atomic_bool* new_video, manipulation_settings* m_settings, video_sync* v_sync,
+                   std::atomic_int* frame_index);
 
 public slots:
-    void on_set_zoom_rect(QPoint p1, QPoint p2);
-    void on_video_info(int frame_width, int frame_height, int frame_rate, int last_frame);
-    void on_set_draw_area_size(QSize size);
-    void on_zoom_out();
-    void on_fit_screen();
-    void on_rotate_right();
-    void on_rotate_left();
-    void on_set_bright_cont(int b_val, double c_val);
-    void on_move_zoom_rect(int x, int y);
-
     void check_events(void);
 signals:
+    void set_scale_factor(double);
+    void set_anchor(QPoint);
     void done_processing(cv::Mat frame, int frame_index);
 private:
     void process_frame();

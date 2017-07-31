@@ -31,16 +31,14 @@ public:
     void scale_frame(cv::Mat& frame);
     cv::Rect get_zoom_rect() const;
     double get_scale_factor() const;
-    void update_scale();
-    void update_rect_size();
 
+    QPoint get_anchor() const;
     QSize get_viewport_size() const;
 
+    void update_rect_size();
 private:
     void force_bounds();
-
-
-
+    void update_scale();
 };
 
 #endif // ZOOMER_H

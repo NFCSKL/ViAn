@@ -54,7 +54,6 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
 
     connect(scroll_area, SIGNAL(new_size(QSize)), frame_wgt, SLOT(set_scroll_area_size(QSize)));
     connect(this, SIGNAL(set_detections_on_frame(int)), frame_wgt, SLOT(set_detections_on_frame(int)));
-
     init_video_controller();
     v_controller->start();
     init_frame_processor();
@@ -128,6 +127,8 @@ void VideoWidget::init_video_controller(){
     connect(v_controller, &VideoController::video_info, this, &VideoWidget::on_video_info);
     connect(v_controller, SIGNAL(display_index()), this, SLOT(on_new_frame()));
     connect(v_controller, &VideoController::playback_stopped, this, &VideoWidget::on_playback_stopped);
+
+
 }
 
 /**
@@ -137,7 +138,7 @@ void VideoWidget::init_video_controller(){
 void VideoWidget::init_frame_processor() {
     QTimer* process_timer = new QTimer(this);
     f_processor = new FrameProcessor(&new_frame, &settings_changed, &z_settings, &video_width,
-                                     &video_height, &new_video, &m_settings, &v_sync);
+                                     &video_height, &new_video, &m_settings, &v_sync, &frame_index);
 
     QThread* processing_thread = new QThread();
     f_processor->moveToThread(processing_thread);
@@ -148,6 +149,10 @@ void VideoWidget::init_frame_processor() {
     connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_rectangle);
     connect(scroll_area, SIGNAL(new_size(QSize)), this, SLOT(set_draw_area_size(QSize)));
     connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(pan(int,int)));
+
+    connect(f_processor, &FrameProcessor::set_scale_factor, frame_wgt, &FrameWidget::set_scale_factor);
+    connect(f_processor, &FrameProcessor::set_scale_factor, this, &VideoWidget::set_scale_factor);
+    connect(f_processor, &FrameProcessor::set_anchor, frame_wgt, &FrameWidget::set_anchor);
 
     processing_thread->start();
 }
@@ -173,6 +178,10 @@ void VideoWidget::set_btn_icons() {
     zoom_out_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_out.png"), "", this);
     fit_btn = new QPushButton(QIcon("../ViAn/Icons/fit_screen.png"), "", this);
     original_size_btn = new QPushButton(QIcon("../ViAn/Icons/move.png"), "", this);
+
+    zoom_label = new QLabel;
+    zoom_label->setText("100%");
+    zoom_label->setMinimumWidth(40);
     set_start_interval_btn = new QPushButton(QIcon("../ViAn/Icons/start_interval.png"), "", this);
     set_end_interval_btn = new QPushButton(QIcon("../ViAn/Icons/end_interval.png"), "", this);
     play_btn->setCheckable(true);
@@ -273,6 +282,7 @@ void VideoWidget::set_btn_shortcuts() {
     remove_frame_act = new QShortcut(Qt::Key_R, this);
     new_tag_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
     zoom_in_btn->setShortcut(Qt::Key_Z);
+    fit_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
     set_start_interval_btn->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Left));
     set_end_interval_btn->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Right));
 }
@@ -334,6 +344,9 @@ void VideoWidget::add_btns_to_layouts() {
     zoom_btns->addWidget(fit_btn);
     zoom_btns->addWidget(original_size_btn);
 
+    zoom_btns->addWidget(zoom_label);
+
+
     control_row->addLayout(zoom_btns);
 
     interval_btns->addWidget(set_start_interval_btn);
@@ -360,7 +373,13 @@ void VideoWidget::connect_btns() {
     connect(analysis_play_btn, &QPushButton::toggled, this, &VideoWidget::analysis_play_btn_toggled);
     connect(next_poi_btn, &QPushButton::clicked, this, &VideoWidget::next_poi_btn_clicked);
     connect(prev_poi_btn, &QPushButton::clicked, this, &VideoWidget::prev_poi_btn_clicked);
+
     // Tag
+
+
+    connect(zoom_in_btn, &QPushButton::toggled, frame_wgt, &FrameWidget::toggle_zoom);
+
+    connect(bookmark_btn, &QPushButton::clicked, this, &VideoWidget::on_bookmark_clicked);
     connect(tag_btn, &QPushButton::clicked, this, &VideoWidget::tag_frame);
     connect(remove_frame_act, &QShortcut::activated, this, &VideoWidget::remove_tag_frame);
     connect(new_tag_btn, &QPushButton::clicked, this, &VideoWidget::new_tag_clicked);
@@ -386,7 +405,7 @@ void VideoWidget::init_playback_slider() {
     QHBoxLayout* progress_area = new QHBoxLayout();
     current_time = new QLabel("--:--");
     total_time = new QLabel("--:--");
-    frame_line_edit = new QLineEdit();
+    frame_line_edit = new QLineEdit("0");
 
     frame_line_edit->setFixedWidth(50);
 
@@ -468,6 +487,11 @@ void VideoWidget::set_current_time(int time) {
  */
 void VideoWidget::set_total_time(int time) {
     total_time->setText(convert_time(time));
+}
+
+void VideoWidget::set_scale_factor(double scale_factor) {
+    m_scale_factor = scale_factor;
+    zoom_label->setText(QString::number(((int)(10000*m_scale_factor))/(double)100) +"%");
 }
 
 void VideoWidget::on_bookmark_clicked() {

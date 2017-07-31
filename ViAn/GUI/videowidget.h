@@ -37,6 +37,7 @@ private:
 
     int prev_frame_idx;
     int POI_end;
+    double m_scale_factor = 1;
 
     zoomer_settings z_settings;
     manipulation_settings m_settings;
@@ -60,7 +61,6 @@ private:
     std::pair<int, int> m_interval = std::make_pair(0, 0);
 
     FrameProcessor* f_processor;
-
 public:
     explicit VideoWidget(QWidget *parent = nullptr);
 
@@ -94,6 +94,7 @@ signals:
 public slots:
     void set_current_time(int time);
     void set_total_time(int time);
+    void set_scale_factor(double);
     void play_btn_toggled(bool status);
     void analysis_btn_clicked(void);
     void tag_frame(void);
@@ -146,6 +147,7 @@ private:
     QLabel* current_time;
     QLabel* total_time;
     QLineEdit* frame_line_edit;
+    QLabel* zoom_label;
 
     QShortcut* remove_frame_act;
 

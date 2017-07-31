@@ -6,6 +6,7 @@
 
 #include <stack>
 #include <mutex>
+#include <atomic>
 #include <condition_variable>
 
 #include <opencv2/opencv.hpp>
