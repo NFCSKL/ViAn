@@ -38,10 +38,6 @@ public:
                     std::mutex* player_lock, std::string* video_path, std::atomic_int* speed);
 
 signals:
-    // TO VIDEO PLAYER
-    void load_video(std::string video_path);
-    void update_speed(int steps);
-
     // FROM VIDEO PLAYER
     void display_index();
     void video_info(int frame_width, int frame_height, int frame_rate, int last_frame);

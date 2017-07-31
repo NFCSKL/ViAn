@@ -121,16 +121,10 @@ void VideoWidget::init_layouts() {
  * Performs the initial setup that connects the video controller with the rest of the program.
  */
 void VideoWidget::init_video_controller(){
-    // Playback control
-    connect(speed_slider, &QSlider::valueChanged, this, &VideoWidget::update_playback_speed);
-    connect(this, &VideoWidget::load_video, v_controller, &VideoController::load_video);
-
     // Video data
     connect(v_controller, &VideoController::video_info, this, &VideoWidget::on_video_info);
     connect(v_controller, SIGNAL(display_index()), this, SLOT(on_new_frame()));
     connect(v_controller, &VideoController::playback_stopped, this, &VideoWidget::on_playback_stopped);
-
-
 }
 
 /**
@@ -313,6 +307,8 @@ void VideoWidget::init_speed_slider() {
     speed_slider_layout->addWidget(label1, 1, 0, 1, 1);
     speed_slider_layout->addWidget(label2, 1, 2, 1, 1);
     speed_slider_layout->addWidget(label3, 1, 4, 1, 1);
+
+    connect(speed_slider, &QSlider::valueChanged, this, &VideoWidget::update_playback_speed);
 }
 
 /**
