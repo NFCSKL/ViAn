@@ -25,7 +25,8 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
     // Init video contoller
     v_controller = new VideoController(&frame_index, &is_playing, &new_frame,
                                        &video_width, &video_height, &new_video, &v_sync,
-                                       &player_con, &player_lock, &m_video_path);
+                                       &player_con, &player_lock, &m_video_path,
+                                       &m_speed_step);
 
     //Setup playback area
     vertical_layout = new QVBoxLayout;
@@ -121,7 +122,7 @@ void VideoWidget::init_layouts() {
  */
 void VideoWidget::init_video_controller(){
     // Playback control
-    connect(speed_slider, SIGNAL(valueChanged(int)), v_controller, SIGNAL(update_speed(int)));
+    connect(speed_slider, &QSlider::valueChanged, this, &VideoWidget::update_playback_speed);
     connect(this, &VideoWidget::load_video, v_controller, &VideoController::load_video);
 
     // Video data
@@ -901,6 +902,10 @@ void VideoWidget::update_processing_settings(std::function<void ()> lambda) {
     settings_changed.store(true);
     v_sync.lock.unlock();
     v_sync.con_var.notify_all();
+}
+
+void VideoWidget::update_playback_speed(int speed){
+    m_speed_step.store(speed);
 }
 
 void VideoWidget::set_current_frame_size(QSize size) {

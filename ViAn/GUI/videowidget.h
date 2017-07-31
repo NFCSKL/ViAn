@@ -48,8 +48,9 @@ private:
     std::atomic<int> frame_index{0};            // Shared frame index. Updated by the video player and the GUI
     std::atomic_int video_width{0};
     std::atomic_int video_height{0};
+    std::atomic_int m_speed_step{0};            // Playback speed
 
-    std::atomic_bool is_playing{false};        // True when the video player is playing
+    std::atomic_bool is_playing{false};         // True when the video player is playing
     std::atomic_bool settings_changed{false};   // True when the user changed something. Zoom, brightness etc.
     std::atomic_bool new_frame{false};          // True when a new frame has been loaded by the video player
     std::atomic_bool new_video{false};          // True when a new video is loaded
@@ -142,6 +143,7 @@ public slots:
     void rotate_cw(void);
     void rotate_ccw(void);
     void update_processing_settings(std::function<void(void)> lambda);
+    void update_playback_speed(int speed);
 private:
     const QSize BTN_SIZE = QSize(30, 30);
 

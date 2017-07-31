@@ -6,7 +6,9 @@
 VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic<bool>* is_playing,
                          std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
                          std::atomic_bool* new_video, video_sync* v_sync, std::condition_variable* player_con,
-                         std::mutex* player_lock, std::string* video_path, QObject *parent) : QObject(parent) {
+                         std::mutex* player_lock, std::string* video_path,
+                         std::atomic_int* speed_step, QObject *parent) : QObject(parent) {
+
     m_frame = frame_index;
     m_is_playing = is_playing;
     m_new_frame = new_frame;
@@ -20,6 +22,7 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic<bool>* is_pl
     m_player_lock = player_lock;
 
     m_video_path = video_path;
+    m_speed_step = speed_step;
 }
 
 /**
@@ -50,7 +53,7 @@ void VideoPlayer::load_video(){
  * Updates the playback speed.
  * @param speed_steps   :   Steps to increase/decrease
  */
-void VideoPlayer::on_update_speed(int speed_steps) {
+void VideoPlayer::set_playback_speed(int speed_steps) {
     if (speed_steps > 0) {
         speed_multiplier = 1.0 / (speed_steps * 2);
     } else if (speed_steps < 0) {
@@ -107,16 +110,17 @@ void VideoPlayer::set_frame() {
 
 /**
  * @brief VideoPlayer::check_events
- * Slot function for when the playback loop is not running1
+ * Main loop for video playback.
+ *
  */
 void VideoPlayer::check_events() {
     std::chrono::duration<double> elapsed{0};
-    qDebug() << elapsed.count();
     while (true) {
         std::unique_lock<std::mutex> lk(*m_player_lock);
         auto now = std::chrono::system_clock::now();
         auto delay = std::chrono::milliseconds{static_cast<int>(m_delay * speed_multiplier)};
         if (m_player_con->wait_until(lk, now + delay - elapsed, [&](){return m_new_video->load() || current_frame != m_frame->load();})) {
+            // Notified from the VideoWidget
             if (m_new_video->load()) {
                 load_video();
             } else if (current_frame != m_frame->load()) {
@@ -124,6 +128,12 @@ void VideoPlayer::check_events() {
             }
 
         } else {
+            // Timer condition triggered. Update playback speed if nessecary and read new frame
+            int speed = m_speed_step->load();
+            if (speed != m_cur_speed_step) {
+                set_playback_speed(speed);
+            }
+
             // Timer condition triggered. Read new frame
             if (m_is_playing->load()) {
                 std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();

@@ -31,6 +31,7 @@ class VideoPlayer : public QObject{
     std::mutex* m_player_lock;
 
     std::atomic_int* m_frame;
+    std::atomic_int* m_speed_step;
     std::atomic_bool* m_new_frame;
     std::atomic_bool* m_new_video;
 
@@ -43,6 +44,7 @@ class VideoPlayer : public QObject{
     std::atomic_bool* m_is_playing;
     bool m_video_loaded = false;
     bool m_playback_status = false;
+    int m_cur_speed_step = 1;
     double speed_multiplier = 1;
     int current_frame = -1;
 
@@ -55,7 +57,8 @@ public:
     explicit VideoPlayer(std::atomic<int>* frame_index, std::atomic<bool>* is_playing,
                          std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
                          std::atomic_bool* new_video, video_sync* v_sync, std::condition_variable* player_con,
-                         std::mutex* player_lock, std::string* video_path, QObject *parent = nullptr);
+                         std::mutex* player_lock, std::string* video_path,
+                         std::atomic_int* speed_step, QObject *parent = nullptr);
 
 signals:
     void display(cv::Mat frame, int frame_index);
@@ -64,16 +67,14 @@ signals:
     void playback_stopped(void);
 
 public slots:
-
-    void on_update_speed(int speed_steps);
     void set_frame();
     void check_events(void);
-
 private:
     void load_video();
     void playback_loop();
     void load_video_info();
     bool synced_read();
+    void set_playback_speed(int speed_steps);
 };
 
 #endif // VIDEOPLAYER_H
