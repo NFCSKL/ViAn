@@ -10,8 +10,12 @@
 #include <QPushButton>
 #include <QSlider>
 #include <QShortcut>
+
 #include <vector>
 #include <atomic>
+#include <mutex>
+#include <condition_variable>
+
 #include "framewidget.h"
 #include "analysisslider.h"
 #include "Video/video_player.h"
@@ -19,6 +23,8 @@
 #include "drawscrollarea.h"
 #include "Project/Analysis/tag.h"
 #include "Video/videocontroller.h"
+#include "Video/videoplayer.h"
+
 class VideoWidget : public QWidget
 {
     Q_OBJECT
@@ -31,11 +37,22 @@ private:
 
     int prev_frame_idx;
     int POI_end;
+    double m_scale_factor = 1;
 
-    // Current video info
-    std::atomic<int> frame_index{0};
-    std::atomic<bool> is_playing{false};
-    int current_frame = 0;
+    zoomer_settings z_settings;
+    manipulation_settings m_settings;
+    video_sync v_sync;
+
+    std::atomic<int> frame_index{0};            // Shared frame index. Updated by the video player and the GUI
+
+    std::atomic_int video_width{0};
+    std::atomic_int video_height{0};
+
+    std::atomic_bool is_playing{false};        // True when the video player is playing
+    std::atomic_bool settings_changed{false};   // True when the user changed something. Zoom, brightness etc.
+    std::atomic_bool new_frame{false};          // True when a new frame has been loaded by the video player
+    std::atomic_bool new_video{false};          // True when a new video is loaded
+
     int m_video_width = 0;
     int m_video_height = 0;
     int m_frame_rate = 0;
@@ -43,6 +60,7 @@ private:
 
     std::pair<int, int> m_interval = std::make_pair(0, 0);
 
+    FrameProcessor* f_processor;
 public:
     explicit VideoWidget(QWidget *parent = nullptr);
 
@@ -77,6 +95,7 @@ signals:
 public slots:
     void set_current_time(int time);
     void set_total_time(int time);
+    void set_scale_factor(double);
     void play_btn_toggled(bool status);
     void analysis_btn_clicked(void);
     void tag_frame(void);
@@ -97,9 +116,7 @@ public slots:
     void on_playback_slider_released(void);
     void on_playback_slider_value_changed(void);
     void on_playback_slider_moved(void);
-    void fit_clicked(void);
     void load_marked_video(VideoProject* vid_proj, int frame);
-    void update_bar_pos(int change_x, int change_y);
     void set_current_frame_size(QSize size);
     void on_bookmark_clicked(void);
     void set_interval_start_clicked();
@@ -112,6 +129,16 @@ public slots:
     void on_video_info(int video_width, int video_height, int frame_rate, int last_frame);
     void on_playback_stopped(void);
 
+    void pan(int x, int y);
+    void set_zoom_rectangle(QPoint p1, QPoint p2);
+    void set_draw_area_size(QSize s);
+    void on_zoom_out();
+    void on_fit_screen(void);
+    void on_original_size(void);
+    void update_brightness_contrast(int c_val, double v_val);
+    void rotate_cw(void);
+    void rotate_ccw(void);
+    void update_processing_settings(std::function<void(void)> lambda);
 private:
     const QSize BTN_SIZE = QSize(30, 30);
 
@@ -121,6 +148,7 @@ private:
     QLabel* current_time;
     QLabel* total_time;
     QLineEdit* frame_line_edit;
+    QLabel* zoom_label;
 
     QShortcut* remove_frame_act;
 
@@ -139,7 +167,7 @@ private:
     QPushButton* zoom_in_btn;
     QPushButton* zoom_out_btn;
     QPushButton* fit_btn;
-    QPushButton* move_btn;
+    QPushButton* original_size_btn;
     QPushButton* set_start_interval_btn;
     QPushButton* set_end_interval_btn;
 
@@ -169,6 +197,7 @@ private:
     void init_control_buttons();
     void init_layouts();
     void init_video_controller();
+    void init_frame_processor();
 
     void set_btn_icons();
     void set_btn_tool_tip();

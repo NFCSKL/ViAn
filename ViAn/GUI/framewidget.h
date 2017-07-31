@@ -34,11 +34,14 @@ class FrameWidget : public QWidget
 
     // Zoom
     QPoint zoom_start_pos, zoom_end_pos, prev_pos;
+    QPoint anchor = QPoint(0,0);
     bool draw_zoom_rect = false;
     bool do_zoom = false;
     bool do_zoom_out = false;
     bool m_detections = false;
     bool show_detections = true;
+
+    double m_scale_factor = 1;
 
 public:
     explicit FrameWidget(QWidget *parent = nullptr);
@@ -51,7 +54,6 @@ signals:
     void video_pressed(QPoint pos);
     void video_released(QPoint pos);
     void video_moved(QPoint pos);
-    void zoom_factor(double scale_factor);
     void current_size(int width, int height);
     void moved_xy(int x, int y);
     void current_frame_size(QSize size);
@@ -73,6 +75,8 @@ public slots:
     void set_show_detections(bool);
     void set_tool(SHAPES tool);
     void set_overlay_color(QColor color);
+    void set_anchor(QPoint);
+    void set_scale_factor(double scale_factor);
     void update();
 protected:
     QImage _qimage;

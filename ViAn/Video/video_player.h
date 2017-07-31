@@ -122,6 +122,7 @@ signals:
     void update_current_frame(const int frame);
     void frame_count(int value);
     void total_time(int time);
+    void scale_factor(double scale_factor);
 
 public slots:
     // All slot functions that manipulates a value used by the video thread must be locked
