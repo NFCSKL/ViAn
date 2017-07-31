@@ -95,27 +95,28 @@ cv::Mat FrameWidget::get_mat() const {
 }
 
 void FrameWidget::on_new_image(cv::Mat frame, int frame_index) {
-    std::cout << "NEw FRAME" << std::endl;
-    current_frame = frame;
+    cv::Mat frame2 = frame.clone();
+    current_frame = frame2;
     current_frame_nr = frame_index;
     switch (frame.type()) {
         case CV_8UC1:
-            cvtColor(frame, _tmp_frame, CV_GRAY2RGB);
+            cvtColor(frame2, _tmp_frame, CV_GRAY2RGB);
             break;
         case CV_8UC3:
-            cvtColor(frame, _tmp_frame, CV_BGR2RGB);
+            cvtColor(frame2, _tmp_frame, CV_BGR2RGB);
             break;
     }
 
     // QImage needs the data to be stored continuously in memory
-    assert(frame.isContinuous());
+    assert(frame2.isContinuous());
     // Assign OpenCV's image buffer to the QImage. Note that the bytesPerLine parameter
     // (http://qt-project.org/doc/qt-4.8/qimage.html#QImage-6) is 3*width because each pixel
     // has three bytes.
     _qimage = QImage(_tmp_frame.data, _tmp_frame.cols, _tmp_frame.rows, _tmp_frame.cols*3, QImage::Format_RGB888);
     setFixedSize(_qimage.size());
     set_detections_on_frame(frame_index);
-    video_overlay->draw_overlay(frame, frame_index);
+
+    video_overlay->draw_overlay(frame2, frame_index);
     repaint();
 }
 

@@ -13,9 +13,7 @@ Overlay::Overlay() {}
  */
 void Overlay::draw_overlay(cv::Mat &frame, int frame_nr) {
     if (show_overlay) {
-        std::cout << "size " << overlays[frame_nr].overlay.size() << std::endl;
         for (auto it = overlays[frame_nr].overlay.begin(); it != overlays[frame_nr].drawn; it++) {
-            //std::cout << "in for" << std::endl;
             frame = (*it)->draw(frame);
         }
     }

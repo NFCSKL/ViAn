@@ -353,7 +353,6 @@ void VideoWidget::add_btns_to_layouts() {
 
     zoom_btns->addWidget(zoom_label);
 
-
     control_row->addLayout(zoom_btns);
 
     interval_btns->addWidget(set_start_interval_btn);
@@ -382,11 +381,6 @@ void VideoWidget::connect_btns() {
     connect(prev_poi_btn, &QPushButton::clicked, this, &VideoWidget::prev_poi_btn_clicked);
 
     // Tag
-
-
-    connect(zoom_in_btn, &QPushButton::toggled, frame_wgt, &FrameWidget::toggle_zoom);
-
-    connect(bookmark_btn, &QPushButton::clicked, this, &VideoWidget::on_bookmark_clicked);
     connect(tag_btn, &QPushButton::clicked, this, &VideoWidget::tag_frame);
     connect(remove_frame_act, &QShortcut::activated, this, &VideoWidget::remove_tag_frame);
     connect(new_tag_btn, &QPushButton::clicked, this, &VideoWidget::new_tag_clicked);
@@ -498,7 +492,7 @@ void VideoWidget::set_total_time(int time) {
 
 
 int VideoWidget::get_current_frame() {
-    return frame_index.load()
+    return frame_index.load();
 }
 
 void VideoWidget::set_scale_factor(double scale_factor) {
