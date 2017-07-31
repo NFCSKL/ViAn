@@ -80,6 +80,7 @@ void ProjectWidget::add_video() {
         VideoProject* vid_proj = new VideoProject(new Video(video_path.toStdString()));
         m_proj->add_video_project(vid_proj);
         tree_add_video(vid_proj, vid_name);
+        emit new_vid_proj(vid_proj);
     }
 }
 
@@ -141,7 +142,7 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
     insertTopLevelItem(topLevelItemCount(), vid_item);
     vid_proj->set_tree_index(get_index_path(dynamic_cast<QTreeWidgetItem*>(vid_item)));
     emit set_status_bar("Video added: " + vid_name);
-
+    emit new_vid_proj(vid_item->get_video_project());
     // Add analysis and tag
     add_analyses_to_item(vid_item);
 }
@@ -563,6 +564,7 @@ void ProjectWidget::open_project(QString project_path) {
     emit proj_path(m_proj->getDir());
     for (auto vid_proj : m_proj->get_videos()) {
         insert_to_path_index(vid_proj);
+        emit new_vid_proj(vid_proj);
         emit load_bookmarks(vid_proj);
     }
 }

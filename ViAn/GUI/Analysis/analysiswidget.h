@@ -19,7 +19,6 @@ public:
     int duration = 0;
     std::deque<std::tuple<std::string, std::string, QTreeWidgetItem*, AnalysisSettings*>> analysis_queue;
     QTreeWidgetItem* current_analysis;
-    
 private:
 
     void perform_analysis(tuple<string, string, QTreeWidgetItem *, AnalysisSettings *> analys);
@@ -30,6 +29,7 @@ public slots:
                         QTreeWidgetItem* item, AnalysisSettings* settings);
     void send_progress(int);
     void analysis_done(AnalysisProxy);
+    void add_video_project(VideoProject*);
     
 signals:
     void add_analysis_bar(void);

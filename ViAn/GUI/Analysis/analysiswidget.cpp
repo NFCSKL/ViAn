@@ -5,7 +5,7 @@
 #include <QDebug>
 #include <QTreeWidgetItem>
 #include <tuple>
-
+#include "analysisdialog.h"
 AnalysisWidget::AnalysisWidget(QWidget *parent) {
     an_col = new AnalysisController(this);
     connect(an_col, SIGNAL(progress_signal(int)), this, SLOT(send_progress(int)));
@@ -25,6 +25,8 @@ void AnalysisWidget::start_analysis(std::string save_path, std::string video_pat
     index = vid_name.find_last_of('.');
     vid_name = vid_name.substr(0,index);
 
+    AnalysisDialog* dialog  = new AnalysisDialog();
+    dialog->show();
     tuple<std::string, std::string, QTreeWidgetItem*, AnalysisSettings*> analys (save_path+vid_name+"-motion-analysis", video_path, item, settings);
     if (!analysis_queue.empty()) {
         analysis_queue.push_back(analys);
@@ -73,6 +75,11 @@ void AnalysisWidget::analysis_done(AnalysisProxy analysis) {
         move_queue();
         perform_analysis(analysis_queue.front());
     }
+}
+
+void AnalysisWidget::add_video_project(VideoProject *)
+{
+
 }
 
 /**

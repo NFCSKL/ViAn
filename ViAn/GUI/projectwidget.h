@@ -46,7 +46,7 @@ signals:
     void set_status_bar(QString);
     void begin_analysis(std::string, std::string, QTreeWidgetItem*, AnalysisSettings*);
     void update_frame();
-
+    void new_vid_proj(VideoProject*);
 public slots:
     void new_project(void);
     void add_project(const QString project_name, const QString project_path);
