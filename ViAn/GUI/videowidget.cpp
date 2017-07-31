@@ -771,6 +771,12 @@ void VideoWidget::on_playback_stopped(){
     play_btn->setChecked(false);
 }
 
+/**
+ * @brief VideoWidget::pan
+ * Notifies the frame processor when the zoom rectangle should be moved
+ * @param x movement
+ * @param y movement
+ */
 void VideoWidget::pan(int x, int y) {
     update_processing_settings([&](){
         z_settings.x_movement = x;
@@ -778,6 +784,12 @@ void VideoWidget::pan(int x, int y) {
     });
 }
 
+/**
+ * @brief VideoWidget::set_zoom_rectangle
+ * Notifies the frame processor that a new zoom rectangle has been set
+ * @param p1 tl point of the zoom rectangle
+ * @param p2 br point of the zoom rectangle
+ */
 void VideoWidget::set_zoom_rectangle(QPoint p1, QPoint p2) {
     update_processing_settings([&](){
         z_settings.zoom_tl = p1;
@@ -785,22 +797,45 @@ void VideoWidget::set_zoom_rectangle(QPoint p1, QPoint p2) {
     });
 }
 
+/**
+ * @brief VideoWidget::set_draw_area_size
+ * Notifies the frame processor that the draw area has changed size
+ * @param s Size of the area where the frame will be displayed
+ */
 void VideoWidget::set_draw_area_size(QSize s) {
     update_processing_settings([&](){z_settings.draw_area_size = s;});
 }
 
+/**
+ * @brief VideoWidget::on_zoom_out
+ * Tells the frame processor to decrease zoom
+ */
 void VideoWidget::on_zoom_out(){
     update_processing_settings([&](){z_settings.zoom_factor *= 0.5;});
 }
 
+/**
+ * @brief VideoWidget::on_fit_screen
+ * Tells the frame processor to fit the video to the current draw area
+ */
 void VideoWidget::on_fit_screen() {
     update_processing_settings([&](){z_settings.fit = true;});
 }
 
+/**
+ * @brief VideoWidget::on_original_size
+ * Tells the frame processor to display the video in its original size
+ */
 void VideoWidget::on_original_size(){
     update_processing_settings([&](){z_settings.original = true;});
 }
 
+/**
+ * @brief VideoWidget::update_brightness_contrast
+ * Notifies the frame processor of changes to the brightness and contrast values
+ * @param b_val brightness value
+ * @param c_val contrast value
+ */
 void VideoWidget::update_brightness_contrast(int b_val, double c_val) {
     update_processing_settings([&](){
         m_settings.brightness = b_val;
@@ -808,14 +843,28 @@ void VideoWidget::update_brightness_contrast(int b_val, double c_val) {
     });
 }
 
+/**
+ * @brief VideoWidget::rotate_cw
+ * Tells the frame processor to rotate the frame cw
+ */
 void VideoWidget::rotate_cw(){
     update_processing_settings([&](){m_settings.rotate = 1;});
 }
 
+/**
+ * @brief VideoWidget::rotate_ccw
+ * Tells the frame processor to rotate the frame ccw
+ */
 void VideoWidget::rotate_ccw(){
     update_processing_settings([&](){m_settings.rotate = -1;});
 }
 
+/**
+ * @brief VideoWidget::update_processing_settings
+ * This functions intended use is to update variables shared with the frame processor thread.
+ * After the change is made it will notify the frame processor.
+ * @param lambda function where the variable is changed
+ */
 void VideoWidget::update_processing_settings(std::function<void ()> lambda) {
     v_sync.lock.lock();
     lambda();

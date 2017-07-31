@@ -81,7 +81,6 @@ void VideoPlayer::playback_loop() {
         ++*m_frame;
         ++current_frame;
         display_index();
-//        qDebug() << "TIME IN ITERATION" << frame_rate_timer.elapsed();
     }
     playback_stopped();
 }

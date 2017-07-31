@@ -31,9 +31,8 @@ class VideoPlayer : public QObject{
 
     video_sync* m_v_sync;
 
-
-
-    int m_delay = 0;    // Delay time to reach the right frame rate
+    // Delay time to reach the right frame rate
+    int m_delay = 0;
 
     // Player state
     std::atomic_bool* m_is_playing;
@@ -41,7 +40,6 @@ class VideoPlayer : public QObject{
     bool m_playback_status = false;
     double speed_multiplier = 1;
     int current_frame = -1;
-    std::string m_vid_path = "D:/Testdata/Sequence 01.mp4";
 
     // Loaded video info
     std::atomic_int* m_video_width;

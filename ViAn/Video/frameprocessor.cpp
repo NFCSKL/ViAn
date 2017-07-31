@@ -15,7 +15,8 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
 
     m_width = width;
     m_height = height;
-    cv::namedWindow("test");
+    // NICLAS
+    // cv::namedWindow("test");
 }
 
 /**
@@ -130,7 +131,6 @@ void FrameProcessor::check_events() {
 
         // Settings has been changed by the user
         if (m_changed->load()) {
-            qDebug("here");
             m_changed->store(false);
 
             update_zoomer_settings();
@@ -138,7 +138,6 @@ void FrameProcessor::check_events() {
 
             // Skip reprocessing of old frame if there is a new
             if (!m_new_frame->load()) {
-                qDebug("Processing with new settings");
                 process_frame();
                 lk.unlock();
                 continue;
@@ -183,10 +182,10 @@ void FrameProcessor::process_frame() {
     }
 
     // Displays the zoom rectangle on the original frame in a new windows.
-    // NIKLAS
-    cv::Mat tmp = manipulated_frame.clone();
-    cv::rectangle(tmp, m_zoomer.get_zoom_rect(), cv::Scalar(255,0,0));
-    imshow("test", tmp);
+    // NICLAS
+    // cv::Mat tmp = manipulated_frame.clone();
+    // cv::rectangle(tmp, m_zoomer.get_zoom_rect(), cv::Scalar(255,0,0));
+    // imshow("test", tmp);
 
     // Scales the frame
     m_zoomer.scale_frame(manipulated_frame);
@@ -284,7 +283,6 @@ void FrameProcessor::reset_settings() {
     m_zoomer.set_frame_size(cv::Size(m_width->load(), m_height->load()));
     m_zoomer.reset();
     // Centers zoom rectangle and displays the frame without zoom
-//    m_zoomer.set_scale_factor(1);
     m_zoomer.fit_viewport();
 
     // Store current zoomer settings to shared structure
