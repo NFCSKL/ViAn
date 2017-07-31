@@ -132,7 +132,6 @@ void VideoWidget::init_video_controller(){
  * Creates a new FrameProcessor instance which is then moved to a new thread.
  */
 void VideoWidget::init_frame_processor() {
-    QTimer* process_timer = new QTimer(this);
     f_processor = new FrameProcessor(&new_frame, &settings_changed, &z_settings, &video_width,
                                      &video_height, &new_video, &m_settings, &v_sync, &frame_index);
 

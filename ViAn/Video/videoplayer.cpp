@@ -9,6 +9,7 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic<bool>* is_pl
                          std::mutex* player_lock, std::string* video_path,
                          std::atomic_int* speed_step, QObject *parent) : QObject(parent) {
 
+
     m_frame = frame_index;
     m_is_playing = is_playing;
     m_new_frame = new_frame;
@@ -23,6 +24,7 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic<bool>* is_pl
 
     m_video_path = video_path;
     m_speed_step = speed_step;
+
 }
 
 /**
@@ -64,38 +66,6 @@ void VideoPlayer::set_playback_speed(int speed_steps) {
 }
 
 /**
- * @brief VideoPlayer::playback_loop
- * Main loop for video playback.
- * This function is executed whilst the video is playing/
- * It emits both the current frame and its index back to the controller object.
- */
-void VideoPlayer::playback_loop() {
-    QTime frame_rate_timer;
-    frame_rate_timer.start();
-
-    while (m_is_playing->load()) {
-        // Handle events from controller
-        QCoreApplication::processEvents();
-        if (m_frame->load() != current_frame) set_frame();
-        if (!m_is_playing->load()) break;
-
-        // Make sure playback sticks to the correct frame rate
-        if (frame_rate_timer.elapsed() < m_delay * speed_multiplier) {
-            QThread::msleep(1); // Reduces busy waiting
-            continue;
-        }
-        frame_rate_timer.restart();
-
-        if (!synced_read()) break;
-
-        ++*m_frame;
-        ++current_frame;
-        display_index();
-    }
-    playback_stopped();
-}
-
-/**
  * @brief VideoPlayer::set_frame
  * Moves the playback to the frame indicated by the number on top of the frame_stack.
  */
@@ -111,7 +81,6 @@ void VideoPlayer::set_frame() {
 /**
  * @brief VideoPlayer::check_events
  * Main loop for video playback.
- *
  */
 void VideoPlayer::check_events() {
     std::chrono::duration<double> elapsed{0};
@@ -167,6 +136,7 @@ bool VideoPlayer::synced_read(){
         if (!m_capture.read(m_v_sync->frame)) {
             m_is_playing->store(false);
             playback_stopped();
+
             return false;
         }
         m_new_frame->store(true);

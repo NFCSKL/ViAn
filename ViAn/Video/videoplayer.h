@@ -37,8 +37,9 @@ class VideoPlayer : public QObject{
 
     video_sync* m_v_sync;
 
+
     // Delay time to reach the right frame rate
-    int m_delay = 0;
+    int m_delay = 10;
 
     // Player state
     std::atomic_bool* m_is_playing;
@@ -60,6 +61,7 @@ public:
                          std::mutex* player_lock, std::string* video_path,
                          std::atomic_int* speed_step, QObject *parent = nullptr);
 
+
 signals:
     void display(cv::Mat frame, int frame_index);
     void display_index();
@@ -71,10 +73,10 @@ public slots:
     void check_events(void);
 private:
     void load_video();
-    void playback_loop();
     void load_video_info();
     bool synced_read();
     void set_playback_speed(int speed_steps);
+
 };
 
 #endif // VIDEOPLAYER_H

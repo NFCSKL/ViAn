@@ -7,6 +7,7 @@ VideoController::VideoController(std::atomic<int>* frame_index, std::atomic<bool
                                  std::atomic_bool* new_frame, std::atomic_int* width, std::atomic_int* height,
                                  std::atomic_bool* new_video, video_sync* v_sync, std::condition_variable* player_con,
                                  std::mutex* player_lock, std::string* video_path, std::atomic_int* speed){
+
     m_frame = frame_index;
     m_is_playing = is_playing;
     m_width = width;
@@ -14,10 +15,12 @@ VideoController::VideoController(std::atomic<int>* frame_index, std::atomic<bool
     m_new_video = new_video;
     m_v_sync = v_sync;
     m_new_frame = new_frame;
+
     m_player_con = player_con;
     m_player_lock = player_lock;
     m_video_path = video_path;
     m_speed = speed;
+
 }
 
 void VideoController::run() {
@@ -34,4 +37,5 @@ void VideoController::run() {
     v_player->check_events();
     exec();
     delete v_player;
+
 }
