@@ -64,7 +64,7 @@ void FrameProcessor::check_events() {
         }
 
         // A new video has been loaded. Reset processing settings
-        if (m_new_video->load()) {        
+        if (m_new_video->load()) {
             reset_settings();
         }
         lk.unlock();

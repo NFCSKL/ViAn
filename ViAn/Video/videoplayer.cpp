@@ -73,7 +73,10 @@ void VideoPlayer::playback_loop() {
         if (!m_is_playing->load()) break;
 
         // Make sure playback sticks to the correct frame rate
-        if (frame_rate_timer.elapsed() < m_delay * speed_multiplier) continue;
+        if (frame_rate_timer.elapsed() < m_delay * speed_multiplier) {
+            QThread::msleep(1); // Reduces busy waiting
+            continue;
+        }
         frame_rate_timer.restart();
 
         if (!synced_read()) break;
