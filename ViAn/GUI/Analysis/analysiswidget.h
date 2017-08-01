@@ -7,10 +7,12 @@
 #include <ctime>
 #include "Analysis/AnalysisController.h"
 #include "GUI/TreeItems/videoitem.h"
-
+#include "Project/videoproject.h"
+#include <QThreadPool>
 class AnalysisWidget : public QWidget
 {
     Q_OBJECT
+    QThread* m_analysis_thread;
 public:
     explicit AnalysisWidget(QWidget *parent = nullptr);
     AnalysisController* an_col;
@@ -20,16 +22,12 @@ public:
     std::deque<tuple<AnalysisMethod*,QTreeWidgetItem*>> analysis_queue;
     QTreeWidgetItem* current_analysis;
 private:
-
     void perform_analysis(tuple<AnalysisMethod *, QTreeWidgetItem *> analys);
     void move_queue();
-    
 public slots:
     void start_analysis(QTreeWidgetItem* item, AnalysisMethod *method);
     void send_progress(int);
     void analysis_done(AnalysisProxy);
-    void add_video_project(VideoProject*);
-    
 signals:
     void add_analysis_bar(void);
     void remove_analysis_bar(void);

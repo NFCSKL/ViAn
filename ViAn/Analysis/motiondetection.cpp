@@ -8,7 +8,8 @@
 MotionDetection::MotionDetection(std::string source_file, std::string save_file) : AnalysisMethod(source_file, save_file)
 {
     m_analysis.type = MOTION_DETECTION;
-
+    init_settings();
+    setup_analysis();
 }
 
 MotionDetection::~MotionDetection() {
@@ -29,12 +30,12 @@ void MotionDetection::init_settings()
  * @brief MotionDetection::setup_analysis
  * Initial setup of the analysis
  */
-void MotionDetection::setup_analysis(){
+void MotionDetection::setup_analysis(){    
     background_subtractor = cv::createBackgroundSubtractorMOG2(get_setting("BACKGROUND_HISTORY"),
                                                                get_setting("MOG2_THRESHOLD"),
-                                                               get_setting("DETECT_SHADOWS"));
-    dilation_kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(get_setting("DILATION_DEGREE"),
-                                                                         get_setting("DILATION_DEGREE")));
+                                                               get_setting("IGNORE_SHADOWS"));
+    dilation_kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(get_setting("OPEN_DEGREE"),
+                                                                         get_setting("OPEN_DEGREE")));
 }
 
 /**
@@ -49,10 +50,9 @@ std::vector<DetectionBox> MotionDetection::analyse_frame(){
     std::vector<std::vector<cv::Point> > contours;
 
     // Updates background model
-    blurred_frame = analysis_frame.clone();
+    blurred_frame = analysis_frame.clone();;
     //cv::GaussianBlur(blurred_frame, blurred_frame, m_settings->BLUR_SIZE, 0);
     background_subtractor->apply(blurred_frame, foreground_mask,-1);   
-
     cv::threshold(foreground_mask, foreground_mask, DETECTION_THRESHOLD, GRAYSCALE_WHITE, cv::THRESH_BINARY);
     cv::morphologyEx(foreground_mask, result, cv::MORPH_OPEN, dilation_kernel);
 

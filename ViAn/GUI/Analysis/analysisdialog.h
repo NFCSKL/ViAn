@@ -6,20 +6,31 @@
 #include <QDialogButtonBox>
 #include <QListWidget>
 #include <QLineEdit>
+#include <QAbstractItemView>
+#include "GUI/TreeItems/videoitem.h"
+#include "GUI/TreeItems/analysisitem.h"
+#include "videolistitem.h"
+class VideoItem;
 class AnalysisDialog : public QDialog
 {
     Q_OBJECT
-    QLineEdit* dilation;
-    QLineEdit* small_obj;
-    QLineEdit* det_tresh;
+    QListWidget* m_v_proj_list;
+    std::map<std::string,QLineEdit*> m_settings;
+    AnalysisMethod* method;
+    std::string m_save_dir;
 
-    QLineEdit* graywhite;
-    QLineEdit* bg_hist;
-    QLineEdit* mog2_thresh;
-    QLineEdit* det_shadows;
+    QLineEdit* interval;
+    QLineEdit* bounding_box;
 public:
-
-    AnalysisDialog();
+    AnalysisDialog(std::vector<VideoItem*> vid_projs, string save_dir);
+public slots:
+    void ok_btn_clicked();
+    void cancel_btn_clicked();
+signals:
+    void start_analysis(AnalysisMethod* method, VideoProject* vid_proj);
+private:
+    void add_settings(QFormLayout* form);
+    void set_settings(AnalysisMethod* method);
 };
 
 #endif // ANALYSISDIALOG_H

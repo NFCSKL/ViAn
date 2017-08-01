@@ -80,7 +80,6 @@ void ProjectWidget::add_video() {
         VideoProject* vid_proj = new VideoProject(new Video(video_path.toStdString()));
         m_proj->add_video_project(vid_proj);
         tree_add_video(vid_proj, vid_name);
-        emit new_vid_proj(vid_proj);
     }
 }
 
@@ -91,19 +90,14 @@ void ProjectWidget::add_video() {
  */
 void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
     qDebug() << "start_analysis_begin";
-    std::string video_path = vid_proj->get_video()->file_path;
-    std::size_t index = video_path.find_last_of('/') + 1;
-    std::string vid_name = video_path.substr(index);
-    index = vid_name.find_last_of('.');
-    vid_name = vid_name.substr(0,index);
 
-    AnalysisItem* ana = new AnalysisItem();
-    AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->getDir()+vid_name+"-motion-analysis");
-
+    AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->getDir());
     if(settings->use_bounding_box) method->setBounding_box(settings->bounding_box);
     if(settings->use_interval) method->setInterval(settings->interval);
-    VideoItem* v_item = get_video_item(vid_proj);
+
     if (vid_proj == nullptr) return;
+    VideoItem* v_item = get_video_item(vid_proj);
+    AnalysisItem* ana = new AnalysisItem();
     v_item->addChild(ana);
     ana->setText(0, "Loading");
     v_item->setExpanded(true);
@@ -154,7 +148,6 @@ void ProjectWidget::tree_add_video(VideoProject* vid_proj, const QString& vid_na
     insertTopLevelItem(topLevelItemCount(), vid_item);
     vid_proj->set_tree_index(get_index_path(dynamic_cast<QTreeWidgetItem*>(vid_item)));
     emit set_status_bar("Video added: " + vid_name);
-    emit new_vid_proj(vid_item->get_video_project());
     // Add analysis and tag
     add_analyses_to_item(vid_item);
 }
@@ -371,6 +364,40 @@ void ProjectWidget::dropEvent(QDropEvent *event) {
     }
 }
 
+void ProjectWidget::advanced_analysis()
+{
+    std::vector<VideoItem*> v_items;
+    QTreeWidgetItem* s_item = invisibleRootItem();
+    for (auto i = 0; i < s_item->childCount(); ++i) {
+        QTreeWidgetItem* item = s_item->child(i);
+        if (item->type() == VIDEO_ITEM) {
+            VideoItem* v_item = dynamic_cast<VideoItem*>(item);
+            v_items.push_back(v_item);
+        }
+    }
+    AnalysisDialog* dialog = new AnalysisDialog(v_items,m_proj->getDir());
+    connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::advanced_analysis_setup);
+    dialog->show();
+
+    qDebug() << "start_analysis_begin";
+
+
+}
+
+void ProjectWidget::advanced_analysis_setup(AnalysisMethod * method, VideoProject* vid_proj)
+{
+    qDebug() << "hej";
+    if (vid_proj == nullptr) return;
+    VideoItem* v_item = get_video_item(vid_proj);
+    AnalysisItem* ana = new AnalysisItem();
+    v_item->addChild(ana);
+    ana->setText(0, "Loading");
+    v_item->setExpanded(true);
+    qDebug() << "hej";
+    emit begin_analysis(dynamic_cast<QTreeWidgetItem*>(ana), method);
+}
+
+
 /**
  * @brief ProjectWidget::tree_item_clicked
  * Slot function for when a tree item is clicked.
@@ -576,7 +603,6 @@ void ProjectWidget::open_project(QString project_path) {
     emit proj_path(m_proj->getDir());
     for (auto vid_proj : m_proj->get_videos()) {
         insert_to_path_index(vid_proj);
-        emit new_vid_proj(vid_proj);
         emit load_bookmarks(vid_proj);
     }
 }

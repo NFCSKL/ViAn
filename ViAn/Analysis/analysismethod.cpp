@@ -24,9 +24,13 @@ void AnalysisMethod::setInterval(const AnalysisInterval &value)
     use_interval = true;
 }
 
-std::string AnalysisMethod::get_descr(const std::string& var_name)
+std::string AnalysisMethod::get_descr(const std::string& var)
 {
-    return m_descriptions.at(var_name);
+    auto val_pair = m_settings.find(var);
+    if(val_pair != m_settings.end())
+        return val_pair->first;
+    qWarning("No variable \"%s found",var.c_str());
+    return "";
 }
 
 void AnalysisMethod::add_setting(const std::string &var, int value_default, const std::string& descr)
@@ -37,7 +41,11 @@ void AnalysisMethod::add_setting(const std::string &var, int value_default, cons
 
 int AnalysisMethod::get_setting(const std::string &var)
 {
-    return m_settings.at(var);
+    auto val_pair = m_settings.find(var);
+    if(val_pair != m_settings.end())
+        return val_pair->second;
+    qWarning("No variable \"%s found",var.c_str());
+    return -1;
 }
 
 void AnalysisMethod::set_setting(const std::string &var, int value)
@@ -45,10 +53,24 @@ void AnalysisMethod::set_setting(const std::string &var, int value)
     m_settings[var] = value;
 }
 
+std::vector<std::string> AnalysisMethod::get_var_names()
+{
+    std::vector<std::string> res;
+    for(auto pair : m_settings){
+        res.push_back(pair.first);
+    }
+    return res;
+}
+
 AnalysisMethod::AnalysisMethod(const std::string &video_path, const std::string& save_path)
 {
     m_source_file = video_path;
-    m_save_path = save_path;
+    std::size_t index = video_path.find_last_of('/') + 1;
+    std::string vid_name = video_path.substr(index);
+    index = vid_name.find_last_of('.');
+    vid_name = vid_name.substr(0,index);
+
+    m_save_path = save_path+vid_name +"-motion_analysis";
     add_setting("SAMPLE_FREQUENCY",1, "How often analysis will use frame from video");
 }
 /**
@@ -93,7 +115,7 @@ bool AnalysisMethod::sample_current_frame() {
  * This is the main loop method for doing an analysis.
  * @return all detections from the performed analysis.
  */
-void AnalysisMethod::run_analysis() {
+void AnalysisMethod::run() {
     qDebug() << m_source_file.c_str();
     capture.open(m_source_file);
     if (!capture.isOpened()) {
@@ -107,7 +129,7 @@ void AnalysisMethod::run_analysis() {
     POI* m_POI = new POI();    
     // If Interval is use, start analysis at frame
     int end_frame = num_frames -1;
-    int start_frame = 0;
+    int start_frame = -1;
     if(use_interval){
         start_frame = interval.get_start();
         capture.set(CV_CAP_PROP_POS_FRAMES, start_frame);
@@ -115,16 +137,11 @@ void AnalysisMethod::run_analysis() {
         num_frames = end_frame - start_frame;
         current_frame_index = start_frame -1;
     }
-    qDebug() << "start_frame" <<start_frame;
-    qDebug() << "end_frame" <<end_frame;
-    qDebug() << "curr frame" <<current_frame_index;
     while(!aborted && capture.read(original_frame) &&
           !(use_interval && current_frame_index <= end_frame)) {
-        qDebug() << "loop, curr: " << current_frame_index;
         // Slice frame if bounding box should be used
         if(use_bounding_box){
             analysis_frame = original_frame(bounding_box);
-            qDebug() << "use boudning box";
         }
         else{
 
@@ -136,7 +153,6 @@ void AnalysisMethod::run_analysis() {
             if (scaling_needed)
                 scale_frame();            
             detections = analyse_frame();
-
             // This if statement handles the sorting of OOIs detected
             // in a frame into the correct POIs.
             if (detections.empty() && detecting) {
@@ -160,7 +176,6 @@ void AnalysisMethod::run_analysis() {
              */
             m_POI->add_detections(current_frame_index, detections);
         }
-
         if (paused) {
             // TODO do pause stuff
             paused = false;
@@ -175,8 +190,9 @@ void AnalysisMethod::run_analysis() {
         m_POI->set_end_frame(current_frame_index);
         m_analysis.add_interval(m_POI);
     }
+    qDebug() << "analysis finished";
     capture.release();
-    m_analysis.save_saveable("SAVE_FILE");
+    m_analysis.save_saveable(m_save_path);
     AnalysisProxy proxy(m_analysis, m_analysis.full_path());
     emit finished_analysis(proxy);
     emit finito();

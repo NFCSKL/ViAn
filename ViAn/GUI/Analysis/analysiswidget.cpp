@@ -5,12 +5,13 @@
 #include <QDebug>
 #include <QTreeWidgetItem>
 #include <tuple>
-#include "analysisdialog.h"
 AnalysisWidget::AnalysisWidget(QWidget *parent) {
     an_col = new AnalysisController(this);
+    m_analysis_thread = new QThread();
     connect(an_col, SIGNAL(progress_signal(int)), this, SLOT(send_progress(int)));
     connect(an_col, SIGNAL(analysis_done(AnalysisProxy)), this, SLOT(analysis_done(AnalysisProxy)));
 }
+
 
 /**
  * @brief AnalysisWidget::start_analysis
@@ -20,10 +21,6 @@ AnalysisWidget::AnalysisWidget(QWidget *parent) {
  * Puts the analysis in the queue and if the was empty starts the analysis directly
  */
 void AnalysisWidget::start_analysis(QTreeWidgetItem* item, AnalysisMethod *method) {
-    qDebug() << "start_analysis";
-
-    //AnalysisDialog* dialog  = new AnalysisDialog();
-    //dialog->show();
     tuple<AnalysisMethod*,QTreeWidgetItem*> analys (method,item);
     if (!analysis_queue.empty()) {
         analysis_queue.push_back(analys);
@@ -34,7 +31,6 @@ void AnalysisWidget::start_analysis(QTreeWidgetItem* item, AnalysisMethod *metho
         perform_analysis(analys);
         current_analysis = item;
     }
-    qDebug() << "start_analysis_end";
 }
 
 /**
@@ -50,14 +46,19 @@ void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> a
 //    an_col->start();
     AnalysisMethod* method = get<0>(analys);
     qDebug()<<"movetothread";
-    QThread* analysis_thread = new QThread();
-    method->moveToThread(analysis_thread);
-    connect(analysis_thread, &QThread::started, method, &AnalysisMethod::run_analysis);
-    //connect(method, &AnalysisMethod::send_progress, &AnalysisWidget::send_progress);
-    connect(method, &AnalysisMethod::finito, analysis_thread, &QThread::quit);
-    connect(method, &AnalysisMethod::finito, method, &AnalysisMethod::deleteLater);
-    connect(analysis_thread, &QThread::finished, analysis_thread, &QThread::deleteLater);
-    analysis_thread->start();
+
+    //method->moveToThread(m_analysis_thread);
+    //connect(m_analysis_thread, &QThread::started, method, &AnalysisMethod::run_analysis);
+    //connect(method, &AnalysisMethod::finito, m_analysis_thread, &QThread::quit);
+    //connect(m_analysis_thread, &QThread::finished, m_analysis_thread, &QThread::deleteLater);
+
+    connect(method, &AnalysisMethod::send_progress, this,&AnalysisWidget::send_progress);
+   // connect(method, &AnalysisMethod::finito, method, &AnalysisMethod::deleteLater);
+    connect(method, SIGNAL(send_progress(int)),this, SLOT(send_progress(int)));
+    connect(method, &AnalysisMethod::finished_analysis, this, &AnalysisWidget::analysis_done);
+    QThreadPool::globalInstance()->start(method);
+    //m_analysis_thread->start();
+
 }
 
 /**
@@ -82,11 +83,6 @@ void AnalysisWidget::analysis_done(AnalysisProxy analysis) {
         move_queue();
         perform_analysis(analysis_queue.front());
     }
-}
-
-void AnalysisWidget::add_video_project(VideoProject *)
-{
-
 }
 
 /**

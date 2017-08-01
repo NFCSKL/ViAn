@@ -3,6 +3,7 @@
 #include <QThread>
 #include <QMutex>
 #include <QWaitCondition>
+#include <QRunnable>
 #include "opencv2/opencv.hpp"
 #include "opencv2/core/core.hpp"
 #include "opencv2/videoio/videoio.hpp"
@@ -12,7 +13,7 @@
 #include "Filehandler/saveable.h"
 using Settings = std::map<std::string,int>;
 using SettingsDescr = std::map<std::string,std::string>;
-class AnalysisMethod : public QObject {
+class AnalysisMethod : public QObject,public QRunnable {
     Q_OBJECT    
     Settings m_settings;
     SettingsDescr m_descriptions;
@@ -29,11 +30,16 @@ protected:
     virtual void init_settings() = 0;
     // Implement this, return constant names, default value and descriptions
     // like so std::vector<std::tuple<name,int value, description>>
-    std::string get_descr(const std::string& var_name);
+
     virtual void add_setting(const std::string& var, int value_default, const std::string& descr);
+
+
+public:
+    std::string get_descr(const std::string& var_name);
     virtual int get_setting(const std::string& var);
     virtual void set_setting(const std::string& var, int value);
-public:
+    virtual std::vector<std::string> get_var_names();
+
     AnalysisMethod(const std::string &video_path, const std::string& save_path);
     void abort_analysis();
     void pause_analysis();
@@ -83,7 +89,7 @@ protected:
     void calculate_scaling_factor();
     void scale_frame();
 public slots:
-    void run_analysis();
+    void run();
 signals:
     void send_progress(int progress);
     void finito(void);

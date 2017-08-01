@@ -2,6 +2,7 @@
 #define VIDEOITEM_H
 #include "treeitem.h"
 #include "Project/videoproject.h"
+class VideoProject;
 class VideoItem : public TreeItem {
     VideoProject* m_vid_proj = nullptr;
 public:

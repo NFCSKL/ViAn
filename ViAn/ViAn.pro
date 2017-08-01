@@ -44,9 +44,6 @@ SOURCES += main.cpp \
     Filehandler/writeable.cpp \
     Project/Analysis/analysisproxy.cpp \
     Project/Analysis/detectionbox.cpp \
-    AxReport/axtable.cpp \
-    AxReport/axrange.cpp \
-    AxReport/axcell.cpp \
     GUI/TreeItems/videoitem.cpp \
     GUI/TreeItems/treeitem.cpp \
     GUI/recentprojectdialog.cpp \
@@ -60,7 +57,8 @@ SOURCES += main.cpp \
     GUI/framewidget.cpp \
     GUI/videowidget.cpp \
     Analysis/analysissettings.cpp \
-    GUI/Analysis/analysisdialog.cpp
+    GUI/Analysis/analysisdialog.cpp \
+    GUI/Analysis/videolistitem.cpp
 
 #
 # TEST
@@ -96,9 +94,6 @@ HEADERS += reportgenerator.h\
     Filehandler/writeable.h \
     Project/Analysis/analysisproxy.h \
     Project/Analysis/detectionbox.h \
-    AxReport/axtable.h \
-    AxReport/axrange.h \
-    AxReport/axcell.h \
     GUI/TreeItems/tagitem.h \
     GUI/TreeItems/videoitem.h \
     GUI/TreeItems/analysisitem.h \
@@ -113,7 +108,8 @@ HEADERS += reportgenerator.h\
     GUI/videowidget.h \
     Analysis/analysissettings.h \
     Analysis/analysismethod.h \
-    GUI/Analysis/analysisdialog.h
+    GUI/Analysis/analysisdialog.h \
+    GUI/Analysis/videolistitem.h
 
 #
 # LIBRARY

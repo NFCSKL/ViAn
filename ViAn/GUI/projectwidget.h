@@ -14,6 +14,8 @@
 #include "Project/videoproject.h"
 #include "Analysis/analysismethod.h"
 #include "Analysis/motiondetection.h"
+#include "Analysis/analysisdialog.h"
+#include "TreeItems/analysisitem.h"
 class Project;
 class VideoItem;
 class FolderItem;
@@ -61,6 +63,8 @@ public slots:
     void remove_project();
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
+    void advanced_analysis();
+    void advanced_analysis_setup(AnalysisMethod*method, VideoProject *vid_proj);
 private slots:
     void context_menu(const QPoint& point);
     void remove_item();
