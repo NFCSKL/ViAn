@@ -91,9 +91,15 @@ void ProjectWidget::add_video() {
  */
 void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
     qDebug() << "start_analysis_begin";
+    std::string video_path = vid_proj->get_video()->file_path;
+    std::size_t index = video_path.find_last_of('/') + 1;
+    std::string vid_name = video_path.substr(index);
+    index = vid_name.find_last_of('.');
+    vid_name = vid_name.substr(0,index);
 
     AnalysisItem* ana = new AnalysisItem();
-    AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->getDir()+vid_name+"-motion-analysis" );
+    AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->getDir()+vid_name+"-motion-analysis");
+
     if(settings->use_bounding_box) method->setBounding_box(settings->bounding_box);
     if(settings->use_interval) method->setInterval(settings->interval);
     VideoItem* v_item = get_video_item(vid_proj);
@@ -102,7 +108,7 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* set
     ana->setText(0, "Loading");
     v_item->setExpanded(true);
     QTreeWidgetItem* item = dynamic_cast<QTreeWidgetItem*>(ana);    
-    emit begin_analysis(m_proj->getDir(), vid_proj->get_video()->file_path, item, method);
+    emit begin_analysis(item, method);
     qDebug() << "start_analysis_end";
 }
 

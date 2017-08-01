@@ -19,16 +19,12 @@ AnalysisWidget::AnalysisWidget(QWidget *parent) {
  * @param item          : video to be analysed
  * Puts the analysis in the queue and if the was empty starts the analysis directly
  */
-void AnalysisWidget::start_analysis(std::string save_path, std::string video_path, QTreeWidgetItem* item, AnalysisMethod *method) {
+void AnalysisWidget::start_analysis(QTreeWidgetItem* item, AnalysisMethod *method) {
     qDebug() << "start_analysis";
-    std::size_t index = video_path.find_last_of('/') + 1;
-    std::string vid_name = video_path.substr(index);
-    index = vid_name.find_last_of('.');
-    vid_name = vid_name.substr(0,index);
 
-    AnalysisDialog* dialog  = new AnalysisDialog();
-    dialog->show();
-    tuple<std::string, AnalysisMethod*,QTreeWidgetItem*> analys (save_path+vid_name+"-motion-analysis", method,item);
+    //AnalysisDialog* dialog  = new AnalysisDialog();
+    //dialog->show();
+    tuple<AnalysisMethod*,QTreeWidgetItem*> analys (method,item);
     if (!analysis_queue.empty()) {
         analysis_queue.push_back(analys);
         std::string name = "Queued #"+to_string(analysis_queue.size()-1);
@@ -47,15 +43,17 @@ void AnalysisWidget::start_analysis(std::string save_path, std::string video_pat
  * Actually starts the analysis
  * Takes in a tuple consisting of <savepath, videopath, video to be analysed>
  */
-void AnalysisWidget::perform_analysis(tuple<std::string,AnalysisMethod*, QTreeWidgetItem*> analys) {
+void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> analys) {
     emit add_analysis_bar();
     //an_col->new_analysis(get<1>(analys),get<0>(analys));
 //    start = std::clock();
 //    an_col->start();
-    AnalysisMethod* method = get<1>(analys);
+    AnalysisMethod* method = get<0>(analys);
+    qDebug()<<"movetothread";
     QThread* analysis_thread = new QThread();
     method->moveToThread(analysis_thread);
     connect(analysis_thread, &QThread::started, method, &AnalysisMethod::run_analysis);
+    //connect(method, &AnalysisMethod::send_progress, &AnalysisWidget::send_progress);
     connect(method, &AnalysisMethod::finito, analysis_thread, &QThread::quit);
     connect(method, &AnalysisMethod::finito, method, &AnalysisMethod::deleteLater);
     connect(analysis_thread, &QThread::finished, analysis_thread, &QThread::deleteLater);
@@ -80,7 +78,7 @@ void AnalysisWidget::analysis_done(AnalysisProxy analysis) {
     current_analysis = nullptr;
     duration = 0;   
     if (!analysis_queue.empty()) {
-        current_analysis = get<2>(analysis_queue.front());
+        current_analysis = get<1>(analysis_queue.front());
         move_queue();
         perform_analysis(analysis_queue.front());
     }
@@ -98,7 +96,7 @@ void AnalysisWidget::add_video_project(VideoProject *)
 void AnalysisWidget::move_queue() {
     for (unsigned int i = 0; i < analysis_queue.size(); i++) {
         std::string name = "Queued #"+to_string(i);
-        emit name_in_tree(get<2>(analysis_queue.at(i)), QString::fromStdString(name));
+        emit name_in_tree(get<1>(analysis_queue.at(i)), QString::fromStdString(name));
     }
 }
 

@@ -1,6 +1,6 @@
 #ifndef MOTIONDETECTION_H
 #define MOTIONDETECTION_H
-
+#include "Project/Analysis/detectionbox.h"
 #include "analysismethod.h"
 #include "analysiscontroller.h"
 #include <string>
@@ -13,7 +13,7 @@
 class MotionDetection : public AnalysisMethod {
 public:
 
-    MotionDetection(std::string source_file);
+    MotionDetection(std::string source_file, std::string save_file);
     ~MotionDetection();
 
 private:

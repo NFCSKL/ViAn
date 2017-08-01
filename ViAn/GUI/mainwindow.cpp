@@ -48,8 +48,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     connect(video_wgt, SIGNAL(start_analysis(VideoProject*, AnalysisSettings*)), project_wgt, SLOT(start_analysis(VideoProject*, AnalysisSettings*)));
     connect(video_wgt->frame_wgt, SIGNAL(quick_analysis(AnalysisSettings*)), video_wgt, SLOT(quick_analysis(AnalysisSettings*)));
-    connect(project_wgt, SIGNAL(begin_analysis(std::string ,std::string,  QTreeWidgetItem*, AnalysisMethod*)),
-            analysis_wgt, SLOT(start_analysis(std::string ,std::string,  QTreeWidgetItem*, AnalysisMethod*)));
+    connect(project_wgt, SIGNAL(begin_analysis(QTreeWidgetItem*, AnalysisMethod*)),
+            analysis_wgt, SLOT(start_analysis(QTreeWidgetItem*, AnalysisMethod*)));
     connect(project_wgt, SIGNAL(new_vid_proj(VideoProject*)), analysis_wgt, SLOT(add_video_project(VideoProject*)));
 
     // Initialize bookmark widget

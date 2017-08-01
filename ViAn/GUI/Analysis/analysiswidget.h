@@ -17,15 +17,15 @@ public:
     std::string dots = "";
     std::clock_t start;
     int duration = 0;
-    std::deque<tuple<std::string, AnalysisMethod*,QTreeWidgetItem*>> analysis_queue;
+    std::deque<tuple<AnalysisMethod*,QTreeWidgetItem*>> analysis_queue;
     QTreeWidgetItem* current_analysis;
 private:
 
-    void perform_analysis(tuple<string, AnalysisMethod *,QTreeWidgetItem *> analys);
+    void perform_analysis(tuple<AnalysisMethod *, QTreeWidgetItem *> analys);
     void move_queue();
     
 public slots:
-    void start_analysis(std::string save_path, std::string video_path, QTreeWidgetItem* item, AnalysisMethod *method);
+    void start_analysis(QTreeWidgetItem* item, AnalysisMethod *method);
     void send_progress(int);
     void analysis_done(AnalysisProxy);
     void add_video_project(VideoProject*);
