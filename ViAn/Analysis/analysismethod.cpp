@@ -116,16 +116,13 @@ bool AnalysisMethod::sample_current_frame() {
  * @return all detections from the performed analysis.
  */
 void AnalysisMethod::run() {
-    qDebug() << m_source_file.c_str();
     capture.open(m_source_file);
     if (!capture.isOpened()) {
         return;
     }
-    qDebug() << "run analysis";
     calculate_scaling_factor();
     std::vector<DetectionBox> detections;
     num_frames = capture.get(CV_CAP_PROP_FRAME_COUNT);    
-    qDebug() << "num_frames" << num_frames;
     POI* m_POI = new POI();    
     // If Interval is use, start analysis at frame
     int end_frame = num_frames -1;
@@ -190,7 +187,6 @@ void AnalysisMethod::run() {
         m_POI->set_end_frame(current_frame_index);
         m_analysis.add_interval(m_POI);
     }
-    qDebug() << "analysis finished";
     capture.release();
     m_analysis.save_saveable(m_save_path);
     AnalysisProxy proxy(m_analysis, m_analysis.full_path());
