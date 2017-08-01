@@ -47,7 +47,8 @@ SOURCES += main.cpp \
     Project/Analysis/analysisinterval.cpp \
     Filehandler/writeable.cpp \
     Project/Analysis/analysisproxy.cpp \
-    Project/Analysis/detectionbox.cpp
+    Project/Analysis/detectionbox.cpp \
+    GUI/doubleclickbutton.cpp
 
 #
 # TEST
@@ -90,7 +91,8 @@ HEADERS += reportgenerator.h\
     table.h \
     AxReport/axtable.h \
     AxReport/axrange.h \
-    AxReport/axcell.h
+    AxReport/axcell.h \
+    GUI/doubleclickbutton.h
 
 #
 # LIBRARY

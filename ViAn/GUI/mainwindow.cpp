@@ -441,7 +441,7 @@ void MainWindow::cont_bri() {
 }
 
 void MainWindow::export_current_frame() {
-    int frame_num = video_wgt->frame_line_edit->text();
+    //int frame_num = video_wgt->frame_line_edit->text();
     //std::pair<int, int> interval = std::make_pair(frame_num, frame_num);
     VideoProject* vid_proj = video_wgt->get_current_video_project();
     if (vid_proj == nullptr){

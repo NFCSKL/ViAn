@@ -16,6 +16,7 @@
 #include <mutex>
 #include <condition_variable>
 
+#include "doubleclickbutton.h"
 #include "framewidget.h"
 #include "analysisslider.h"
 #include "Video/video_player.h"
@@ -108,6 +109,7 @@ public slots:
     void zoom_out_clicked(void);
     void next_poi_btn_clicked(void);
     void prev_poi_btn_clicked(void);
+    void prev_poi_doubleclicked(void);
     void analysis_play_btn_toggled(bool value);
     void set_slider_max(int value);
     void on_new_frame();
@@ -157,7 +159,7 @@ private:
     QPushButton* next_frame_btn;
     QPushButton* prev_frame_btn;
     QPushButton* next_poi_btn;
-    QPushButton* prev_poi_btn;
+    DoubleClickButton* prev_poi_btn;
     QPushButton* analysis_btn;
     QPushButton* analysis_play_btn;
     QPushButton* bookmark_btn;    
