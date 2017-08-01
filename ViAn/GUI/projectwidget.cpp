@@ -89,8 +89,6 @@ void ProjectWidget::add_video() {
  * Start analysis on the selected video
  */
 void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* settings) {
-    qDebug() << "start_analysis_begin";
-
     AnalysisMethod* method = new MotionDetection(vid_proj->get_video()->file_path, m_proj->getDir());
     if(settings->use_bounding_box) method->setBounding_box(settings->bounding_box);
     if(settings->use_interval) method->setInterval(settings->interval);
@@ -103,7 +101,6 @@ void ProjectWidget::start_analysis(VideoProject* vid_proj, AnalysisSettings* set
     v_item->setExpanded(true);
     QTreeWidgetItem* item = dynamic_cast<QTreeWidgetItem*>(ana);    
     emit begin_analysis(item, method);
-    qDebug() << "start_analysis_end";
 }
 
 /**
@@ -378,22 +375,16 @@ void ProjectWidget::advanced_analysis()
     AnalysisDialog* dialog = new AnalysisDialog(v_items,m_proj->getDir());
     connect(dialog, &AnalysisDialog::start_analysis, this, &ProjectWidget::advanced_analysis_setup);
     dialog->show();
-
-    qDebug() << "start_analysis_begin";
-
-
 }
 
 void ProjectWidget::advanced_analysis_setup(AnalysisMethod * method, VideoProject* vid_proj)
 {
-    qDebug() << "hej";
     if (vid_proj == nullptr) return;
     VideoItem* v_item = get_video_item(vid_proj);
     AnalysisItem* ana = new AnalysisItem();
     v_item->addChild(ana);
     ana->setText(0, "Loading");
     v_item->setExpanded(true);
-    qDebug() << "hej";
     emit begin_analysis(dynamic_cast<QTreeWidgetItem*>(ana), method);
 }
 
