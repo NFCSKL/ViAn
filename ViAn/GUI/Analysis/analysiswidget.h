@@ -12,7 +12,6 @@
 class AnalysisWidget : public QWidget
 {
     Q_OBJECT
-    QThread* m_analysis_thread;
 public:
     explicit AnalysisWidget(QWidget *parent = nullptr);
     AnalysisController* an_col;

@@ -597,7 +597,7 @@ void ProjectWidget::open_project(QString project_path) {
     // Load project tree structure
     ProjectTreeState tree_state;
     tree_state.set_tree(invisibleRootItem());
-    tree_state.load_state(m_proj->getDir() + "treestate.json");
+    tree_state.load_state(m_proj->getDir() + "treestate");
 
     parentWidget()->parentWidget()->setWindowTitle(QString::fromStdString(m_proj->getName()));
     emit proj_path(m_proj->getDir());

@@ -6,8 +6,7 @@
 #include <QTreeWidgetItem>
 #include <tuple>
 AnalysisWidget::AnalysisWidget(QWidget *parent) {
-    an_col = new AnalysisController(this);
-    m_analysis_thread = new QThread();
+    an_col = new AnalysisController(this);    
     connect(an_col, SIGNAL(progress_signal(int)), this, SLOT(send_progress(int)));
     connect(an_col, SIGNAL(analysis_done(AnalysisProxy)), this, SLOT(analysis_done(AnalysisProxy)));
 }
@@ -46,18 +45,19 @@ void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> a
 //    an_col->start();
     AnalysisMethod* method = get<0>(analys);
     qDebug()<<"movetothread";
+    //QThread* analysis_thread = new QThread();
 
-    //method->moveToThread(m_analysis_thread);
-    //connect(m_analysis_thread, &QThread::started, method, &AnalysisMethod::run_analysis);
-    //connect(method, &AnalysisMethod::finito, m_analysis_thread, &QThread::quit);
-    //connect(m_analysis_thread, &QThread::finished, m_analysis_thread, &QThread::deleteLater);
+    //method->moveToThread(analysis_thread);
+    //connect(analysis_thread, &QThread::started, method, &AnalysisMethod::run_analysis);
+    //connect(method, &AnalysisMethod::finito, analysis_thread, &QThread::quit);
+    //connect(analysis_thread, &QThread::finished, analysis_thread, &QThread::deleteLater);
 
     connect(method, &AnalysisMethod::send_progress, this,&AnalysisWidget::send_progress);
    // connect(method, &AnalysisMethod::finito, method, &AnalysisMethod::deleteLater);
     connect(method, SIGNAL(send_progress(int)),this, SLOT(send_progress(int)));
     connect(method, &AnalysisMethod::finished_analysis, this, &AnalysisWidget::analysis_done);
     QThreadPool::globalInstance()->start(method);
-    //m_analysis_thread->start();
+    //analysis_thread->start();
 
 }
 

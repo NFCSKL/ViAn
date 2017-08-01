@@ -26,7 +26,7 @@ void RecentProject::update_recent(const std::string& name, const std::string &pr
  * @return
  */
 std::list<std::pair<std::string, std::string>> RecentProject::load_recent(){
-    load_saveable(PATH + "/" + FILE_NAME + ".json");
+    load_saveable(PATH + "/" + FILE_NAME);
     return recent_items;
 }
 
