@@ -126,13 +126,13 @@ void AnalysisMethod::run() {
     POI* m_POI = new POI();    
     // If Interval is use, start analysis at frame
     int end_frame = num_frames -1;
-    int start_frame = -1;
+    int start_frame = 0;
     if(use_interval){
         start_frame = interval.get_start();
         capture.set(CV_CAP_PROP_POS_FRAMES, start_frame);
         end_frame = interval.get_end();
         num_frames = end_frame - start_frame;
-        current_frame_index = start_frame -1;
+        current_frame_index = start_frame;
     }
     while(!aborted && capture.read(original_frame) &&
           !(use_interval && current_frame_index <= end_frame)) {

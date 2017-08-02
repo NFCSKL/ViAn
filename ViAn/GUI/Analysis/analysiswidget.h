@@ -8,10 +8,12 @@
 #include "Analysis/AnalysisController.h"
 #include "GUI/TreeItems/videoitem.h"
 #include "Project/videoproject.h"
+#include "queuewidget.h"
 #include <QThreadPool>
 class AnalysisWidget : public QWidget
 {
     Q_OBJECT
+    QueueWidget* queue_wgt;
 public:
     explicit AnalysisWidget(QWidget *parent = nullptr);
     AnalysisController* an_col;
