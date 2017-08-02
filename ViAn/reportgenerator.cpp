@@ -73,6 +73,7 @@ void ReportGenerator::resize_picture(QString pic_path, QAxObject* inline_shape) 
     inline_shape->dynamicCall( "Height", (multiply_factor*original_height));
     inline_shape->dynamicCall( "Width", img_width);
 }
+
 /**
  * @brief ReportGenerator::calculate_time
  * This method will convert milliseconds into a QString with format

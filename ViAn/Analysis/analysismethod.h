@@ -13,7 +13,7 @@
 #include "Filehandler/saveable.h"
 using Settings = std::map<std::string,int>;
 using SettingsDescr = std::map<std::string,std::string>;
-class AnalysisMethod : public QObject,public QRunnable {
+class AnalysisMethod : public QObject {
     Q_OBJECT    
     Settings m_settings;
     SettingsDescr m_descriptions;

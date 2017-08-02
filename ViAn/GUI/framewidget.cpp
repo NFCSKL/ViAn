@@ -57,6 +57,10 @@ void FrameWidget::set_show_detections(bool show) {
     show_detections = show;
 }
 
+void FrameWidget::set_anchor(QPoint p) {
+    anchor = p;
+}
+
 void FrameWidget::update(){
     repaint();
 }
@@ -101,6 +105,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
             QPoint start = rect_start;
             QPoint end = rect_end;
 
+
             int width = end.x() - start.x();
             int height = end.y() - start.y();
 
@@ -121,8 +126,7 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         for (cv::Rect rect : ooi_rects) {
             QPoint tl(rect.x, rect.y);
             QPoint br(rect.x+rect.width, rect.y+rect.height);
-
-            QRectF detect_rect(tl, br);
+            QRectF detect_rect((tl-anchor)*m_scale_factor, (br-anchor)*m_scale_factor);
             painter.setPen(QColor(0,0,255));
             painter.drawRect(detect_rect);
         }
@@ -218,6 +222,10 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
     }
 }
 
+void FrameWidget::set_scale_factor(double scale_factor) {
+    m_scale_factor = scale_factor;
+}
+
 /**
  * @brief FrameWidget::init_panning
  * Init panning on frame
@@ -280,6 +288,7 @@ void FrameWidget::end_zoom() {
     int width = std::abs(rect_start.x() - rect_end.x());
     int height = std::abs(rect_start.y() - rect_end.y());
     double width_ratio = _qimage.width() / double(width );
+
     double height_ratio = _qimage.height() / double(height);
 
     // ROI rect points
@@ -292,6 +301,7 @@ void FrameWidget::end_zoom() {
 
     cv::Rect zoom_rect(cv::Point(rect_start.x(), rect_start.y()), cv::Point(end.x(), end.y()));
     double  scale_ratio = std::min(m_scroll_area_size.width() / double(zoom_rect.width), m_scroll_area_size.height() / double(zoom_rect.height));
+
 
     emit zoom_points(rect_start, end);
 }

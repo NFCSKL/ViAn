@@ -241,9 +241,9 @@ void MainWindow::init_edit_menu() {
     options_act->setStatusTip(tr("Program options"));
 
     connect(cont_bri_act, &QAction::triggered, this, &MainWindow::cont_bri);
-    connect(cw_act, &QAction::triggered, video_wgt->v_controller, &VideoController::rotate_right);
-    connect(ccw_act, &QAction::triggered, video_wgt->v_controller, &VideoController::rotate_left);
     connect(options_act, &QAction::triggered, this, &MainWindow::options);
+    connect(cw_act, &QAction::triggered, video_wgt, &VideoWidget::rotate_cw);
+    connect(ccw_act, &QAction::triggered, video_wgt, &VideoWidget::rotate_ccw);
 }
 
 /**
@@ -376,7 +376,6 @@ void MainWindow::init_tools_menu() {
     tool_menu->addAction(move_act);
 
     undo_act->setShortcut(QKeySequence::Undo);
-    fit_screen_act->setShortcut(tr("Ctrl+F"));
 
     color_act->setStatusTip(tr("Color picker"));
     undo_act->setStatusTip(tr("Undo last drawing"));
@@ -428,7 +427,7 @@ void MainWindow::gen_report() {
 void MainWindow::cont_bri() {
     emit set_status_bar("Opening contrast/brightness settings");
     ManipulatorDialog* man_dialog = new ManipulatorDialog(this);
-    connect(man_dialog, SIGNAL(values(int,double)), video_wgt->v_controller, SIGNAL(set_bright_cont(int,double)));
+    connect(man_dialog, SIGNAL(values(int,double)), video_wgt, SLOT(update_brightness_contrast(int,double)));
     man_dialog->exec();
 }
 

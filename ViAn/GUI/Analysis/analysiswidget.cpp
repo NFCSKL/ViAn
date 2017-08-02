@@ -45,20 +45,19 @@ void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> a
 //    an_col->start();
     AnalysisMethod* method = get<0>(analys);
     //qDebug()<<"movetothread";
-    //QThread* analysis_thread = new QThread();
+    QThread* analysis_thread = new QThread();
 
-    //method->moveToThread(analysis_thread);
-    //connect(analysis_thread, &QThread::started, method, &AnalysisMethod::run_analysis);
-    //connect(method, &AnalysisMethod::finito, analysis_thread, &QThread::quit);
-    //connect(analysis_thread, &QThread::finished, analysis_thread, &QThread::deleteLater);
+    method->moveToThread(analysis_thread);
+    connect(analysis_thread, &QThread::started, method, &AnalysisMethod::run);
+    connect(method, &AnalysisMethod::finito, analysis_thread, &QThread::quit);
+    connect(analysis_thread, &QThread::finished, analysis_thread, &QThread::deleteLater);
 
     connect(method, &AnalysisMethod::send_progress, this,&AnalysisWidget::send_progress);
-   // connect(method, &AnalysisMethod::finito, method, &AnalysisMethod::deleteLater);
+    connect(method, &AnalysisMethod::finito, method, &AnalysisMethod::deleteLater);
     connect(method, SIGNAL(send_progress(int)),this, SLOT(send_progress(int)));
     connect(method, &AnalysisMethod::finished_analysis, this, &AnalysisWidget::analysis_done);
-    QThreadPool::globalInstance()->start(method);
-    //analysis_thread->start();
-
+//    QThreadPool::globalInstance()->start(method);
+    analysis_thread->start();
 }
 
 /**

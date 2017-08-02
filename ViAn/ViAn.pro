@@ -98,7 +98,6 @@ HEADERS += reportgenerator.h\
     GUI/TreeItems/videoitem.h \
     GUI/TreeItems/analysisitem.h \
     GUI/TreeItems/treeitem.h \
-    GUI/TreeItems/folderitem.h \
     GUI/projectdialog.h \
     GUI/projectwidget.h \
     GUI/recentprojectdialog.h \

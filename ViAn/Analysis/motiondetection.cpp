@@ -8,8 +8,7 @@
 MotionDetection::MotionDetection(std::string source_file, std::string save_file) : AnalysisMethod(source_file, save_file)
 {
     m_analysis.type = MOTION_DETECTION;
-    init_settings();
-    setup_analysis();
+    init_settings();    
 }
 
 MotionDetection::~MotionDetection() {
@@ -38,6 +37,7 @@ void MotionDetection::setup_analysis(){
                                                                          get_setting("OPEN_DEGREE")));
 }
 
+
 /**
  * @brief MotionDetection::do_analysis
  * This method detects motion in a frame, partly by comparing it to the previous frame
@@ -48,15 +48,16 @@ void MotionDetection::setup_analysis(){
 std::vector<DetectionBox> MotionDetection::analyse_frame(){
     std::vector<DetectionBox> OOIs;
     std::vector<std::vector<cv::Point> > contours;
-
+    qDebug() << "setup";
     // Updates background model
     blurred_frame = analysis_frame.clone();;
+    qDebug() << "setup2";
     //cv::GaussianBlur(blurred_frame, blurred_frame, m_settings->BLUR_SIZE, 0);
     background_subtractor->apply(blurred_frame, foreground_mask,-1);   
     cv::threshold(foreground_mask, foreground_mask, DETECTION_THRESHOLD, GRAYSCALE_WHITE, cv::THRESH_BINARY);
-    cv::morphologyEx(foreground_mask, result, cv::MORPH_OPEN, dilation_kernel);
+   // cv::morphologyEx(foreground_mask, result, cv::MORPH_OPEN, dilation_kernel);
 
-
+    qDebug() << "setup done";
     /* Creates an additional foreground mask and uses
      * that combined with the MOG2 foreground mask to
      * assert motion.

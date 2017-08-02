@@ -116,11 +116,13 @@ bool AnalysisMethod::sample_current_frame() {
  * @return all detections from the performed analysis.
  */
 void AnalysisMethod::run() {
+    setup_analysis();
     capture.open(m_source_file);
     if (!capture.isOpened()) {
         return;
     }
     calculate_scaling_factor();
+    qDebug() << scaling_needed;
     std::vector<DetectionBox> detections;
     num_frames = capture.get(CV_CAP_PROP_FRAME_COUNT);    
     POI* m_POI = new POI();    
@@ -141,15 +143,17 @@ void AnalysisMethod::run() {
             analysis_frame = original_frame(bounding_box);
         }
         else{
-
             analysis_frame = original_frame;
         }
 
         // do frame analysis
         if (sample_current_frame() || current_frame_index == end_frame) {
+
             if (scaling_needed)
                 scale_frame();            
+            qDebug() << "analyse_frame";
             detections = analyse_frame();
+            qDebug() << "analyse_frame_end";
             // This if statement handles the sorting of OOIs detected
             // in a frame into the correct POIs.
             if (detections.empty() && detecting) {
@@ -250,8 +254,10 @@ void AnalysisMethod::calculate_scaling_factor() {
  * This method scales the frames of a video according to the scaling factor.
  */
 void AnalysisMethod::scale_frame() {
+    qDebug() << "scale_frame";
     cv::Size size(scaled_width,scaled_height);
     cv::Mat dst(size,analysis_frame.type());
     cv::resize(analysis_frame,dst,size); //resize frame
     analysis_frame = dst;
+    qDebug() << "end_scale_frame";
 }
