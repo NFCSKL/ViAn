@@ -16,7 +16,7 @@ class AnalysisDialog : public QDialog
     Q_OBJECT
     QListWidget* m_v_proj_list;
     std::map<std::string,QLineEdit*> m_settings;
-    AnalysisMethod* method;
+    MotionDetection* method;
     std::string m_save_dir;
 
     QLineEdit* interval;

@@ -121,8 +121,6 @@ void AnalysisMethod::run() {
     if (!capture.isOpened()) {
         return;
     }
-    calculate_scaling_factor();
-    qDebug() << scaling_needed;
     std::vector<DetectionBox> detections;
     num_frames = capture.get(CV_CAP_PROP_FRAME_COUNT);    
     POI* m_POI = new POI();    
@@ -140,20 +138,27 @@ void AnalysisMethod::run() {
           !(use_interval && current_frame_index <= end_frame)) {
         // Slice frame if bounding box should be used
         if(use_bounding_box){
-            analysis_frame = original_frame(bounding_box);
+            cv::Mat temp (original_frame, bounding_box);
+            analysis_frame = temp;
         }
         else{
             analysis_frame = original_frame;
+        }
+        if(!m_scaling_done){
+
+            calculate_scaling_factor();
         }
 
         // do frame analysis
         if (sample_current_frame() || current_frame_index == end_frame) {
 
-            if (scaling_needed)
-                scale_frame();            
-            qDebug() << "analyse_frame";
+            if (scaling_needed){
+                qDebug() << "scaling frame";
+                scale_frame();
+            }
+            qDebug() << "analyse frame";
             detections = analyse_frame();
-            qDebug() << "analyse_frame_end";
+            qDebug() << "analyse frame_end";
             // This if statement handles the sorting of OOIs detected
             // in a frame into the correct POIs.
             if (detections.empty() && detecting) {
@@ -184,6 +189,7 @@ void AnalysisMethod::run() {
 
         emit send_progress(get_progress(start_frame));
         ++current_frame_index;
+        original_frame.release();
     }
     // Makes sure that a POI that stretches to the end of the
     // video gets an end frame.
@@ -230,8 +236,9 @@ void AnalysisMethod::pause_analysis() {
  * on a frame to the original resolution of the video. This method does that.
  */
 void AnalysisMethod::calculate_scaling_factor() {
-    int video_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
-    int video_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+    m_scaling_done = true;
+    int video_width = analysis_frame.cols;
+    int video_height = analysis_frame.rows;
     float height_ratio = float(FULL_HD_HEIGHT)/float(video_height);
     float width_ratio = float(FULL_HD_WIDTH)/float(video_width);
     if (height_ratio >= 1 && width_ratio >= 1) return;
@@ -254,10 +261,12 @@ void AnalysisMethod::calculate_scaling_factor() {
  * This method scales the frames of a video according to the scaling factor.
  */
 void AnalysisMethod::scale_frame() {
-    qDebug() << "scale_frame";
+    qDebug() << analysis_frame.rows;
+    qDebug() << analysis_frame.cols;
     cv::Size size(scaled_width,scaled_height);
     cv::Mat dst(size,analysis_frame.type());
     cv::resize(analysis_frame,dst,size); //resize frame
     analysis_frame = dst;
-    qDebug() << "end_scale_frame";
+    qDebug() << analysis_frame.rows;
+    qDebug() << analysis_frame.cols;
 }

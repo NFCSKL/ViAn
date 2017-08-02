@@ -13,12 +13,13 @@
 #include "Filehandler/saveable.h"
 using Settings = std::map<std::string,int>;
 using SettingsDescr = std::map<std::string,std::string>;
-class AnalysisMethod : public QObject {
+class AnalysisMethod : public QObject ,public QRunnable{
     Q_OBJECT    
     Settings m_settings;
     SettingsDescr m_descriptions;
     std::string m_save_path;
     std::string m_source_file;
+    bool m_scaling_done = false;
 protected:
     AnalysisInterval interval;
     cv::Rect bounding_box;
