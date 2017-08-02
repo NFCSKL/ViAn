@@ -5,12 +5,14 @@
 FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                                zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,
                                std::atomic_bool* new_video, manipulation_settings* m_settings, video_sync* v_sync,
-                               std::atomic_int* frame_index) {
+                               std::atomic_int* frame_index, overlay_settings* o_settings, std::atomic_bool* overlay_changed) {
     m_new_frame = new_frame;
 
+    m_overlay_changed = overlay_changed;
     m_changed = changed;
     m_z_settings = z_settings;
     m_man_settings = m_settings;
+    m_o_settings = o_settings;
     m_v_sync = v_sync;
     m_new_video = new_video;
 
@@ -34,7 +36,15 @@ FrameProcessor::FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* ch
 void FrameProcessor::check_events() {
     while (true) {
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
-        m_v_sync->con_var.wait(lk, [&]{return m_new_frame->load() || m_changed->load() || m_new_video->load();});
+        m_v_sync->con_var.wait(lk, [&]{return m_new_frame->load() || m_changed->load() || m_new_video->load() || m_overlay_changed->load();});
+
+        // The overlay has been changed by the user
+        if (m_overlay_changed) {
+            m_overlay_changed->store(false);
+            update_overlay_settings();
+
+            process_frame();
+        }
 
         // Settings has been changed by the user
         if (m_changed->load()) {
@@ -68,7 +78,6 @@ void FrameProcessor::check_events() {
             reset_settings();
         }
         lk.unlock();
-
     }
 }
 
@@ -93,6 +102,9 @@ void FrameProcessor::process_frame() {
     // cv::Mat tmp = manipulated_frame.clone();
     // cv::rectangle(tmp, m_zoomer.get_zoom_rect(), cv::Scalar(255,0,0));
     // imshow("test", tmp);
+
+    // Draws the overlay
+    m_overlay.draw_overlay(manipulated_frame, m_cur_frame_index);
 
     // Scales the frame
     m_zoomer.scale_frame(manipulated_frame);
@@ -173,6 +185,31 @@ void FrameProcessor::update_manipulator_settings() {
     m_man_settings->rotate = 0;
 }
 
+void FrameProcessor::update_overlay_settings() {
+    m_overlay.set_tool(m_o_settings->tool);
+    m_overlay.set_colour(m_o_settings->color);
+    m_overlay.set_text_settings(m_o_settings->current_string, m_o_settings->current_font_scale);
+
+    if (m_o_settings->undo) {
+        m_o_settings->undo = false;
+        m_overlay.undo(m_cur_frame_index);
+    } else if (m_o_settings->redo) {
+        m_o_settings->redo = false;
+        m_overlay.redo(m_cur_frame_index);
+    } else if (m_o_settings->clear_drawings) {
+        m_o_settings->clear_drawings = false;
+        m_overlay.clear(m_cur_frame_index);
+    } else if (m_o_settings->mouse_clicked) {
+        m_overlay.mouse_pressed(m_o_settings->pos, m_cur_frame_index);
+        m_o_settings->mouse_clicked = false;
+    } else if (m_o_settings->mouse_released) {
+        m_overlay.mouse_released(m_o_settings->pos, m_cur_frame_index);
+        m_o_settings->mouse_released = false;
+    } else if (m_o_settings->mouse_moved) {
+        m_overlay.mouse_moved(m_o_settings->pos, m_cur_frame_index);
+        m_o_settings->mouse_moved = false;
+    }
+}
 
 /**
  * @brief FrameProcessor::reset_settings

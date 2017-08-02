@@ -145,7 +145,7 @@ void VideoWidget::init_video_controller(){
 void VideoWidget::init_frame_processor() {
     QTimer* process_timer = new QTimer(this);
     f_processor = new FrameProcessor(&new_frame, &settings_changed, &z_settings, &video_width,
-                                     &video_height, &new_video, &m_settings, &v_sync, &frame_index);
+                                     &video_height, &new_video, &m_settings, &v_sync, &frame_index, &o_settings, &overlay_changed);
 
     QThread* processing_thread = new QThread();
     f_processor->moveToThread(processing_thread);
@@ -156,6 +156,12 @@ void VideoWidget::init_frame_processor() {
     connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_rectangle);
     connect(scroll_area, SIGNAL(new_size(QSize)), this, SLOT(set_draw_area_size(QSize)));
     connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(pan(int,int)));
+    connect(frame_wgt, SIGNAL(mouse_pressed(QPoint)), this, SLOT(mouse_pressed(QPoint)));
+    connect(frame_wgt, SIGNAL(mouse_released(QPoint)), this, SLOT(mouse_released(QPoint)));
+    connect(frame_wgt, SIGNAL(mouse_moved(QPoint)), this, SLOT(mouse_released(QPoint)));
+    connect(frame_wgt, SIGNAL(send_tool(SHAPES)), this, SLOT(set_tool(SHAPES)));
+    connect(frame_wgt, SIGNAL(send_tool_text(QString,float)), this, SLOT(set_tool_text(QString,float)));
+    connect(frame_wgt, SIGNAL(send_color(QColor)), this, SLOT(set_color(QColor)));
 
     connect(f_processor, &FrameProcessor::set_scale_factor, frame_wgt, &FrameWidget::set_scale_factor);
     connect(f_processor, &FrameProcessor::set_scale_factor, this, &VideoWidget::set_scale_factor);
@@ -803,6 +809,79 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
 
 void VideoWidget::on_playback_stopped(){
     play_btn->setChecked(false);
+}
+
+void VideoWidget::set_undo() {
+    update_overlay_settings([&](){
+        o_settings.undo = true;
+    });
+}
+
+void VideoWidget::set_redo() {
+    update_overlay_settings([&](){
+        o_settings.redo = true;
+    });
+}
+
+void VideoWidget::set_clear_drawings() {
+    update_overlay_settings([&](){
+        o_settings.clear_drawings = true;
+    });
+}
+
+void VideoWidget::set_tool(SHAPES tool) {
+    update_overlay_settings([&](){
+        o_settings.tool = tool;
+    });
+}
+
+void VideoWidget::set_tool_text(QString text, float font_scale) {
+    update_overlay_settings([&](){
+        o_settings.tool = TEXT;
+        o_settings.current_string = text;
+        o_settings.current_font_scale = font_scale;
+    });
+}
+
+void VideoWidget::set_color(QColor color) {
+    update_overlay_settings([&](){
+        o_settings.color = color;
+    });
+}
+
+void VideoWidget::mouse_pressed(QPoint pos) {
+    update_overlay_settings([&](){
+        o_settings.mouse_clicked = true;
+        o_settings.pos = pos;
+    });
+}
+
+void VideoWidget::mouse_released(QPoint pos) {
+    update_overlay_settings([&](){
+        o_settings.mouse_released = true;
+        o_settings.pos = pos;
+    });
+}
+
+void VideoWidget::mouse_moved(QPoint pos) {
+    update_overlay_settings([&](){
+        o_settings.mouse_moved = true;
+        o_settings.pos = pos;
+    });
+}
+
+/**
+ * @brief VideoWidget::update_overlay_settings
+ * This functions intended use is to update variables shared with the frame processor thread.
+ * After the change is made it will notify the frame processor.
+ * @param lambda function where the variable is changed
+ */
+void VideoWidget::update_overlay_settings(std::function<void ()> lambda) {
+    v_sync.lock.lock();
+    lambda();
+    overlay_changed.store(true);
+    v_sync.lock.unlock();
+    v_sync.con_var.notify_all();
 }
 
 /**

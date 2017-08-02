@@ -13,6 +13,9 @@ Overlay::Overlay() {}
  */
 void Overlay::draw_overlay(cv::Mat &frame, int frame_nr) {
     if (show_overlay) {
+        //std::cout << "in draw, frame " << frame_nr << std::endl;
+        //std::cout << "in draw, size " << overlays[frame_nr].overlay.size() << std::endl;
+
         for (auto it = overlays[frame_nr].overlay.begin(); it != overlays[frame_nr].drawn; it++) {
             frame = (*it)->draw(frame);
         }
@@ -44,26 +47,11 @@ void Overlay::set_showing_overlay(bool value) {
  */
 void Overlay::set_tool(SHAPES s) {
     current_shape = s;
-    // If the text option is chosen, a string and size will be entered by the user.
-    if (s == TEXT) {
-        std::string input_string = current_string.toStdString();
-        float input_font_scale = current_font_scale;
-        CustomDialog dialog("Choose text", NULL);
-        dialog.addLabel("Enter values:");
-        dialog.addLineEdit ("Text:", &input_string, "Enter a text that can then be used to draw on the overlay.");
-        dialog.addDblSpinBoxF("Font scale:", Text::FONT_SCALE_MIN, Text::FONT_SCALE_MAX,
-                              &input_font_scale, Text::FONT_SCALE_DECIMALS, Text::FONT_SCALE_STEP,
-                              "Choose font scale, 0.5 to 5.0 (this value is multiplied with a default font size).");
+}
 
-        // Show the dialog (execution will stop here until the dialog is finished)
-        dialog.exec();
-
-        if (!dialog.wasCancelled() && !input_string.empty()) {
-            // Not cancelled and not empty field.
-            current_string = QString::fromStdString(input_string);
-            current_font_scale = input_font_scale;
-        }
-    }
+void Overlay::set_text_settings(QString text, float font_scale) {
+    current_string = text;
+    current_font_scale = font_scale;
 }
 
 /**
@@ -220,6 +208,14 @@ void Overlay::update_drawing_position(QPoint pos, int frame_nr) {
     }
 }
 
+std::map<int, FrameOverlay> Overlay::get_overlays() {
+    return overlays;
+}
+
+void Overlay::set_overlays(std::map<int, FrameOverlay> new_overlays) {
+    overlays = new_overlays;
+}
+
 /**
  * @brief Overlay::undo
  * Undo the drawings on the overlay, if the overlay is visible.
@@ -245,6 +241,7 @@ void Overlay::redo(int frame_nr) {
 void Overlay::clear(int frame_nr) {
     if (show_overlay) {
         overlays[frame_nr].overlay.clear();
+        overlays[frame_nr].drawn = overlays[frame_nr].overlay.end();
     }
 }
 

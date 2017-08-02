@@ -16,6 +16,7 @@
 
 class FrameWidget : public QWidget
 {
+
     Q_OBJECT
     QPainter* painter;
     QSize m_scroll_area_size;
@@ -60,6 +61,9 @@ signals:
     void zoom_points(QPoint, QPoint);
     void trigger_zoom_out();
     void send_tool(SHAPES tool);
+    void send_tool_text(QString, float);
+    void send_color(QColor color);
+
     void mouse_pressed(QPoint);
     void mouse_released(QPoint);
     void mouse_moved(QPoint);
@@ -94,6 +98,7 @@ private:
     void zoom(QPoint pos);
     void end_panning();
     void end_zoom();
+    QPoint scale_point(QPoint pos);
 };
 
 #endif // FRAMEWIDGET_H

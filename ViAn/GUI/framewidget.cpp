@@ -73,20 +73,45 @@ void FrameWidget::update(){
 }
 
 void FrameWidget::set_tool(SHAPES tool) {
-    std::cout << "Tool aquired" << std::endl;
+    std::cout << "Tool aquired " << tool << std::endl;
     if (m_vid_proj != nullptr) {
-        //emit send_tool(tool);
+
+        if (tool == TEXT) {
+            QString current_string = "Enter text";
+            float current_font_scale = 1;
+            std::string input_string = current_string.toStdString();
+            float input_font_scale = current_font_scale;
+            CustomDialog dialog("Choose text", NULL);
+            dialog.addLabel("Enter values:");
+            dialog.addLineEdit ("Text:", &input_string, "Enter a text that can then be used to draw on the overlay.");
+            dialog.addDblSpinBoxF("Font scale:", Text::FONT_SCALE_MIN, Text::FONT_SCALE_MAX,
+                                  &input_font_scale, Text::FONT_SCALE_DECIMALS, Text::FONT_SCALE_STEP,
+                                  "Choose font scale, 0.5 to 5.0 (this value is multiplied with a default font size).");
+
+            // Show the dialog (execution will stop here until the dialog is finished)
+            dialog.exec();
+
+            if (!dialog.wasCancelled() && !input_string.empty()) {
+                // Not cancelled and not empty field.
+                current_string = QString::fromStdString(input_string);
+                current_font_scale = input_font_scale;
+            }
+            emit send_tool_text(current_string, current_font_scale);
+        } else {
+            emit send_tool(tool);
+        }
+
         this->tool = tool;
-        video_overlay->set_tool(tool);
+//        video_overlay->set_tool(tool);
     }
 }
 
 void FrameWidget::set_overlay_color(QColor color) {
     std::cout << "Color set" << std::endl;
     if (m_vid_proj != nullptr) {
-        //emit send_tool(tool);
+        emit send_color(color);
         this->overlay_color = color;
-        video_overlay->set_colour(color);
+//        video_overlay->set_colour(color);
     }
 }
 
@@ -95,20 +120,19 @@ cv::Mat FrameWidget::get_mat() const {
 }
 
 void FrameWidget::on_new_image(cv::Mat frame, int frame_index) {
-    cv::Mat frame2 = frame.clone();
-    current_frame = frame2;
+    current_frame = frame;
     current_frame_nr = frame_index;
     switch (frame.type()) {
         case CV_8UC1:
-            cvtColor(frame2, _tmp_frame, CV_GRAY2RGB);
+            cvtColor(frame, _tmp_frame, CV_GRAY2RGB);
             break;
         case CV_8UC3:
-            cvtColor(frame2, _tmp_frame, CV_BGR2RGB);
+            cvtColor(frame, _tmp_frame, CV_BGR2RGB);
             break;
     }
 
     // QImage needs the data to be stored continuously in memory
-    assert(frame2.isContinuous());
+    assert(frame.isContinuous());
     // Assign OpenCV's image buffer to the QImage. Note that the bytesPerLine parameter
     // (http://qt-project.org/doc/qt-4.8/qimage.html#QImage-6) is 3*width because each pixel
     // has three bytes.
@@ -116,7 +140,7 @@ void FrameWidget::on_new_image(cv::Mat frame, int frame_index) {
     setFixedSize(_qimage.size());
     set_detections_on_frame(frame_index);
 
-    video_overlay->draw_overlay(frame2, frame_index);
+    //video_overlay->draw_overlay(frame, frame_index);
     repaint();
 }
 
@@ -160,6 +184,10 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     painter.end();
 }
 
+QPoint FrameWidget::scale_point(QPoint pos) {
+    return anchor + pos/m_scale_factor;
+}
+
 /**
  * @brief FrameWidget::resizeEvent
  * @param event
@@ -189,9 +217,10 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
         }
         break;
     default:
-        video_overlay->mouse_pressed(event->pos(), current_frame_nr);
+        //video_overlay->mouse_pressed(event->pos(), current_frame_nr);
         //video_overlay->draw_overlay(get_mat(), current_frame_nr);
-        on_new_image(current_frame, current_frame_nr);
+        //on_new_image(current_frame, current_frame_nr);
+        emit mouse_pressed(scale_point(event->pos()));
         break;
     }
 }
@@ -217,9 +246,10 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
         }
         break;
     default:
-        video_overlay->mouse_released(event->pos(), current_frame_nr);
+        //video_overlay->mouse_released(event->pos(), current_frame_nr);
         //video_overlay->draw_overlay(get_mat(), current_frame_nr);
-        on_new_image(current_frame, current_frame_nr);
+        //on_new_image(current_frame, current_frame_nr);
+        emit mouse_released(scale_point(event->pos()));
         break;
     }
 }
@@ -240,9 +270,10 @@ void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
         }
         break;
     default:
-        video_overlay->mouse_moved(event->pos(), current_frame_nr);
+        //video_overlay->mouse_moved(event->pos(), current_frame_nr);
         //video_overlay->draw_overlay(get_mat(), current_frame_nr);
-        on_new_image(current_frame, current_frame_nr);
+        //on_new_image(current_frame, current_frame_nr);
+        emit mouse_moved(scale_point(event->pos()));
         break;
     }
 }
@@ -328,7 +359,3 @@ void FrameWidget::end_zoom() {
 
     emit zoom_points(zoom_start_pos, end);
 }
-
-
-
-

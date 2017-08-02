@@ -41,6 +41,7 @@ private:
 
     zoomer_settings z_settings;
     manipulation_settings m_settings;
+    overlay_settings o_settings;
     video_sync v_sync;
 
     std::atomic<int> frame_index{0};            // Shared frame index. Updated by the video player and the GUI
@@ -50,6 +51,7 @@ private:
 
     std::atomic_bool is_playing{false};        // True when the video player is playing
     std::atomic_bool settings_changed{false};   // True when the user changed something. Zoom, brightness etc.
+    std::atomic_bool overlay_changed{false};    // True when the user have drawn something
     std::atomic_bool new_frame{false};          // True when a new frame has been loaded by the video player
     std::atomic_bool new_video{false};          // True when a new video is loaded
 
@@ -75,6 +77,9 @@ public:
     VideoController* v_controller;
 
     int get_current_video_length();
+    void set_undo();
+    void set_redo();
+    void set_clear_drawings();
 
 signals:
     void first_frame(cv::Mat frame);
@@ -129,6 +134,13 @@ public slots:
     void on_video_info(int video_width, int video_height, int frame_rate, int last_frame);
     void on_playback_stopped(void);
 
+    void set_tool(SHAPES tool);
+    void set_tool_text(QString, float);
+    void set_color(QColor color);
+    void mouse_pressed(QPoint pos);
+    void mouse_released(QPoint pos);
+    void mouse_moved(QPoint pos);
+    void update_overlay_settings(std::function<void ()> lambda);
     void pan(int x, int y);
     void set_zoom_rectangle(QPoint p1, QPoint p2);
     void set_draw_area_size(QSize s);

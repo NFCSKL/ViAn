@@ -88,6 +88,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(draw_toolbar, SIGNAL(set_color(QColor)), video_wgt->frame_wgt, SLOT(set_overlay_color(QColor)));
     connect(draw_toolbar, SIGNAL(set_overlay_tool(SHAPES)), video_wgt->frame_wgt, SLOT(set_tool(SHAPES)));
     connect(draw_toolbar->undo_tool_act, &QAction::triggered, this, &MainWindow::undo);
+    connect(draw_toolbar->redo_tool_act, &QAction::triggered, this, &MainWindow::redo);
     connect(draw_toolbar->clear_tool_act, &QAction::triggered, this, &MainWindow::clear);
     connect(color_act, &QAction::triggered, draw_toolbar, &DrawingToolbar::color_tool_clicked);
 
@@ -388,6 +389,7 @@ void MainWindow::init_tools_menu() {
 
     undo_act->setShortcut(QKeySequence::Undo);
     redo_act->setShortcut(QKeySequence::Redo);
+    clear_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Delete));
     fit_screen_act->setShortcut(tr("Ctrl+F"));
 
     color_act->setStatusTip(tr("Color picker"));
@@ -460,15 +462,15 @@ void MainWindow::text() {
 }
 
 void MainWindow::undo() {
-    video_wgt->frame_wgt->get_overlay()->undo(video_wgt->get_current_frame());
+    video_wgt->set_undo();
 }
 
 void MainWindow::redo() {
-    video_wgt->frame_wgt->get_overlay()->redo(video_wgt->get_current_frame());
+    video_wgt->set_redo();
 }
 
 void MainWindow::clear() {
-    video_wgt->frame_wgt->get_overlay()->clear(video_wgt->get_current_frame());
+    video_wgt->set_clear_drawings();
 }
 
 void MainWindow::zoom() {
