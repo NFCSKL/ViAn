@@ -13,7 +13,6 @@ class QueueWidget : public QWidget
     QVBoxLayout m_layout;
     QProgressBar* progressbar;
     QLabel* m_line;
-    int i = 0;
 public:
     QueueWidget(QWidget* parent = 0);
     void next();

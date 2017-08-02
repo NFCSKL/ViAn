@@ -1,8 +1,7 @@
 #include "queuewidget.h"
 
 
-QueueWidget::QueueWidget(QWidget *parent) : QWidget(parent)
-{
+QueueWidget::QueueWidget(QWidget *parent) : QWidget(parent) {
     m_queue = new QListWidget();
     m_queue->setAcceptDrops(true);
     m_queue->setDragEnabled(true);
@@ -25,15 +24,25 @@ QueueWidget::QueueWidget(QWidget *parent) : QWidget(parent)
 
 void QueueWidget::next()
 {
-    QListWidgetItem* item = m_queue->takeItem(0);
-    m_line->setText(item->text());
+    QListWidgetItem* item;
+    m_line->setText(QString(""));
+    progressbar->setValue(0);
+    if(m_queue->count() != 0){
+        item = m_queue->takeItem(0);
+        m_line->setText(item->text());
+    }
 }
 
 void QueueWidget::enqueue(AnalysisMethod *method)
 {
-    qDebug() << "add item ";
     AnalysisListItem* item = new AnalysisListItem(method);
-    m_queue->addItem(item);
+    std::string path = method->save_path();
+    std::size_t index = path.find_last_of('/') + 1;
+    std::string analysis_name = path.substr(index);
+    index = analysis_name.find_last_of('.');
+    analysis_name = analysis_name.substr(0,index);
+
+    item->setText(QString::fromStdString(analysis_name));
     m_queue->addItem(item);
 }
 

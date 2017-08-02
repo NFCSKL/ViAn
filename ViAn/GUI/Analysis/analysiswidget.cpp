@@ -7,6 +7,7 @@
 #include <tuple>
 AnalysisWidget::AnalysisWidget(QWidget *parent) {
     queue_wgt = new QueueWidget();
+    queue_wgt->hide();
     an_col = new AnalysisController(this);    
     connect(an_col, SIGNAL(progress_signal(int)), this, SLOT(send_progress(int)));
     connect(an_col, SIGNAL(analysis_done(AnalysisProxy)), this, SLOT(analysis_done(AnalysisProxy)));
@@ -23,9 +24,9 @@ AnalysisWidget::AnalysisWidget(QWidget *parent) {
 void AnalysisWidget::start_analysis(QTreeWidgetItem* item, AnalysisMethod *method) {
     tuple<AnalysisMethod*,QTreeWidgetItem*> analys (method,item);
     queue_wgt->enqueue(method);
+    queue_wgt->show();
     if (!analysis_queue.empty()) {
         analysis_queue.push_back(analys);        
-
         std::string name = "Queued #"+to_string(analysis_queue.size()-1);
         emit name_in_tree(item, QString::fromStdString(name));
     } else {
@@ -81,10 +82,10 @@ void AnalysisWidget::analysis_done(AnalysisProxy analysis) {
     vid->get_video_project()->add_analysis(am);
     current_analysis = nullptr;
     duration = 0;   
+    queue_wgt->next();
     if (!analysis_queue.empty()) {
         current_analysis = get<1>(analysis_queue.front());
         move_queue();
-        queue_wgt->next();
         perform_analysis(analysis_queue.front());
     }
 }
