@@ -63,6 +63,11 @@ cv::Mat FrameWidget::get_mat() const {
     return _tmp_frame.clone();
 }
 
+void FrameWidget::export_original_frame(std::string path)
+{
+   cv::imwrite(path + ".tiff", current_frame);
+}
+
 void FrameWidget::on_new_image(cv::Mat frame, int frame_index) {
     current_frame = frame;
     switch (frame.type()) {

@@ -103,8 +103,7 @@ void VideoWidget::init_layouts() {
     analysis_btns = new QHBoxLayout;   // Buttons for starting analysis and jumping between pois
     other_btns = new QHBoxLayout;      // Bookmark, tag
     zoom_btns = new QHBoxLayout;       // Zoom buttons
-    interval_btns = new QHBoxLayout;   // Interval buttons
-
+    interval_btns = new QHBoxLayout;   // Interval buttons    
     control_row->setAlignment(Qt::AlignLeft);
     video_btns->setSpacing(5);
     analysis_btns->setSpacing(5);
@@ -164,15 +163,20 @@ void VideoWidget::set_btn_icons() {
     next_poi_btn = new QPushButton(QIcon("../ViAn/Icons/next_poi.png"), "", this);
     prev_poi_btn = new QPushButton(QIcon("../ViAn/Icons/prev_poi.png"), "", this);
     bookmark_btn = new QPushButton(QIcon("../ViAn/Icons/bookmark.png"), "", this);
+    export_frame_btn = new QPushButton(QIcon("../ViAn/Icons/camera.png"),"",this);
+
     analysis_btn = new QPushButton(QIcon("../ViAn/Icons/analysis.png"), "", this);
     analysis_play_btn = new QPushButton(QIcon("../ViAn/Icons/play.png"), "", this);
     tag_btn = new QPushButton(QIcon("../ViAn/Icons/tag.png"), "", this);
     new_tag_btn = new QPushButton(QIcon("../ViAn/Icons/marker.png"), "", this);
 
+
     zoom_in_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_in.png"), "", this);
     zoom_out_btn = new QPushButton(QIcon("../ViAn/Icons/zoom_out.png"), "", this);
     fit_btn = new QPushButton(QIcon("../ViAn/Icons/fit_screen.png"), "", this);
     original_size_btn = new QPushButton(QIcon("../ViAn/Icons/move.png"), "", this);
+
+
 
     zoom_label = new QLabel;
     zoom_label->setText("100%");
@@ -198,6 +202,7 @@ void VideoWidget::set_btn_tool_tip() {
     analysis_btn->setToolTip(tr("Analysis"));
     analysis_play_btn->setToolTip(tr("Play only the POIs"));
     bookmark_btn->setToolTip(tr("Bookmark the current frame"));
+    export_frame_btn->setToolTip("Export current frame");
     tag_btn->setToolTip(tr("Tag the current frame"));
     new_tag_btn->setToolTip(tr("Create a new tag"));
     zoom_in_btn->setToolTip(tr("Zoom in"));
@@ -226,7 +231,7 @@ void VideoWidget::set_btn_size() {
     btns.push_back(original_size_btn);
     btns.push_back(set_start_interval_btn);
     btns.push_back(set_end_interval_btn);
-
+    btns.push_back(export_frame_btn);
     for (QPushButton* btn : btns) {
         btn->setFixedSize(BTN_SIZE);
         btn->setEnabled(false);
@@ -245,7 +250,6 @@ void VideoWidget::set_btn_size() {
  */
 void VideoWidget::set_btn_tab_order() {
     // TODO update
-
     setTabOrder(prev_frame_btn, play_btn);
     setTabOrder(play_btn, next_frame_btn);
     setTabOrder(next_frame_btn, stop_btn);
@@ -274,6 +278,7 @@ void VideoWidget::set_btn_shortcuts() {
     analysis_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_G));
     bookmark_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
     tag_btn->setShortcut(Qt::Key_T);
+    export_frame_btn->setShortcut(Qt::Key_E);
     remove_frame_act = new QShortcut(Qt::Key_R, this);
     new_tag_btn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
     zoom_in_btn->setShortcut(Qt::Key_Z);
@@ -331,6 +336,7 @@ void VideoWidget::add_btns_to_layouts() {
     control_row->addLayout(analysis_btns);
 
     other_btns->addWidget(bookmark_btn);
+    other_btns->addWidget(export_frame_btn);
     other_btns->addWidget(tag_btn);
     other_btns->addWidget(new_tag_btn);
 
@@ -372,11 +378,6 @@ void VideoWidget::connect_btns() {
     connect(prev_poi_btn, &QPushButton::clicked, this, &VideoWidget::prev_poi_btn_clicked);
 
     // Tag
-
-
-    connect(zoom_in_btn, &QPushButton::toggled, frame_wgt, &FrameWidget::toggle_zoom);
-
-    connect(bookmark_btn, &QPushButton::clicked, this, &VideoWidget::on_bookmark_clicked);
     connect(tag_btn, &QPushButton::clicked, this, &VideoWidget::tag_frame);
     connect(remove_frame_act, &QShortcut::activated, this, &VideoWidget::remove_tag_frame);
     connect(new_tag_btn, &QPushButton::clicked, this, &VideoWidget::new_tag_clicked);
@@ -390,7 +391,7 @@ void VideoWidget::connect_btns() {
 
     // Other
     connect(bookmark_btn, &QPushButton::clicked, this, &VideoWidget::on_bookmark_clicked);
-
+    connect(export_frame_btn, &QPushButton::clicked, this, &VideoWidget::on_export_frame);
     connect(set_start_interval_btn, &QPushButton::clicked, this, &VideoWidget::set_interval_start_clicked);
     connect(set_end_interval_btn, &QPushButton::clicked, this, &VideoWidget::set_interval_end_clicked);
 }
@@ -905,6 +906,11 @@ void VideoWidget::update_playback_speed(int speed){
 
 void VideoWidget::set_current_frame_size(QSize size) {
     current_frame_size = size;
+}
+
+void VideoWidget::on_export_frame()
+{
+    emit export_original_frame();
 }
 
 /**

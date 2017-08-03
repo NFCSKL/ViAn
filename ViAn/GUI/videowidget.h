@@ -97,6 +97,7 @@ signals:
     void add_basic_analysis(VideoProject*, BasicAnalysis*);
     void set_status_bar(QString);
     void load_video(std::string video_path);
+    void export_original_frame(void);
 public slots:
     void set_current_time(int time);
     void set_total_time(int time);
@@ -123,6 +124,7 @@ public slots:
     void on_playback_slider_moved(void);
     void load_marked_video(VideoProject* vid_proj, int frame);
     void set_current_frame_size(QSize size);
+    void on_export_frame(void);
     void on_bookmark_clicked(void);
     void set_interval_start_clicked();
     void set_interval_end_clicked();
@@ -176,7 +178,7 @@ private:
     QPushButton* original_size_btn;
     QPushButton* set_start_interval_btn;
     QPushButton* set_end_interval_btn;
-
+    QPushButton* export_frame_btn;
     //Layouts
     QHBoxLayout* control_row;     // Container for all button areas
     QHBoxLayout* video_btns;      // Play, pause etc

@@ -44,8 +44,10 @@ signals:
     void set_status_bar(QString);
     void begin_analysis(std::string, std::string, QTreeWidgetItem*);
     void update_frame();
+    void export_org_frame(std::string path);
 
 public slots:
+    void export_original_frame(void);
     void new_project(void);
     void add_project(const QString project_name, const QString project_path);
     void add_video();

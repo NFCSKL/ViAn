@@ -53,6 +53,7 @@ signals:
     void zoom_points(QPoint, QPoint);
     void trigger_zoom_out();
 public slots:
+    void export_original_frame(std::string path);
     void on_new_image(cv::Mat image, int frame_index);
     void toggle_zoom(bool value);
     void set_scroll_area_size(QSize size);
