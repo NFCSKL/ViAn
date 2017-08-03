@@ -124,6 +124,7 @@ bool AnalysisMethod::sample_current_frame() {
  */
 void AnalysisMethod::run() {
     setup_analysis();
+    sample_freq = get_setting("SAMPLE_FREQUENCY");
     capture.open(m_source_file);
     if (!capture.isOpened()) {
         return;
