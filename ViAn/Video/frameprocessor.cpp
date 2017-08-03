@@ -189,9 +189,7 @@ void FrameProcessor::reset_settings() {
     m_manipulator.reset();
     m_man_settings->brightness = m_manipulator.BRIGHTNESS_DEFAULT;
     m_man_settings->contrast = m_manipulator.CONTRAST_DEFAULT;
-qDebug () << "hej";
     m_zoomer.set_frame_size(cv::Size(m_width->load(), m_height->load()));
-    qDebug () << "hej";
     m_zoomer.reset();
     // Centers zoom rectangle and displays the frame without zoom
     m_zoomer.fit_viewport();
