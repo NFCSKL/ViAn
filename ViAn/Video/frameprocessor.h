@@ -45,6 +45,8 @@ struct manipulation_settings {
 };
 
 struct overlay_settings {
+    Overlay* overlay = nullptr;
+
     QPoint pos = QPoint(0,0);
     int frame_nr = 0;
     bool mouse_clicked = false;
@@ -66,7 +68,6 @@ struct overlay_settings {
 class FrameProcessor : public QObject {
     Q_OBJECT
     cv::Mat m_frame;
-    int m_cur_frame_index;
     std::atomic_int* m_frame_index;
 
     std::atomic_int* m_width;
@@ -93,7 +94,7 @@ class FrameProcessor : public QObject {
 
     Zoomer m_zoomer;
     FrameManipulator m_manipulator;
-    Overlay m_overlay;
+    Overlay* m_overlay = nullptr;
 public:
     FrameProcessor(std::atomic_bool* new_frame, std::atomic_bool* changed,
                    zoomer_settings* z_settings, std::atomic_int* width, std::atomic_int* height,

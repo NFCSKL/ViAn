@@ -47,6 +47,7 @@ public:
     void undo(int frame_nr);
     void redo(int frame_nr);
     void clear(int frame_nr);
+    void clear_overlay();
 
     void read(const QJsonObject& json);
     void write(QJsonObject& json);

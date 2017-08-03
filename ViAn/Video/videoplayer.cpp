@@ -38,6 +38,7 @@ void VideoPlayer::load_video(){
     m_is_playing->store(false);
     m_frame->store(0);
 
+    qDebug() << "video Loa";
     m_capture.open(*m_video_path);
     if (!m_capture.isOpened()) return;
     load_video_info();
@@ -89,10 +90,13 @@ void VideoPlayer::check_events() {
         auto now = std::chrono::system_clock::now();
         auto delay = std::chrono::milliseconds{static_cast<int>(m_delay * speed_multiplier)};
         if (m_player_con->wait_until(lk, now + delay - elapsed, [&](){return m_new_video->load() || current_frame != m_frame->load();})) {
+            qDebug() << "outside if";
             // Notified from the VideoWidget
             if (m_new_video->load()) {
+                qDebug() << "m_vid_load 1";
                 load_video();
             } else if (current_frame != m_frame->load()) {
+                qDebug() << "else if 2";
                 set_frame();
             }
 

@@ -43,6 +43,7 @@ void FrameWidget::set_video_project(VideoProject* vid_proj) {
  * @param frame_num
  */
 void FrameWidget::set_detections_on_frame(int frame_num) {
+    std::cout << "detections on frame " << frame_num << std::endl;
     if (m_analysis != nullptr) {
         ooi_rects = m_analysis->get_detections_on_frame(frame_num);
     }
@@ -121,7 +122,6 @@ cv::Mat FrameWidget::get_mat() const {
 
 void FrameWidget::on_new_image(cv::Mat frame, int frame_index) {
     current_frame = frame;
-    current_frame_nr = frame_index;
     switch (frame.type()) {
         case CV_8UC1:
             cvtColor(frame, _tmp_frame, CV_GRAY2RGB);
@@ -139,8 +139,6 @@ void FrameWidget::on_new_image(cv::Mat frame, int frame_index) {
     _qimage = QImage(_tmp_frame.data, _tmp_frame.cols, _tmp_frame.rows, _tmp_frame.cols*3, QImage::Format_RGB888);
     setFixedSize(_qimage.size());
     set_detections_on_frame(frame_index);
-
-    //video_overlay->draw_overlay(frame, frame_index);
     repaint();
 }
 

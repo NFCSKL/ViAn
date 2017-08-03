@@ -31,8 +31,6 @@ class FrameWidget : public QWidget
     VideoProject* m_vid_proj = nullptr;
     Overlay* video_overlay;
 
-    int current_frame_nr = 0;
-
     // Zoom
     QPoint zoom_start_pos, zoom_end_pos, prev_pos;
     QPoint anchor = QPoint(0,0);

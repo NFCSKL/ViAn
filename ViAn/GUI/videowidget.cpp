@@ -57,12 +57,6 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
     connect(scroll_area, SIGNAL(new_size(QSize)), frame_wgt, SLOT(set_scroll_area_size(QSize)));
     connect(this, SIGNAL(set_detections_on_frame(int)), frame_wgt, SLOT(set_detections_on_frame(int)));
 
-    // TODO
-//    connect(frame_wgt, SIGNAL(send_tool(SHAPES)), m_video_player, SLOT(set_overlay_tool(SHAPES)));
-//    connect(frame_wgt, SIGNAL(mouse_pressed(QPoint)), m_video_player, SLOT(video_mouse_pressed(QPoint)));
-//    connect(frame_wgt, SIGNAL(mouse_released(QPoint)), m_video_player, SLOT(video_mouse_released(QPoint)));
-//    connect(frame_wgt, SIGNAL(mouse_moved(QPoint)), m_video_player, SLOT(video_mouse_moved(QPoint)));
-
     init_video_controller();
     v_controller->start();
     init_frame_processor();
@@ -153,7 +147,7 @@ void VideoWidget::init_frame_processor() {
     connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(pan(int,int)));
     connect(frame_wgt, SIGNAL(mouse_pressed(QPoint)), this, SLOT(mouse_pressed(QPoint)));
     connect(frame_wgt, SIGNAL(mouse_released(QPoint)), this, SLOT(mouse_released(QPoint)));
-    connect(frame_wgt, SIGNAL(mouse_moved(QPoint)), this, SLOT(mouse_released(QPoint)));
+    connect(frame_wgt, SIGNAL(mouse_moved(QPoint)), this, SLOT(mouse_moved(QPoint)));
     connect(frame_wgt, SIGNAL(send_tool(SHAPES)), this, SLOT(set_tool(SHAPES)));
     connect(frame_wgt, SIGNAL(send_tool_text(QString,float)), this, SLOT(set_tool_text(QString,float)));
     connect(frame_wgt, SIGNAL(send_color(QColor)), this, SLOT(set_color(QColor)));
@@ -704,7 +698,8 @@ void VideoWidget::on_new_frame() {
 
 
     set_current_time(frame_num / m_frame_rate);
-    frame_line_edit->setText(QString::number(frame_num));
+    std::cout << frame_num << " + " << frame_index.load() << std::endl;
+    frame_line_edit->setText(QString::number(frame_index.load()));
 
     playback_slider->update();
 }
@@ -760,9 +755,9 @@ void VideoWidget::load_marked_video(VideoProject* vid_proj, int frame) {
 
         m_interval = make_pair(0,0);
 
-        //TODO
-        //m_video_player->load_video(m_vid_proj->get_video()->file_path, m_vid_proj->get_overlay());
-        frame_wgt->set_overlay(m_vid_proj->get_overlay());
+
+        //frame_wgt->set_overlay(m_vid_proj->get_overlay());
+        set_overlay(m_vid_proj->get_overlay());
         set_status_bar("Video loaded");
         play_btn->setChecked(false);
         playback_slider->set_interval(-1, -1);
@@ -811,6 +806,12 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
 
 void VideoWidget::on_playback_stopped(){
     play_btn->setChecked(false);
+}
+
+void VideoWidget::set_overlay(Overlay *overlay) {
+    update_overlay_settings([&](){
+        o_settings.overlay = overlay;
+    });
 }
 
 void VideoWidget::set_undo() {
