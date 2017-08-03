@@ -44,6 +44,7 @@ signals:
     void set_status_bar(QString);
     void begin_analysis(std::string, std::string, QTreeWidgetItem*);
     void update_frame();
+    void remove_overlay();
 
 public slots:
     void new_project(void);

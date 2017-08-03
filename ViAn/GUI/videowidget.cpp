@@ -814,6 +814,13 @@ void VideoWidget::set_overlay(Overlay *overlay) {
     });
 }
 
+void VideoWidget::set_overlay_removed() {
+    update_overlay_settings([&](){
+        o_settings.overlay_removed = true;
+    });
+}
+
+
 void VideoWidget::set_undo() {
     update_overlay_settings([&](){
         o_settings.undo = true;

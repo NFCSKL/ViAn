@@ -141,6 +141,7 @@ public slots:
     void on_video_info(int video_width, int video_height, int frame_rate, int last_frame);
     void on_playback_stopped(void);
 
+    void set_overlay_removed();
     void set_tool(SHAPES tool);
     void set_tool_text(QString, float);
     void set_color(QColor color);

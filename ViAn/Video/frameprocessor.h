@@ -57,6 +57,8 @@ struct overlay_settings {
     bool redo = false;
     bool clear_drawings = false;
 
+    bool overlay_removed = false;
+
     SHAPES tool = NONE;
     QColor color = Qt::red;
     QString current_string = "Enter text";

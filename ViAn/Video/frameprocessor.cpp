@@ -43,16 +43,17 @@ void FrameProcessor::check_events() {
             qDebug() << "new_video";
             reset_settings();
             m_overlay = m_o_settings->overlay;
-
-            // Update overlay
-            //qDebug() << "in load";
+            m_o_settings->overlay_removed = false;
 
             lk.unlock();
             qDebug() << "end processor newvideo";
             continue;
         }
 
-        if (m_overlay == nullptr) m_overlay_changed->store(false);
+        if (m_overlay == nullptr || m_o_settings->overlay_removed) {
+
+            m_overlay_changed->store(false);
+        }
 
         // The overlay has been changed by the user
         if (m_overlay_changed->load()) {

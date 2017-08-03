@@ -126,6 +126,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     connect(video_wgt, SIGNAL(add_basic_analysis(VideoProject*, BasicAnalysis*)), project_wgt, SLOT(add_basic_analysis(VideoProject*, BasicAnalysis*)));
 
+    connect(project_wgt, &ProjectWidget::remove_overlay, video_wgt, &VideoWidget::set_overlay_removed);
 
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->playback_slider, &AnalysisSlider::update);
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->frame_wgt, &FrameWidget::update);
