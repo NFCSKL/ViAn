@@ -126,31 +126,32 @@ void AnalysisMethod::run() {
     POI* m_POI = new POI();    
     // If Interval is use, start analysis at frame
     int end_frame = num_frames -1;
-    int start_frame = -1;
+    int start_frame = 0;
     if(use_interval){
+          qDebug() << "hej";
         start_frame = interval.get_start();
         capture.set(CV_CAP_PROP_POS_FRAMES, start_frame);
         end_frame = interval.get_end();
         num_frames = end_frame - start_frame;
-        current_frame_index = start_frame -1;
+        current_frame_index = start_frame;
     }
     while(!aborted && capture.read(original_frame) &&
-          !(use_interval && current_frame_index <= end_frame)) {
-        // Slice frame if bounding box should be used
-        if(use_bounding_box){
-            cv::Mat temp (original_frame, bounding_box);
-            analysis_frame = temp;
-        }
-        else{
-            analysis_frame = original_frame;
-        }
-        if(!m_scaling_done){
-
-            calculate_scaling_factor();
-        }
-
+          !(use_interval && (current_frame_index <= end_frame))) {
         // do frame analysis
         if (sample_current_frame() || current_frame_index == end_frame) {
+            // Slice frame if bounding box should be used
+            if(use_bounding_box){
+                cv::Mat temp (original_frame, bounding_box);
+                analysis_frame = temp;
+            }
+            else{
+                analysis_frame = original_frame;
+            }
+            if(!m_scaling_done){
+
+                calculate_scaling_factor();
+            }
+
 
             if (scaling_needed){
                 qDebug() << "scaling frame";

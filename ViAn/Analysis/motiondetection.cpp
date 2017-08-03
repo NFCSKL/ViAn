@@ -29,15 +29,10 @@ void MotionDetection::init_settings()
  * @brief MotionDetection::setup_analysis
  * Initial setup of the analysis
  */
-void MotionDetection::setup_analysis(){
-    bool ign_sh = false;
-    if(get_setting("IGNORE_SHADOWS") == 1) ign_sh =true;
-    qDebug() << get_setting("BACKGROUND_HISTORY");
-    qDebug() << get_setting("MOG2_THRESHOLD");
-    qDebug() << get_setting("IGNORE_SHADOWS");
-    background_subtractor = cv::createBackgroundSubtractorMOG2(500,
-                                                               16,
-                                                               false);
+void MotionDetection::setup_analysis(){    
+    background_subtractor = cv::createBackgroundSubtractorMOG2(get_setting("BACKGROUND_HISTORY"),
+                                                               get_setting("MOG2_THRESHOLD"),
+                                                               get_setting("IGNORE_SHADOWS"));
     dilation_kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(get_setting("OPEN_DEGREE"),
                                                                          get_setting("OPEN_DEGREE")));
 }
@@ -54,47 +49,19 @@ std::vector<DetectionBox> MotionDetection::analyse_frame(){
     std::vector<DetectionBox> OOIs;
     std::vector<std::vector<cv::Point> > contours;
     // Updates background model
-    blurred_frame = analysis_frame.clone();
-    qDebug() << blurred_frame.rows << ":blurred frame rows";
-    qDebug() << blurred_frame.cols << ":blurred frame cols";;
-    //cv::GaussianBlur(blurred_frame, blurred_frame, BLUR_SIZE, 0);
-    qDebug() << "bg_sub";
-    background_subtractor->apply(blurred_frame, foreground_mask,-1);   
-    qDebug() << "treshhold";
-    cv::threshold(foreground_mask, foreground_mask, DETECTION_THRESHOLD, GRAYSCALE_WHITE, cv::THRESH_BINARY);
-    qDebug() << "morph";
-    cv::morphologyEx(foreground_mask, result, cv::MORPH_OPEN, dilation_kernel);
-    qDebug() << "morph";
-    /* Creates an additional foreground mask and uses
-     * that combined with the MOG2 foreground mask to
-     * assert motion.
-//     */
-//    if (!prev_frame.empty()) {
-//        cv::Mat gray_frame = frame.clone();
-//        cv::cvtColor(gray_frame, gray_frame, CV_RGB2GRAY);
-//        // Get differences between current and previous frame
-//        cv::absdiff(prev_frame,gray_frame,diff_frame);
-//        // Filters out everything but the detections
-//        //cv::GaussianBlur(diff_frame, diff_frame, BLUR_SIZE, 0);
-//        cv::threshold(diff_frame, diff_frame, m_settings->DETECTION_THRESHOLD, m_settings->GRAYSCALE_WHITE, cv::THRESH_BINARY);
-//        cv::dilate(diff_frame, diff_frame, dilation_kernel);
-//        // ANDs the foreground masks
-//        cv::bitwise_and(diff_frame, foreground_mask, result);
-//        gray_frame.release();
-//    } else {
-//        // diff_prev is empty for the first analysed frame.
-//        result = foreground_mask.clone();
-//    }
-
     prev_frame = analysis_frame.clone();
+    background_subtractor->apply(analysis_frame, foreground_mask,-1);
+    cv::threshold(foreground_mask, foreground_mask, DETECTION_THRESHOLD, GRAYSCALE_WHITE, cv::THRESH_BINARY);
+    cv::morphologyEx(foreground_mask, result, cv::MORPH_OPEN, dilation_kernel);
     cv::cvtColor(prev_frame, prev_frame, CV_RGB2GRAY);
 
     //This code excludes the area of the frame that has been given by exclude_frame.
     if (do_exclusion) {
         cv::bitwise_and(result, exclude_frame, result);
     }
+    cv::Mat clone = result.clone();
     // Creates OOIs from the detected countours.
-    cv::findContours(result.clone(), contours, cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
+    cv::findContours(clone, contours, cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
     for (std::vector<cv::Point> contour : contours) {
         if (cv::contourArea(contour) > get_setting("SMALLEST_OBJECT_SIZE")) {
             cv::Rect rect = cv::boundingRect(contour);
@@ -109,6 +76,7 @@ std::vector<DetectionBox> MotionDetection::analyse_frame(){
         }        
     }    
     prev_frame.release();
-    blurred_frame.release();
+    result.release();
+    analysis_frame.release();
     return OOIs;
 }
