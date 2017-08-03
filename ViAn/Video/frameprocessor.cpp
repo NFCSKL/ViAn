@@ -37,16 +37,18 @@ void FrameProcessor::check_events() {
     while (true) {
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
         m_v_sync->con_var.wait(lk, [&]{return m_new_frame->load() || m_changed->load() || m_new_video->load() || m_overlay_changed->load();});
-
+        qDebug() << "in processor";
         // A new video has been loaded. Reset processing settings
         if (m_new_video->load()) {
 
             reset_settings();
+            m_overlay = m_o_settings->overlay;
 
             // Update overlay
-            qDebug() << "in load";
+            //qDebug() << "in load";
 
             lk.unlock();
+            qDebug() << "end processor newvideo";
             continue;
         }
 
@@ -55,11 +57,10 @@ void FrameProcessor::check_events() {
             m_overlay_changed->store(false);
             update_overlay_settings();
 
-            if (!m_new_frame->load() && !m_changed->load()) {
-                process_frame();
-                lk.unlock();
-                continue;
-            }
+            process_frame();
+            lk.unlock();
+            qDebug() << "end processor overlay";
+            continue;
         }
 
         // Settings has been changed by the user
@@ -73,6 +74,7 @@ void FrameProcessor::check_events() {
             if (!m_new_frame->load()) {
                 process_frame();
                 lk.unlock();
+                qDebug() << "end processor m_change";
                 continue;
             }
         }
@@ -85,6 +87,7 @@ void FrameProcessor::check_events() {
 
             lk.unlock();
             m_v_sync->con_var.notify_one();
+            qDebug() << "end processor new frame";
             continue;
         }
     }
@@ -113,9 +116,6 @@ void FrameProcessor::process_frame() {
     // imshow("test", tmp);
 
     // Draws the overlay
-    if (m_overlay != nullptr) {
-
-    }
 
     m_overlay->draw_overlay(manipulated_frame, m_frame_index->load());
 
@@ -238,7 +238,6 @@ void FrameProcessor::update_overlay_settings() {
  */
 void FrameProcessor::reset_settings() {
     m_new_video->store(false);
-
     m_rotate_direction = ROTATE_NONE;
 
     // Reset manipulator values
@@ -259,4 +258,5 @@ void FrameProcessor::reset_settings() {
 
     set_anchor(m_zoomer.get_anchor());
     set_scale_factor(m_zoomer.get_scale_factor());
+
 }

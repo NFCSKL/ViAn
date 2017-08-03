@@ -43,7 +43,7 @@ void FrameWidget::set_video_project(VideoProject* vid_proj) {
  * @param frame_num
  */
 void FrameWidget::set_detections_on_frame(int frame_num) {
-    std::cout << "detections on frame " << frame_num << std::endl;
+    //std::cout << "detections on frame " << frame_num << std::endl;
     if (m_analysis != nullptr) {
         ooi_rects = m_analysis->get_detections_on_frame(frame_num);
     }
