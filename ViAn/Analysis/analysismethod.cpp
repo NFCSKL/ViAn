@@ -162,12 +162,9 @@ void AnalysisMethod::run() {
 
 
             if (scaling_needed){
-                qDebug() << "scaling frame";
                 scale_frame();
             }
-            qDebug() << "analyse frame";
             detections = analyse_frame();
-            qDebug() << "analyse frame_end";
             // This if statement handles the sorting of OOIs detected
             // in a frame into the correct POIs.
             if (detections.empty() && detecting) {
@@ -270,12 +267,8 @@ void AnalysisMethod::calculate_scaling_factor() {
  * This method scales the frames of a video according to the scaling factor.
  */
 void AnalysisMethod::scale_frame() {
-    qDebug() << analysis_frame.rows;
-    qDebug() << analysis_frame.cols;
     cv::Size size(scaled_width,scaled_height);
     cv::Mat dst(size,analysis_frame.type());
     cv::resize(analysis_frame,dst,size); //resize frame
     analysis_frame = dst;
-    qDebug() << analysis_frame.rows;
-    qDebug() << analysis_frame.cols;
 }

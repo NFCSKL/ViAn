@@ -49,19 +49,16 @@ std::vector<DetectionBox> MotionDetection::analyse_frame(){
     std::vector<DetectionBox> OOIs;
     std::vector<std::vector<cv::Point> > contours;
     // Updates background model
-    prev_frame = analysis_frame.clone();
     background_subtractor->apply(analysis_frame, foreground_mask,-1);
     cv::threshold(foreground_mask, foreground_mask, DETECTION_THRESHOLD, GRAYSCALE_WHITE, cv::THRESH_BINARY);
     cv::morphologyEx(foreground_mask, result, cv::MORPH_OPEN, dilation_kernel);
-    cv::cvtColor(prev_frame, prev_frame, CV_RGB2GRAY);
 
     //This code excludes the area of the frame that has been given by exclude_frame.
     if (do_exclusion) {
         cv::bitwise_and(result, exclude_frame, result);
     }
-    cv::Mat clone = result.clone();
     // Creates OOIs from the detected countours.
-    cv::findContours(clone, contours, cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
+    cv::findContours(result.clone(), contours, cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
     for (std::vector<cv::Point> contour : contours) {
         if (cv::contourArea(contour) > get_setting("SMALLEST_OBJECT_SIZE")) {
             cv::Rect rect = cv::boundingRect(contour);
@@ -75,8 +72,6 @@ std::vector<DetectionBox> MotionDetection::analyse_frame(){
 
         }
     }
-    prev_frame.release();
-    result.release();
     analysis_frame.release();
     return OOIs;
 }
