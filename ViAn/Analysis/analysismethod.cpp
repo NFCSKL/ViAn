@@ -158,8 +158,6 @@ void AnalysisMethod::run() {
 
                 calculate_scaling_factor();
             }
-
-
             if (scaling_needed){
                 scale_frame();
             }
