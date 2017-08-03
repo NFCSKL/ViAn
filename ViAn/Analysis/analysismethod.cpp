@@ -136,7 +136,6 @@ void AnalysisMethod::run() {
     int end_frame = num_frames -1;
     int start_frame = 0;
     if(use_interval){
-          qDebug() << "hej";
         start_frame = interval.get_start();
         capture.set(CV_CAP_PROP_POS_FRAMES, start_frame);
         end_frame = interval.get_end();

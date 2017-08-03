@@ -49,7 +49,6 @@ void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> a
 //    start = std::clock();
 //    an_col->start();
     AnalysisMethod* method = get<0>(analys);
-    //qDebug()<<"movetothread";
     QThread* analysis_thread = new QThread();
 
     method->moveToThread(analysis_thread);

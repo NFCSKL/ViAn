@@ -35,7 +35,6 @@ VideoPlayer::VideoPlayer(std::atomic<int>* frame_index, std::atomic_bool *is_pla
  */
 
 void VideoPlayer::load_video(){
-    qDebug() << "load_video";
     current_frame = -1;
     m_is_playing->store(false);    
     m_capture.open(*m_video_path);
@@ -91,14 +90,12 @@ void VideoPlayer::check_events() {
         auto now = std::chrono::system_clock::now();
         auto delay = std::chrono::milliseconds{static_cast<int>(m_delay * speed_multiplier)};
         if (m_player_con->wait_until(lk, now + delay - elapsed, [&](){return m_new_video->load() || current_frame != m_frame->load();})) {
-            qDebug() << "in videoplayer_wait";
             // Notified from the VideoWidget
             if (m_new_video->load()) {
                 load_video();
             } else if (current_frame != m_frame->load()) {
                 set_frame();
             }
-            qDebug() << "end videoplayer";
         } else {
             // Timer condition triggered. Update playback speed if nessecary and read new frame
             int speed = m_speed_step->load();
@@ -136,7 +133,6 @@ void VideoPlayer::load_video_info() {
 bool VideoPlayer::synced_read(){
     // Read new frame and notify processing thread
    {
-        qDebug() << "sync_read";
         std::lock_guard<std::mutex> lk(m_v_sync->lock);
         if (!m_capture.read(m_v_sync->frame)) {
             m_is_playing->store(false);

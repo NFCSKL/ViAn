@@ -3,12 +3,12 @@
 
 QueueWidget::QueueWidget(QWidget *parent) : QWidget(parent) {
     m_queue = new QListWidget();
-    m_queue->setAcceptDrops(true);
-    m_queue->setDragEnabled(true);
+//    m_queue->setAcceptDrops(true);
+//    m_queue->setDragEnabled(true);
 
-    m_queue->setSelectionMode(QAbstractItemView::SingleSelection);
-    m_queue->setDropIndicatorShown(true);
-    m_queue->setDragDropMode(QAbstractItemView::InternalMove);
+//    m_queue->setSelectionMode(QAbstractItemView::SingleSelection);
+//    m_queue->setDropIndicatorShown(true);
+//    m_queue->setDragDropMode(QAbstractItemView::InternalMove);
 
     QVBoxLayout* layout = new QVBoxLayout();
     QHBoxLayout* progress_thingy = new QHBoxLayout();

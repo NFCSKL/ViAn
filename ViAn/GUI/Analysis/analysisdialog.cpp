@@ -14,11 +14,6 @@ AnalysisDialog::AnalysisDialog(std::vector<VideoItem *> vid_projs, std::string s
 
     // Add analysis form
     QFormLayout* form_lay = new QFormLayout();
-
-    QLineEdit* sample_freq = new QLineEdit("1");
-    QLineEdit* interval = new QLineEdit("100%");
-    form_lay->addRow("Sample frequency", sample_freq);
-    form_lay->addRow("Analysed interval", interval);
     v_lay->addLayout(form_lay);
     // Add analysis specific options
     VideoListItem* item  = dynamic_cast<VideoListItem*>(m_v_proj_list->itemAt(0,0));
