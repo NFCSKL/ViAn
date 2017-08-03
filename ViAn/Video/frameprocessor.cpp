@@ -40,7 +40,7 @@ void FrameProcessor::check_events() {
         qDebug() << "in processor";
         // A new video has been loaded. Reset processing settings
         if (m_new_video->load()) {
-
+            qDebug() << "new_video";
             reset_settings();
             m_overlay = m_o_settings->overlay;
 
@@ -52,8 +52,11 @@ void FrameProcessor::check_events() {
             continue;
         }
 
+        if (m_overlay == nullptr) m_overlay_changed->store(false);
+
         // The overlay has been changed by the user
         if (m_overlay_changed->load()) {
+            qDebug() << "overlay changed";
             m_overlay_changed->store(false);
             update_overlay_settings();
 
@@ -65,6 +68,7 @@ void FrameProcessor::check_events() {
 
         // Settings has been changed by the user
         if (m_changed->load()) {
+            qDebug() << "changed";
             m_changed->store(false);
 
             update_zoomer_settings();
@@ -81,6 +85,7 @@ void FrameProcessor::check_events() {
 
         // A new frame has been loaded by the VideoPlayer
         if (m_new_frame->load()) {
+            qDebug() << "new frame";
             m_new_frame->store(false);
             m_frame = m_v_sync->frame.clone();
             process_frame();
@@ -90,7 +95,10 @@ void FrameProcessor::check_events() {
             qDebug() << "end processor new frame";
             continue;
         }
+        qDebug() << "end process nothing";
+
     }
+
 }
 
 /**
@@ -244,7 +252,6 @@ void FrameProcessor::reset_settings() {
     m_manipulator.reset();
     m_man_settings->brightness = m_manipulator.BRIGHTNESS_DEFAULT;
     m_man_settings->contrast = m_manipulator.CONTRAST_DEFAULT;
-
     m_zoomer.set_frame_size(cv::Size(m_width->load(), m_height->load()));
     m_zoomer.reset();
     // Centers zoom rectangle and displays the frame without zoom
