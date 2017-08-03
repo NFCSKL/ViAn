@@ -60,6 +60,8 @@ public:
     AnalysisInterval getInterval() const;
     void setInterval(const AnalysisInterval &value);
 
+    std::string save_path() const;
+
 private:
     int prev_detection_frame = -1;
     bool detecting = false;

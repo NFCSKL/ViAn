@@ -2,6 +2,18 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/videoio/videoio.hpp>
 #include "Analysis/analysismethod.h"
+AnalysisMethod::AnalysisMethod(const std::string &video_path, const std::string& save_path)
+{
+    m_source_file = video_path;
+    std::size_t index = video_path.find_last_of('/') + 1;
+    std::string vid_name = video_path.substr(index);
+    index = vid_name.find_last_of('.');
+    vid_name = vid_name.substr(0,index);
+
+    m_save_path = save_path+vid_name +"-motion_analysis";
+    add_setting("SAMPLE_FREQUENCY",1, "How often analysis will use frame from video");
+}
+
 /**
  * @brief AnalysisMethod::abort_analysis
  * Sets the necessary bools to abort an analysis.
@@ -33,6 +45,11 @@ std::string AnalysisMethod::get_descr(const std::string& var)
     return "";
 }
 
+
+std::string AnalysisMethod::save_path() const
+{
+    return m_save_path;
+}
 void AnalysisMethod::add_setting(const std::string &var, int value_default, const std::string& descr)
 {
     m_settings[var] = value_default;
@@ -62,17 +79,7 @@ std::vector<std::string> AnalysisMethod::get_var_names()
     return res;
 }
 
-AnalysisMethod::AnalysisMethod(const std::string &video_path, const std::string& save_path)
-{
-    m_source_file = video_path;
-    std::size_t index = video_path.find_last_of('/') + 1;
-    std::string vid_name = video_path.substr(index);
-    index = vid_name.find_last_of('.');
-    vid_name = vid_name.substr(0,index);
 
-    m_save_path = save_path+vid_name +"-motion_analysis";
-    add_setting("SAMPLE_FREQUENCY",1, "How often analysis will use frame from video");
-}
 /**
  * @brief AnalysisMethod::set_include_exclude_area
  * Sets an exlusion frame that will be used to exclude detections in a specific area of each frame.

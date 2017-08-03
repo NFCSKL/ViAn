@@ -58,7 +58,8 @@ SOURCES += main.cpp \
     GUI/videowidget.cpp \
     Analysis/analysissettings.cpp \
     GUI/Analysis/analysisdialog.cpp \
-    GUI/Analysis/videolistitem.cpp
+    GUI/Analysis/videolistitem.cpp \
+    GUI/Analysis/queuewidget.cpp
 
 #
 # TEST
@@ -108,7 +109,8 @@ HEADERS += reportgenerator.h\
     Analysis/analysissettings.h \
     Analysis/analysismethod.h \
     GUI/Analysis/analysisdialog.h \
-    GUI/Analysis/videolistitem.h
+    GUI/Analysis/videolistitem.h \
+    GUI/Analysis/queuewidget.h
 
 #
 # LIBRARY
