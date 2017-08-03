@@ -37,16 +37,13 @@ void FrameProcessor::check_events() {
     while (true) {
         std::unique_lock<std::mutex> lk(m_v_sync->lock);
         m_v_sync->con_var.wait(lk, [&]{return m_new_frame->load() || m_changed->load() || m_new_video->load() || m_overlay_changed->load();});
-        qDebug() << "in processor";
         // A new video has been loaded. Reset processing settings
         if (m_new_video->load()) {
-            qDebug() << "new_video";
             reset_settings();
             m_overlay = m_o_settings->overlay;
             m_o_settings->overlay_removed = false;
 
             lk.unlock();
-            qDebug() << "end processor newvideo";
             continue;
         }
 
@@ -57,19 +54,16 @@ void FrameProcessor::check_events() {
 
         // The overlay has been changed by the user
         if (m_overlay_changed->load()) {
-            qDebug() << "overlay changed";
             m_overlay_changed->store(false);
             update_overlay_settings();
 
             process_frame();
             lk.unlock();
-            qDebug() << "end processor overlay";
             continue;
         }
 
         // Settings has been changed by the user
         if (m_changed->load()) {
-            qDebug() << "changed";
             m_changed->store(false);
 
             update_zoomer_settings();
@@ -79,25 +73,20 @@ void FrameProcessor::check_events() {
             if (!m_new_frame->load()) {
                 process_frame();
                 lk.unlock();
-                qDebug() << "end processor m_change";
                 continue;
             }
         }
 
         // A new frame has been loaded by the VideoPlayer
         if (m_new_frame->load()) {
-            qDebug() << "new frame";
             m_new_frame->store(false);
             m_frame = m_v_sync->frame.clone();
             process_frame();
 
             lk.unlock();
             m_v_sync->con_var.notify_one();
-            qDebug() << "end processor new frame";
             continue;
         }
-        qDebug() << "end process nothing";
-
     }
 
 }
