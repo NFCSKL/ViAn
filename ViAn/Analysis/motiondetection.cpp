@@ -58,7 +58,7 @@ std::vector<DetectionBox> MotionDetection::analyse_frame(){
         cv::bitwise_and(result, exclude_frame, result);
     }
     // Creates OOIs from the detected countours.
-    cv::findContours(result.clone(), contours, cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
+    cv::findContours(result, contours, cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
     for (std::vector<cv::Point> contour : contours) {
         if (cv::contourArea(contour) > get_setting("SMALLEST_OBJECT_SIZE")) {
             cv::Rect rect = cv::boundingRect(contour);
