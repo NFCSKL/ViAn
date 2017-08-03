@@ -73,8 +73,8 @@ std::vector<DetectionBox> MotionDetection::analyse_frame(){
             }
             OOIs.push_back(DetectionBox(rect));
 
-        }        
-    }    
+        }
+    }
     prev_frame.release();
     result.release();
     analysis_frame.release();
