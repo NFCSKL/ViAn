@@ -7,7 +7,6 @@
  */
 VideoProject::VideoProject(Video* v){
     this->video = v;    
-    this->id = -1;
 }
 
 /**
@@ -16,7 +15,11 @@ VideoProject::VideoProject(Video* v){
  */
 VideoProject::VideoProject(){
     this->video = new Video();
-    this->id = -1;
+}
+
+VideoProject::~VideoProject(){
+    delete m_overlay;
+    delete video;
 }
 
 /**
@@ -34,7 +37,7 @@ Video* VideoProject::get_video(){
  * Returns the overlay.
  */
 Overlay* VideoProject::get_overlay() {
-    return overlay;
+    return m_overlay;
 }
 
 /**
@@ -43,7 +46,7 @@ Overlay* VideoProject::get_overlay() {
  * Return all bookmarks.
  */
 std::map<ID, Bookmark *> VideoProject::get_bookmarks(){
-    return this->bookmarks;
+    return this->m_bookmarks;
 }
 
 /**
@@ -51,16 +54,32 @@ std::map<ID, Bookmark *> VideoProject::get_bookmarks(){
  * @param id of the analysis
  * @return the analysis
  */
-Analysis VideoProject::get_analysis(ID id) {
-    return analyses[id];
+BasicAnalysis *VideoProject::get_analysis(const int& id) {
+    return m_analyses[id];
 }
 
 /**
  * @brief VideoProject::remove_analysis
  * @param id of the analysis
  */
-void VideoProject::remove_analysis(ID id) {
-    analyses.erase(id);
+void VideoProject::delete_analysis(const int& id) {
+    BasicAnalysis* am = m_analyses.at(id);
+    m_analyses.erase(id);
+    am->delete_saveable();
+    delete am;
+}
+
+/**
+ * @brief VideoProject::delete_bookmark
+ * @param id
+ */
+void VideoProject::delete_bookmark(const int &id) {
+    Bookmark* bm = m_bookmarks.at(id);
+    bool remove = bm->remove(); // the bookmark should only be deleted if this return true
+    if (!remove) return;
+    m_bookmarks.erase(id);
+    bm->remove_exported_image();
+    delete bm;
 }
 
 /**
@@ -68,8 +87,8 @@ void VideoProject::remove_analysis(ID id) {
  * @return analyses
  * return all analyses.
  */
-std::map<ID,Analysis> VideoProject::get_analyses() {
-    return analyses;
+std::map<ID, BasicAnalysis*> VideoProject::get_analyses() {
+    return m_analyses;
 }
 
 /**
@@ -78,6 +97,7 @@ std::map<ID,Analysis> VideoProject::get_analyses() {
  * Read videoproject parameters from json object.
  */
 void VideoProject::read(const QJsonObject& json){
+    m_tree_index = json["tree_index"].toString().toStdString();
     this->video->read(json);
     QJsonArray json_bookmarks = json["bookmarks"].toArray();
     // Read bookmarks from json
@@ -88,13 +108,27 @@ void VideoProject::read(const QJsonObject& json){
         add_bookmark(new_bookmark);
     }
     QJsonObject json_overlay = json["overlay"].toObject();
-    this->overlay->read(json_overlay);
+    this->m_overlay->read(json_overlay);
     QJsonArray json_analyses = json["analyses"].toArray();
+
     // Read analyses from json
     for (int j = 0; j < json_analyses.size(); ++j) {
-        QJsonObject json_analysis = json_analyses[j].toObject();
-        Analysis analysis;
-        analysis.read(json_analysis);
+        QJsonObject json_analysis = json_analyses[j].toObject();        
+        BasicAnalysis* analysis;
+        SAVE_TYPE save_type = (SAVE_TYPE)json_analysis["save_type"].toInt();
+        switch(save_type){
+        case INTERVAL:
+            analysis = new Tag();
+            break;
+        case DETECTION:
+            analysis = new AnalysisProxy();
+            break;
+        default:
+            analysis = new BasicAnalysis();
+            qWarning("Undefined analysis, read as default basic analysis");
+            break;
+        }
+        analysis->read(json_analysis);
         add_analysis(analysis);
     }
 }
@@ -105,11 +139,11 @@ void VideoProject::read(const QJsonObject& json){
  * Write videoproject parameters to json object.
  */
 void VideoProject::write(QJsonObject& json){
+    json["tree_index"] = QString::fromStdString(m_tree_index);
     this->video->write(json);
+    // Write bookmarks to json
     QJsonArray json_bookmarks;
-    // Needs to delete bookmarks before exporting the new ones.
-    delete_artifacts();
-    for(auto it = bookmarks.begin(); it != bookmarks.end(); it++){
+    for(auto it = m_bookmarks.begin(); it != m_bookmarks.end(); it++){
         QJsonObject json_bookmark;
         Bookmark* temp = it->second;
         temp->write(json_bookmark);
@@ -118,16 +152,16 @@ void VideoProject::write(QJsonObject& json){
     json["bookmarks"] = json_bookmarks;
     // Write analyses to json
     QJsonArray json_analyses;
-    for(auto it2 = analyses.begin(); it2 != analyses.end(); it2++){
+    for(auto it2 = m_analyses.begin(); it2 != m_analyses.end(); it2++){
         QJsonObject json_analysis;
-        Analysis an = it2->second;
-        an.write(json_analysis);
+        BasicAnalysis* an = it2->second;
+        json_analysis["save_type"] = an->get_save_type(); // Check for type in read
+        an->write(json_analysis);
         json_analyses.append(json_analysis);
     }
     json["analyses"] = json_analyses;
-
     QJsonObject json_overlay;
-    this->overlay->write(json_overlay);
+    this->m_overlay->write(json_overlay);
     json["overlay"] = json_overlay;
 }
 
@@ -137,8 +171,22 @@ void VideoProject::write(QJsonObject& json){
  * Add new bookmark.
  */
 ID VideoProject::add_bookmark(Bookmark *bookmark){
-    this->bookmarks.insert(std::make_pair(id_bookmark, bookmark));
-    return id_bookmark++;
+    this->m_bookmarks.insert(std::make_pair(m_bm_cnt, bookmark));
+    bookmark->set_video_project(this);
+    return m_bm_cnt++;
+}
+
+void VideoProject::set_tree_index(std::stack<int> tree_index) {
+    m_tree_index.clear();
+    while (!tree_index.empty()) {
+        m_tree_index.append(std::to_string(tree_index.top()));
+        tree_index.pop();
+        m_tree_index.append(":");
+    }
+}
+
+void VideoProject::set_project(Project *proj){
+    m_project = proj;
 }
 
 /**
@@ -147,9 +195,9 @@ ID VideoProject::add_bookmark(Bookmark *bookmark){
  * @return id of the analysis
  * Adds analysis to video project.
  */
-ID VideoProject::add_analysis(Analysis& analysis){
-    this->analyses.insert(std::make_pair(this->id_analysis, analysis));
-    return this->id_analysis++;
+ID VideoProject::add_analysis(BasicAnalysis *analysis){
+    m_analyses.insert(std::make_pair(m_ana_cnt, analysis));
+    return m_ana_cnt++;
 }
 
 /**
@@ -157,9 +205,21 @@ ID VideoProject::add_analysis(Analysis& analysis){
  * Delete bookmark files.
  */
 void VideoProject::delete_artifacts(){
-    for(auto it = bookmarks.begin(); it != bookmarks.end(); it++){
+    for(auto it = m_bookmarks.begin(); it != m_bookmarks.end(); it++){
         Bookmark* temp = it->second;
         temp->remove_exported_image();
     }
+    for(auto it2 = m_analyses.begin(); it2 != m_analyses.end(); it2++){
+        BasicAnalysis* temp = it2->second;
+        temp->delete_saveable();
+    }
 }
 
+void VideoProject::remove_from_project()
+{
+    m_project->remove_video_project(this);
+}
+
+string VideoProject::get_index_path() {
+    return m_tree_index;
+}
