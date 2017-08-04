@@ -341,8 +341,6 @@ void MainWindow::init_interval_menu() {
 void MainWindow::init_tools_menu() {
     QMenu* tool_menu = menuBar()->addMenu(tr("&Tools"));
 
-    QAction* undo_act = new QAction(tr("&Undo"), this);
-    QAction* clear_act = new QAction(tr("C&lear"), this);
     QAction* zoom_in_act = new QAction(tr("&Zoom in"), this);
     color_act = new QAction(tr("&Color"), this);
     QAction* zoom_out_act = new QAction(tr("Zoom &out"), this);
