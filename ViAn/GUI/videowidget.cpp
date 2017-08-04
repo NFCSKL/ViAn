@@ -1,7 +1,7 @@
 #include "videowidget.h"
 #include "utility.h"
-#include "drawscrollarea.h"
-#include "tagdialog.h"
+#include "GUI/drawscrollarea.h"
+#include "GUI/Analysis/tagdialog.h"
 
 #include <QTime>
 #include <QDebug>
@@ -11,7 +11,7 @@
 
 #include "GUI/frameexporterdialog.h"
 #include "Video/video_player.h"
-#include "Analysis/AnalysisController.h"
+#include "Analysis/analysiscontroller.h"
 #include "imageexporter.h"
 
 #include <opencv2/videoio.hpp>
@@ -24,7 +24,9 @@
 VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new DrawScrollArea) {
     // Init video contoller
     v_controller = new VideoController(&frame_index, &is_playing, &new_frame,
-                                       &video_width, &video_height, &new_video, &v_sync);
+                                       &video_width, &video_height, &new_video, &new_frame_video, &v_sync,
+                                       &player_con, &player_lock, &m_video_path,
+                                       &m_speed_step);
 
     //Setup playback area
     vertical_layout = new QVBoxLayout;
@@ -54,6 +56,7 @@ VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent), scroll_area(new Dra
 
     connect(scroll_area, SIGNAL(new_size(QSize)), frame_wgt, SLOT(set_scroll_area_size(QSize)));
     connect(this, SIGNAL(set_detections_on_frame(int)), frame_wgt, SLOT(set_detections_on_frame(int)));
+
     init_video_controller();
     v_controller->start();
     init_frame_processor();
@@ -73,6 +76,11 @@ std::pair<int, int> VideoWidget::get_frame_interval(){
  */
 int VideoWidget::get_current_video_length(){
     return m_frame_length;
+}
+
+void VideoWidget::quick_analysis(AnalysisSettings * settings)
+{
+    emit start_analysis(m_vid_proj, settings);
 }
 
 /**
@@ -119,16 +127,10 @@ void VideoWidget::init_layouts() {
  * Performs the initial setup that connects the video controller with the rest of the program.
  */
 void VideoWidget::init_video_controller(){
-    // Playback control
-    connect(speed_slider, SIGNAL(valueChanged(int)), v_controller, SIGNAL(update_speed(int)));
-    connect(this, &VideoWidget::load_video, v_controller, &VideoController::load_video);
-
     // Video data
     connect(v_controller, &VideoController::video_info, this, &VideoWidget::on_video_info);
     connect(v_controller, SIGNAL(display_index()), this, SLOT(on_new_frame()));
     connect(v_controller, &VideoController::playback_stopped, this, &VideoWidget::on_playback_stopped);
-
-
 }
 
 /**
@@ -136,9 +138,8 @@ void VideoWidget::init_video_controller(){
  * Creates a new FrameProcessor instance which is then moved to a new thread.
  */
 void VideoWidget::init_frame_processor() {
-    QTimer* process_timer = new QTimer(this);
     f_processor = new FrameProcessor(&new_frame, &settings_changed, &z_settings, &video_width,
-                                     &video_height, &new_video, &m_settings, &v_sync, &frame_index);
+                                     &video_height, &new_frame_video, &m_settings, &v_sync, &frame_index, &o_settings, &overlay_changed);
 
     QThread* processing_thread = new QThread();
     f_processor->moveToThread(processing_thread);
@@ -149,6 +150,12 @@ void VideoWidget::init_frame_processor() {
     connect(frame_wgt, &FrameWidget::zoom_points, this, &VideoWidget::set_zoom_rectangle);
     connect(scroll_area, SIGNAL(new_size(QSize)), this, SLOT(set_draw_area_size(QSize)));
     connect(frame_wgt, SIGNAL(moved_xy(int,int)), this, SLOT(pan(int,int)));
+    connect(frame_wgt, SIGNAL(mouse_pressed(QPoint)), this, SLOT(mouse_pressed(QPoint)));
+    connect(frame_wgt, SIGNAL(mouse_released(QPoint)), this, SLOT(mouse_released(QPoint)));
+    connect(frame_wgt, SIGNAL(mouse_moved(QPoint)), this, SLOT(mouse_moved(QPoint)));
+    connect(frame_wgt, SIGNAL(send_tool(SHAPES)), this, SLOT(set_tool(SHAPES)));
+    connect(frame_wgt, SIGNAL(send_tool_text(QString,float)), this, SLOT(set_tool_text(QString,float)));
+    connect(frame_wgt, SIGNAL(send_color(QColor)), this, SLOT(set_color(QColor)));
 
     connect(f_processor, &FrameProcessor::set_scale_factor, frame_wgt, &FrameWidget::set_scale_factor);
     connect(f_processor, &FrameProcessor::set_scale_factor, this, &VideoWidget::set_scale_factor);
@@ -313,6 +320,8 @@ void VideoWidget::init_speed_slider() {
     speed_slider_layout->addWidget(label1, 1, 0, 1, 1);
     speed_slider_layout->addWidget(label2, 1, 2, 1, 1);
     speed_slider_layout->addWidget(label3, 1, 4, 1, 1);
+
+    connect(speed_slider, &QSlider::valueChanged, this, &VideoWidget::update_playback_speed);
 }
 
 /**
@@ -348,7 +357,6 @@ void VideoWidget::add_btns_to_layouts() {
 
     zoom_btns->addWidget(zoom_label);
 
-
     control_row->addLayout(zoom_btns);
 
     interval_btns->addWidget(set_start_interval_btn);
@@ -371,12 +379,13 @@ void VideoWidget::connect_btns() {
     connect(prev_frame_btn, &QPushButton::clicked, this, &VideoWidget::prev_frame_clicked);
 
     // Analysis
-    connect(analysis_btn, &QPushButton::clicked, this, &VideoWidget::analysis_btn_clicked);
+
     connect(analysis_play_btn, &QPushButton::toggled, this, &VideoWidget::analysis_play_btn_toggled);
     connect(next_poi_btn, &QPushButton::clicked, this, &VideoWidget::next_poi_btn_clicked);
     connect(prev_poi_btn, &DoubleClickButton::clicked, this, &VideoWidget::prev_poi_btn_clicked);
     connect(prev_poi_btn, &DoubleClickButton::double_clicked, this, &VideoWidget::prev_poi_btn_clicked);
 
+    connect(analysis_btn, &QPushButton::clicked, frame_wgt, &FrameWidget::set_analysis_tool);
     // Tag
     connect(tag_btn, &QPushButton::clicked, this, &VideoWidget::tag_frame);
     connect(remove_frame_act, &QShortcut::activated, this, &VideoWidget::remove_tag_frame);
@@ -487,6 +496,11 @@ void VideoWidget::set_total_time(int time) {
     total_time->setText(convert_time(time));
 }
 
+
+int VideoWidget::get_current_frame() {
+    return frame_index.load();
+}
+
 void VideoWidget::set_scale_factor(double scale_factor) {
     m_scale_factor = scale_factor;
     zoom_label->setText(QString::number(((int)(10000*m_scale_factor))/(double)100) +"%");
@@ -548,14 +562,6 @@ void VideoWidget::play_btn_toggled(bool status) {
     } else {
         play_btn->setIcon(QIcon("../ViAn/Icons/play.png"));
         set_status_bar("Pause");
-    }
-}
-
-void VideoWidget::analysis_btn_clicked() {
-    if (m_vid_proj != nullptr) {
-        emit start_analysis(m_vid_proj);
-    } else {
-        emit set_status_bar("No video selected");
     }
 }
 
@@ -691,8 +697,9 @@ void VideoWidget::on_new_frame() {
         playback_slider->blockSignals(false);
     }
 
+
     set_current_time(frame_num / m_frame_rate);
-    frame_line_edit->setText(QString::number(frame_num));
+    frame_line_edit->setText(QString::number(frame_index.load()));
 
     playback_slider->update();
 }
@@ -733,16 +740,24 @@ void VideoWidget::on_playback_slider_moved() {
  * Slot function for loading a new video
  * @param vid_proj
  */
-void VideoWidget::load_marked_video(VideoProject* vid_proj, int frame) {
+void VideoWidget::load_marked_video(VideoProject* vid_proj) {
+    int frame = -1;
     if (!video_btns_enabled) enable_video_btns();
-
     if (m_vid_proj != vid_proj) {
+        player_lock.lock();
+        m_video_path = vid_proj->get_video()->file_path;
+        new_video.store(true);
+        player_lock.unlock();
+        player_con.notify_all();
+
         m_vid_proj = vid_proj;
-        load_video(vid_proj->get_video()->file_path);
         playback_slider->setValue(frame);
 
         m_interval = make_pair(0,0);
 
+
+        //frame_wgt->set_overlay(m_vid_proj->get_overlay());
+        set_overlay(m_vid_proj->get_overlay());
         set_status_bar("Video loaded");
         play_btn->setChecked(false);
         playback_slider->set_interval(-1, -1);
@@ -791,6 +806,92 @@ void VideoWidget::on_video_info(int video_width, int video_height, int frame_rat
 
 void VideoWidget::on_playback_stopped(){
     play_btn->setChecked(false);
+}
+
+void VideoWidget::set_overlay(Overlay *overlay) {
+    update_overlay_settings([&](){
+        o_settings.overlay = overlay;
+    });
+}
+
+void VideoWidget::set_overlay_removed() {
+    update_overlay_settings([&](){
+        o_settings.overlay_removed = true;
+    });
+}
+
+
+void VideoWidget::set_undo() {
+    update_overlay_settings([&](){
+        o_settings.undo = true;
+    });
+}
+
+void VideoWidget::set_redo() {
+    update_overlay_settings([&](){
+        o_settings.redo = true;
+    });
+}
+
+void VideoWidget::set_clear_drawings() {
+    update_overlay_settings([&](){
+        o_settings.clear_drawings = true;
+    });
+}
+
+void VideoWidget::set_tool(SHAPES tool) {
+    update_overlay_settings([&](){
+        o_settings.tool = tool;
+    });
+}
+
+void VideoWidget::set_tool_text(QString text, float font_scale) {
+    update_overlay_settings([&](){
+        o_settings.tool = TEXT;
+        o_settings.current_string = text;
+        o_settings.current_font_scale = font_scale;
+    });
+}
+
+void VideoWidget::set_color(QColor color) {
+    update_overlay_settings([&](){
+        o_settings.color = color;
+    });
+}
+
+void VideoWidget::mouse_pressed(QPoint pos) {
+    update_overlay_settings([&](){
+        o_settings.mouse_clicked = true;
+        o_settings.pos = pos;
+    });
+}
+
+void VideoWidget::mouse_released(QPoint pos) {
+    update_overlay_settings([&](){
+        o_settings.mouse_released = true;
+        o_settings.pos = pos;
+    });
+}
+
+void VideoWidget::mouse_moved(QPoint pos) {
+    update_overlay_settings([&](){
+        o_settings.mouse_moved = true;
+        o_settings.pos = pos;
+    });
+}
+
+/**
+ * @brief VideoWidget::update_overlay_settings
+ * This functions intended use is to update variables shared with the frame processor thread.
+ * After the change is made it will notify the frame processor.
+ * @param lambda function where the variable is changed
+ */
+void VideoWidget::update_overlay_settings(std::function<void ()> lambda) {
+    v_sync.lock.lock();
+    lambda();
+    overlay_changed.store(true);
+    v_sync.lock.unlock();
+    v_sync.con_var.notify_all();
 }
 
 /**
@@ -893,6 +994,10 @@ void VideoWidget::update_processing_settings(std::function<void ()> lambda) {
     settings_changed.store(true);
     v_sync.lock.unlock();
     v_sync.con_var.notify_all();
+}
+
+void VideoWidget::update_playback_speed(int speed){
+    m_speed_step.store(speed);
 }
 
 void VideoWidget::set_current_frame_size(QSize size) {

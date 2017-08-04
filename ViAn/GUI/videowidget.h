@@ -18,10 +18,10 @@
 
 #include "doubleclickbutton.h"
 #include "framewidget.h"
-#include "analysisslider.h"
+#include "GUI/Analysis/analysisslider.h"
 #include "Video/video_player.h"
 #include "Project/videoproject.h"
-#include "drawscrollarea.h"
+#include "GUI/drawscrollarea.h"
 #include "Project/Analysis/tag.h"
 #include "Video/videocontroller.h"
 #include "Video/videoplayer.h"
@@ -42,17 +42,25 @@ private:
 
     zoomer_settings z_settings;
     manipulation_settings m_settings;
+    overlay_settings o_settings;
     video_sync v_sync;
 
-    std::atomic<int> frame_index{0};            // Shared frame index. Updated by the video player and the GUI
+    std::string m_video_path;
 
+    std::atomic<int> frame_index{0};            // Shared frame index. Updated by the video player and the GUI
     std::atomic_int video_width{0};
     std::atomic_int video_height{0};
+    std::atomic_int m_speed_step{0};            // Playback speed
 
-    std::atomic_bool is_playing{false};        // True when the video player is playing
+    std::atomic_bool is_playing{false};         // True when the video player is playing
     std::atomic_bool settings_changed{false};   // True when the user changed something. Zoom, brightness etc.
+    std::atomic_bool overlay_changed{false};    // True when the user have drawn something
     std::atomic_bool new_frame{false};          // True when a new frame has been loaded by the video player
     std::atomic_bool new_video{false};          // True when a new video is loaded
+    std::atomic_bool new_frame_video{false};    // True when a new video has been loaded by video player but not by frameprocesser
+    
+    std::condition_variable player_con;         // Used to notify the video player when to load a new video or when to play the current one
+    std::mutex player_lock;
 
     int m_video_width = 0;
     int m_video_height = 0;
@@ -72,9 +80,14 @@ public:
 
     VideoProject* get_current_video_project();
     std::pair<int, int> get_frame_interval();
+    int get_current_frame();
     VideoController* v_controller;
 
     int get_current_video_length();
+    void set_overlay(Overlay* overlay);
+    void set_undo();
+    void set_redo();
+    void set_clear_drawings();
 
 signals:
     void first_frame(cv::Mat frame);
@@ -88,16 +101,16 @@ signals:
     void ret_first_frame(void);
     void new_bookmark(VideoProject*, int, cv::Mat);
     void set_detections_on_frame(int);
-    void start_analysis(VideoProject*);
+    void start_analysis(VideoProject*, AnalysisSettings*);
     void add_basic_analysis(VideoProject*, BasicAnalysis*);
     void set_status_bar(QString);
-    void load_video(std::string video_path);
+    void load_video(Video* video);
 public slots:
+    void quick_analysis(AnalysisSettings*settings);
     void set_current_time(int time);
     void set_total_time(int time);
     void set_scale_factor(double);
     void play_btn_toggled(bool status);
-    void analysis_btn_clicked(void);
     void tag_frame(void);
     void remove_tag_frame(void);
     void new_tag_clicked();
@@ -116,7 +129,9 @@ public slots:
     void on_playback_slider_released(void);
     void on_playback_slider_value_changed(void);
     void on_playback_slider_moved(void);
-    void load_marked_video(VideoProject* vid_proj, int frame);
+
+    void load_marked_video(VideoProject* vid_proj);
+
     void set_current_frame_size(QSize size);
     void on_bookmark_clicked(void);
     void set_interval_start_clicked();
@@ -129,6 +144,14 @@ public slots:
     void on_video_info(int video_width, int video_height, int frame_rate, int last_frame);
     void on_playback_stopped(void);
 
+    void set_overlay_removed();
+    void set_tool(SHAPES tool);
+    void set_tool_text(QString, float);
+    void set_color(QColor color);
+    void mouse_pressed(QPoint pos);
+    void mouse_released(QPoint pos);
+    void mouse_moved(QPoint pos);
+    void update_overlay_settings(std::function<void ()> lambda);
     void pan(int x, int y);
     void set_zoom_rectangle(QPoint p1, QPoint p2);
     void set_draw_area_size(QSize s);
@@ -139,6 +162,7 @@ public slots:
     void rotate_cw(void);
     void rotate_ccw(void);
     void update_processing_settings(std::function<void(void)> lambda);
+    void update_playback_speed(int speed);
 private:
     const QSize BTN_SIZE = QSize(30, 30);
 
@@ -208,7 +232,6 @@ private:
     void init_speed_slider();
     void add_btns_to_layouts();
     void connect_btns();
-
     void init_playback_slider();
 private slots:
     void stop_btn_clicked(void);
