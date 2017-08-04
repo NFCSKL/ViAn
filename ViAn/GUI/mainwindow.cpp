@@ -13,8 +13,8 @@
 #include <chrono>
 #include <thread>
 #include "Video/shapes/shape.h"
-#include "Analysis/MotionDetection.h"
-#include "Analysis/AnalysisMethod.h"
+#include "Analysis/motiondetection.h"
+#include "Analysis/analysismethod.h"
 #include "Toolbars/maintoolbar.h"
 #include "Toolbars/drawingtoolbar.h"
 #include "manipulatordialog.h"
@@ -39,15 +39,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     setCentralWidget(video_wgt);
 
     // Initialize project widget
-    project_wgt = new ProjectWidget();
+    project_wgt = new ProjectWidget(); //mianwindow->eemit from frame_wgt to videoplayer/overlay
     project_dock->setWidget(project_wgt);
     addDockWidget(Qt::LeftDockWidgetArea, project_dock);
 
     // Initialize analysis widget
     analysis_wgt = new AnalysisWidget();
-    connect(video_wgt, SIGNAL(start_analysis(VideoProject*)), project_wgt, SLOT(start_analysis(VideoProject*)));
-    connect(project_wgt, SIGNAL(begin_analysis(std::string,std::string,QTreeWidgetItem*)), analysis_wgt, SLOT(start_analysis(std::string,std::string,QTreeWidgetItem*)));
 
+    connect(video_wgt, SIGNAL(start_analysis(VideoProject*, AnalysisSettings*)), project_wgt, SLOT(start_analysis(VideoProject*, AnalysisSettings*)));
+    connect(video_wgt->frame_wgt, SIGNAL(quick_analysis(AnalysisSettings*)), video_wgt, SLOT(quick_analysis(AnalysisSettings*)));
+    connect(project_wgt, SIGNAL(begin_analysis(QTreeWidgetItem*, AnalysisMethod*)),
+            analysis_wgt, SLOT(start_analysis(QTreeWidgetItem*, AnalysisMethod*)));
 
     // Initialize bookmark widget
     bookmark_wgt = new BookmarkWidget();
@@ -58,7 +60,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(video_wgt, SIGNAL(new_bookmark(VideoProject*,int,cv::Mat)), bookmark_wgt, SLOT(create_bookmark(VideoProject*,int,cv::Mat)));
     connect(project_wgt, SIGNAL(proj_path(std::string)), bookmark_wgt, SLOT(set_path(std::string)));
     connect(project_wgt, SIGNAL(load_bookmarks(VideoProject*)), bookmark_wgt, SLOT(load_bookmarks(VideoProject*)));
-    connect(bookmark_wgt, SIGNAL(play_bookmark_video(VideoProject*,int)), video_wgt, SLOT(load_marked_video(VideoProject*,int)));
+    connect(bookmark_wgt, SIGNAL(play_bookmark_video(VideoProject*,int)), video_wgt, SLOT(load_marked_video(VideoProject*)));
     connect(project_wgt, &ProjectWidget::project_closed, bookmark_wgt, &BookmarkWidget::clear_bookmarks);
     bookmark_dock->setWidget(bookmark_wgt);    
 
@@ -85,6 +87,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     QAction* toggle_draw_toolbar = draw_toolbar->toggleViewAction();
     addToolBar(draw_toolbar);
     connect(main_toolbar->toggle_draw_toolbar_act, &QAction::triggered, toggle_draw_toolbar, &QAction::trigger);   
+    connect(draw_toolbar, SIGNAL(set_color(QColor)), video_wgt->frame_wgt, SLOT(set_overlay_color(QColor)));
+    connect(draw_toolbar, SIGNAL(set_overlay_tool(SHAPES)), video_wgt->frame_wgt, SLOT(set_tool(SHAPES)));
+    connect(draw_toolbar->undo_tool_act, &QAction::triggered, this, &MainWindow::undo);
+    connect(draw_toolbar->redo_tool_act, &QAction::triggered, this, &MainWindow::redo);
+    connect(draw_toolbar->clear_tool_act, &QAction::triggered, this, &MainWindow::clear);
+    connect(color_act, &QAction::triggered, draw_toolbar, &DrawingToolbar::color_tool_clicked);
 
     // Status bar
     status_bar = new StatusBar();
@@ -103,6 +111,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt->playback_slider, &AnalysisSlider::clear_slider);
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::load_marked_video);
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::clear_tag);
+    connect(project_wgt, &ProjectWidget::marked_video, video_wgt->frame_wgt, &FrameWidget::set_video_project);
 
     connect(analysis_wgt, SIGNAL(name_in_tree(QTreeWidgetItem*,QString)), project_wgt, SLOT(set_tree_item_name(QTreeWidgetItem*,QString)));
 
@@ -121,6 +130,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
 
     connect(video_wgt, SIGNAL(add_basic_analysis(VideoProject*, BasicAnalysis*)), project_wgt, SLOT(add_basic_analysis(VideoProject*, BasicAnalysis*)));
 
+    connect(project_wgt, &ProjectWidget::remove_overlay, video_wgt, &VideoWidget::set_overlay_removed);
 
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->playback_slider, &AnalysisSlider::update);
     connect(project_wgt, &ProjectWidget::update_frame, video_wgt->frame_wgt, &FrameWidget::update);
@@ -256,14 +266,17 @@ void MainWindow::init_view_menu() {
     detect_intv_act = new QAction(tr("&Detection intervals"), this);      //Slider pois
     bound_box_act = new QAction(tr("&Bounding boxes"), this);        //Video oois
     interval_act = new QAction(tr("&Interval"), this);
+    drawing_act = new QAction(tr("&Paintings"), this);
 
     detect_intv_act->setCheckable(true);
     bound_box_act->setCheckable(true);
     interval_act->setCheckable(true);
+    drawing_act->setCheckable(true);
 
     detect_intv_act->setChecked(true);
     bound_box_act->setChecked(true);
     interval_act->setChecked(true);
+    drawing_act->setChecked(true);
 
     view_menu->addAction(toggle_project_wgt);
     view_menu->addAction(toggle_bookmark_wgt);
@@ -271,12 +284,14 @@ void MainWindow::init_view_menu() {
     view_menu->addAction(detect_intv_act);
     view_menu->addAction(bound_box_act);
     view_menu->addAction(interval_act);
+    view_menu->addAction(drawing_act);
 
     toggle_project_wgt->setStatusTip(tr("Show/hide project widget"));
     toggle_bookmark_wgt->setStatusTip(tr("Show/hide bookmark widget"));
     detect_intv_act->setStatusTip(tr("Toggle annotations on/off"));
     bound_box_act->setStatusTip(tr("Toggle detections on/off"));
     interval_act->setStatusTip(tr("Toggle interval on/off"));
+    drawing_act->setStatusTip(tr("Toggle drawings on/off"));
 
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::set_show_detections);
     connect(bound_box_act, &QAction::toggled, video_wgt->frame_wgt, &FrameWidget::update);
@@ -284,6 +299,7 @@ void MainWindow::init_view_menu() {
     connect(detect_intv_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::set_show_interval);
     connect(interval_act, &QAction::toggled, video_wgt->playback_slider, &AnalysisSlider::update);
+    //connect(drawing_act, &QAction::toggled, video_wgt->frame_wgt->get_overlay(), &Overlay::set_showing_overlay);
 }
 
 /**
@@ -297,7 +313,7 @@ void MainWindow::init_analysis_menu() {
     analysis_act->setIcon(QIcon("../ViAn/Icons/analysis.png"));
     analysis_act->setStatusTip(tr("Perform analysis"));
     analysis_menu->addAction(analysis_act);
-    connect(analysis_act, &QAction::triggered, video_wgt, &VideoWidget::analysis_btn_clicked);
+    connect(analysis_act, &QAction::triggered, project_wgt, &ProjectWidget::advanced_analysis);
 }
 
 void MainWindow::init_interval_menu() {
@@ -323,9 +339,7 @@ void MainWindow::init_interval_menu() {
 void MainWindow::init_tools_menu() {
     QMenu* tool_menu = menuBar()->addMenu(tr("&Tools"));
 
-    QAction* color_act = new QAction(tr("&Color"), this);
-    QAction* undo_act = new QAction(tr("&Undo"), this);
-    QAction* clear_act = new QAction(tr("C&lear"), this);
+    color_act = new QAction(tr("&Color"), this);
     QAction* zoom_in_act = new QAction(tr("Zoom &in"), this);
     QAction* zoom_out_act = new QAction(tr("Zoom &out"), this);
     QAction* fit_screen_act = new QAction(tr("&Fit to screen"), this);
@@ -336,13 +350,13 @@ void MainWindow::init_tools_menu() {
     QAction* arrow_act = new QAction(tr("&Arrow"), this);
     QAction* pen_act = new QAction(tr("&Pen"), this);
     QAction* text_act = new QAction(tr("&Text"), this);
-
+    QAction* undo_act = new QAction(tr("&Undo"), this);
+    QAction* redo_act = new QAction(tr("Re&do"), this);
+    QAction* clear_act = new QAction(tr("C&lear"), this);
 
     QAction* export_act  =new QAction(tr("&Frames"), this);
 
     color_act->setIcon(QIcon("../ViAn/Icons/color.png"));
-    undo_act->setIcon(QIcon("../ViAn/Icons/undo.png"));
-    clear_act->setIcon(QIcon("../ViAn/Icons/clear.png"));
     zoom_in_act->setIcon(QIcon("../ViAn/Icons/zoom_in.png"));
     zoom_out_act->setIcon(QIcon("../ViAn/Icons/zoom_out.png"));
     fit_screen_act->setIcon(QIcon("../ViAn/Icons/fit_screen.png"));
@@ -353,11 +367,13 @@ void MainWindow::init_tools_menu() {
     arrow_act->setIcon(QIcon("../ViAn/Icons/arrow.png"));
     pen_act->setIcon(QIcon("../ViAn/Icons/pen.png"));
     text_act->setIcon(QIcon("../ViAn/Icons/text.png"));
+    undo_act->setIcon(QIcon("../ViAn/Icons/undo.png"));
+    redo_act->setIcon(QIcon("../ViAn/Icons/redo.png"));
+    clear_act->setIcon(QIcon("../ViAn/Icons/clear.png"));
 
     // Export submenu
     QMenu* export_menu = tool_menu->addMenu(tr("&Export"));
     export_menu->addAction(export_act);
-
 
     tool_menu->addAction(color_act);
     QMenu* drawing_tools = tool_menu->addMenu(tr("&Shapes"));
@@ -368,6 +384,7 @@ void MainWindow::init_tools_menu() {
     drawing_tools->addAction(pen_act);
     drawing_tools->addAction(text_act);
     tool_menu->addAction(undo_act);
+    tool_menu->addAction(redo_act);
     tool_menu->addAction(clear_act);
     tool_menu->addSeparator();
     tool_menu->addAction(zoom_in_act);
@@ -376,10 +393,11 @@ void MainWindow::init_tools_menu() {
     tool_menu->addAction(move_act);
 
     undo_act->setShortcut(QKeySequence::Undo);
+    redo_act->setShortcut(QKeySequence::Redo);
+    clear_act->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Delete));
+    fit_screen_act->setShortcut(tr("Ctrl+F"));
 
     color_act->setStatusTip(tr("Color picker"));
-    undo_act->setStatusTip(tr("Undo last drawing"));
-    clear_act->setStatusTip(tr("Clear all drawings"));
     zoom_in_act->setStatusTip(tr("Zoom in"));
     zoom_out_act->setStatusTip(tr("Zoom out"));
     fit_screen_act->setStatusTip(tr("Fit to screen"));
@@ -390,10 +408,23 @@ void MainWindow::init_tools_menu() {
     arrow_act->setStatusTip(tr("Arrow tool"));
     pen_act->setStatusTip(tr("Pen tool"));
     text_act->setStatusTip(tr("Text tool"));
+    undo_act->setStatusTip(tr("Undo last drawing"));
+    redo_act->setStatusTip(tr("Redo last drawing"));
+    clear_act->setStatusTip(tr("Clear all drawings"));
 
     //Connect
     connect(export_act, &QAction::triggered, this, &MainWindow::export_images);
-
+    connect(rectangle_act, &QAction::triggered, this, &MainWindow::rectangle);
+    connect(circle_act, &QAction::triggered, this, &MainWindow::circle);
+    connect(line_act, &QAction::triggered, this, &MainWindow::line);
+    connect(arrow_act, &QAction::triggered, this, &MainWindow::arrow);
+    connect(pen_act, &QAction::triggered, this, &MainWindow::pen);
+    connect(text_act, &QAction::triggered, this, &MainWindow::text);
+    connect(undo_act, &QAction::triggered, this, &MainWindow::undo);
+    connect(redo_act, &QAction::triggered, this, &MainWindow::redo);
+    connect(clear_act, &QAction::triggered, this, &MainWindow::clear);
+    connect(zoom_in_act, &QAction::triggered, this, &MainWindow::zoom);
+    connect(move_act, &QAction::triggered, this, &MainWindow::move);
 }
 
 /**
@@ -409,6 +440,50 @@ void MainWindow::init_help_menu() {
     help_act->setStatusTip(tr("Help"));
 
     //connect
+}
+
+void MainWindow::rectangle() {
+    video_wgt->frame_wgt->set_tool(RECTANGLE);
+}
+
+void MainWindow::circle() {
+    video_wgt->frame_wgt->set_tool(CIRCLE);
+}
+
+void MainWindow::line() {
+    video_wgt->frame_wgt->set_tool(LINE);
+}
+
+void MainWindow::arrow() {
+    video_wgt->frame_wgt->set_tool(ARROW);
+}
+
+void MainWindow::pen() {
+    video_wgt->frame_wgt->set_tool(PEN);
+}
+
+void MainWindow::text() {
+    video_wgt->frame_wgt->set_tool(TEXT);
+}
+
+void MainWindow::undo() {
+    video_wgt->set_undo();
+}
+
+void MainWindow::redo() {
+    video_wgt->set_redo();
+}
+
+void MainWindow::clear() {
+    video_wgt->set_clear_drawings();
+}
+
+void MainWindow::zoom() {
+    video_wgt->frame_wgt->set_tool(ZOOM);
+}
+
+void MainWindow::move() {
+    video_wgt->frame_wgt->set_tool(MOVE);
 }
 
 /**

@@ -16,6 +16,12 @@ void FrameWidget::toggle_zoom(bool value) {
     }
 }
 
+void FrameWidget::set_analysis_tool()
+{
+    tool = ANALYSIS_BOX;
+}
+
+
 void FrameWidget::set_scroll_area_size(QSize size) {
     m_scroll_area_size = size;
 }
@@ -30,6 +36,11 @@ void FrameWidget::set_analysis(AnalysisProxy *analysis) {
  */
 void FrameWidget::clear_analysis() {
     m_analysis = nullptr;
+    ooi_rects.clear();
+}
+
+void FrameWidget::set_video_project(VideoProject* vid_proj) {
+    m_vid_proj = vid_proj;
 }
 
 /**
@@ -51,12 +62,59 @@ void FrameWidget::set_show_detections(bool show) {
     show_detections = show;
 }
 
+void FrameWidget::set_overlay(Overlay* overlay) {
+    video_overlay = overlay;
+}
+
+Overlay* FrameWidget::get_overlay() {
+    return video_overlay;
+}
+
 void FrameWidget::set_anchor(QPoint p) {
     anchor = p;
 }
 
 void FrameWidget::update(){
     repaint();
+}
+
+void FrameWidget::set_tool(SHAPES tool) {
+    if (m_vid_proj != nullptr) {
+
+        if (tool == TEXT) {
+            QString current_string = "Enter text";
+            float current_font_scale = 1;
+            std::string input_string = current_string.toStdString();
+            float input_font_scale = current_font_scale;
+            CustomDialog dialog("Choose text", NULL);
+            dialog.addLabel("Enter values:");
+            dialog.addLineEdit ("Text:", &input_string, "Enter a text that can then be used to draw on the overlay.");
+            dialog.addDblSpinBoxF("Font scale:", Text::FONT_SCALE_MIN, Text::FONT_SCALE_MAX,
+                                  &input_font_scale, Text::FONT_SCALE_DECIMALS, Text::FONT_SCALE_STEP,
+                                  "Choose font scale, 0.5 to 5.0 (this value is multiplied with a default font size).");
+
+            // Show the dialog (execution will stop here until the dialog is finished)
+            dialog.exec();
+
+            if (!dialog.wasCancelled() && !input_string.empty()) {
+                // Not cancelled and not empty field.
+                current_string = QString::fromStdString(input_string);
+                current_font_scale = input_font_scale;
+            }
+            emit send_tool_text(current_string, current_font_scale);
+        } else {
+            emit send_tool(tool);
+        }
+
+        this->tool = tool;
+    }
+}
+
+void FrameWidget::set_overlay_color(QColor color) {
+    if (m_vid_proj != nullptr) {
+        emit send_color(color);
+        this->overlay_color = color;
+    }
 }
 
 cv::Mat FrameWidget::get_mat() const {
@@ -98,25 +156,27 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.drawImage(QPoint(0,0), _qimage);
 
-    if (draw_zoom_rect) {
+    if (mark_rect) {
 
-        QPoint start = zoom_start_pos;
-        QPoint end = zoom_end_pos;
+        if(tool == ZOOM){
+            QPoint start = rect_start;
+            QPoint end = rect_end;
 
-        int width = end.x() - start.x();
-        int height = end.y() - start.y();
 
-        double width_ratio = double(width) / _qimage.width();
-        double height_mod = std::copysign(_qimage.height() * width_ratio, height);
+            int width = end.x() - start.x();
+            int height = end.y() - start.y();
 
-        end = QPoint(end.x(), start.y() + height_mod);
+            double width_ratio = double(width) / _qimage.width();
+            double height_mod = std::copysign(_qimage.height() * width_ratio, height);
 
-        painter.setPen(QColor(255,0,0));
-        QRectF tmp(start, end);
-        painter.drawRect(tmp);
+            end = QPoint(end.x(), start.y() + height_mod);
 
+            painter.setPen(QColor(255,0,0));
+            QRectF tmp(start, end);
+            painter.drawRect(tmp);
+        }
         painter.setPen(QColor(0,255,0));
-        QRectF zoom(zoom_start_pos, zoom_end_pos);
+        QRectF zoom(rect_start, rect_end);
         painter.drawRect(zoom);
     }
     if (m_detections && show_detections) {
@@ -129,6 +189,10 @@ void FrameWidget::paintEvent(QPaintEvent *event) {
         }
     }
     painter.end();
+}
+
+QPoint FrameWidget::scale_point(QPoint pos) {
+    return anchor + pos/m_scale_factor;
 }
 
 /**
@@ -145,6 +209,11 @@ void FrameWidget::resizeEvent(QResizeEvent *event) {
  */
 void FrameWidget::mousePressEvent(QMouseEvent *event) {
     switch (tool) {
+    case NONE:
+        break;
+    case ANALYSIS_BOX:
+        set_rect_start(event->pos());
+        break;
     case ZOOM:
         if (event->button() == Qt::RightButton) {
             init_panning(event->pos());
@@ -152,11 +221,12 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
             if (event->modifiers() == Qt::ControlModifier) {
                 do_zoom_out = true;
             } else {
-                init_zoom(event->pos());
+                set_rect_start(event->pos());
             }
         }
         break;
     default:
+        emit mouse_pressed(scale_point(event->pos()));
         break;
     }
 }
@@ -167,20 +237,35 @@ void FrameWidget::mousePressEvent(QMouseEvent *event) {
  */
 void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
     switch (tool) {
-    case ZOOM: {
+    case NONE:
+        break;
+    case ZOOM:
+    {
         if (event->button() == Qt::RightButton) {
             end_panning();
         } else if (event->button() == Qt::LeftButton){
             if (do_zoom_out) {
                 emit trigger_zoom_out();
                 do_zoom_out = false;
-            } else {
+            }else {
                 end_zoom();
             }
         }
         break;
     }
+    case ANALYSIS_BOX:
+    {
+        AnalysisSettings* settings = new AnalysisSettings(MOTION_DETECTION);
+        settings->setBounding_box(cv::Rect(anchor.x() +rect_start.x()/m_scale_factor, anchor.y() + rect_start.y()/m_scale_factor,
+                                           anchor.x()+rect_end.x()/m_scale_factor,anchor.y()+rect_end.y()/m_scale_factor));
+        emit quick_analysis(settings);
+        qDebug () << "TODO:analysis rect needs scaling";
+        tool = NONE;
+        mark_rect = false;
+        break;
+    }
     default:
+        emit mouse_released(scale_point(event->pos()));
         break;
     }
 }
@@ -191,14 +276,19 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
  */
 void FrameWidget::mouseMoveEvent(QMouseEvent *event) {
     switch (tool) {
+    case NONE:
+        break;
+    case ANALYSIS_BOX:
+
     case ZOOM:
         if (event->buttons() == Qt::RightButton){
             panning(event->pos());
         } else if (event->buttons() == Qt::LeftButton && !do_zoom_out) {
-            zoom(event->pos());
+            rect_update(event->pos());
         }
         break;
     default:
+        emit mouse_moved(scale_point(event->pos()));
         break;
     }
 }
@@ -222,8 +312,8 @@ void FrameWidget::init_panning(QPoint pos) {
  * Init zoom on frame
  * @param pos
  */
-void FrameWidget::init_zoom(QPoint pos) {
-    zoom_start_pos = pos;
+void FrameWidget::set_rect_start(QPoint pos) {
+    rect_start = pos;
 }
 
 /**
@@ -243,9 +333,9 @@ void FrameWidget::panning(QPoint pos) {
  * Updates and redraws the zooming rect
  * @param pos
  */
-void FrameWidget::zoom(QPoint pos) {
-    zoom_end_pos = pos;
-    draw_zoom_rect = true;
+void FrameWidget::rect_update(QPoint pos) {
+    rect_end = pos;
+    mark_rect = true;
     repaint();
 }
 
@@ -262,29 +352,27 @@ void FrameWidget::end_panning() {
  * Emits the points of the zooming rect
  */
 void FrameWidget::end_zoom() {
-    draw_zoom_rect = false;
+    mark_rect = false;
     repaint();
 
     // Scale factor
-    int width = std::abs(zoom_start_pos.x() - zoom_end_pos.x());
-    int height = std::abs(zoom_start_pos.y() - zoom_end_pos.y());
-    double width_ratio = _qimage.width() / double(width);
+    int width = std::abs(rect_start.x() - rect_end.x());
+    int height = std::abs(rect_start.y() - rect_end.y());
+    double width_ratio = _qimage.width() / double(width );
+
     double height_ratio = _qimage.height() / double(height);
 
     // ROI rect points
-    int wid = zoom_end_pos.x() - zoom_start_pos.x();
-    int hei = zoom_end_pos.y() - zoom_start_pos.y();
+    int wid = rect_end.x() - rect_start.x();
+    int hei = rect_end.y() - rect_start.y();
 
     double wid_ratio = double(wid) / _qimage.width();
     double height_mod = std::copysign(_qimage.height() * wid_ratio, hei);
-    QPoint end = QPoint(zoom_end_pos.x(), zoom_start_pos.y() + height_mod);
+    QPoint end = QPoint(rect_end.x(), rect_start.y() + height_mod);
 
-    cv::Rect zoom_rect(cv::Point(zoom_start_pos.x(), zoom_start_pos.y()), cv::Point(end.x(), end.y()));
-    double scale_ratio = std::min(m_scroll_area_size.width() / double(zoom_rect.width), m_scroll_area_size.height() / double(zoom_rect.height));
+    cv::Rect zoom_rect(cv::Point(rect_start.x(), rect_start.y()), cv::Point(end.x(), end.y()));
+    double  scale_ratio = std::min(m_scroll_area_size.width() / double(zoom_rect.width), m_scroll_area_size.height() / double(zoom_rect.height));
 
-    emit zoom_points(zoom_start_pos, end);
+
+    emit zoom_points(rect_start, end);
 }
-
-
-
-
