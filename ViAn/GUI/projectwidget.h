@@ -49,12 +49,9 @@ signals:
     void set_status_bar(QString);
     void begin_analysis(QTreeWidgetItem*, AnalysisMethod*);
     void update_frame();
-<<<<<<< HEAD
     void export_org_frame(std::string path);
-=======
     void remove_overlay();
     void new_vid_proj(VideoProject*);
->>>>>>> 12e1bb1a57fdbbaec9e0dda9cc371ac4ccfb6280
 
 public slots:
     void export_original_frame(void);
