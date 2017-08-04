@@ -16,22 +16,101 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp
-
+SOURCES += main.cpp \
+    reportgenerator.cpp \
+    GUI/Toolbars/maintoolbar.cpp \
+    GUI/Toolbars/drawingtoolbar.cpp \
+    utility.cpp \
+    GUI/drawscrollarea.cpp \
+    Video/zoomer.cpp \
+    GUI/Analysis/analysisslider.cpp \
+    Project/Test/videoprojecttest.cpp \
+    GUI/Bookmark/bookmarkcategory.cpp \
+    imagegenerator.cpp \
+    GUI/Bookmark/bookmarklist.cpp \
+    GUI/statusbar.cpp \
+    GUI/Analysis/analysiswidget.cpp \
+    GUI/manipulatordialog.cpp \
+    Video/frameprocessor.cpp \
+    Project/projecttreestate.cpp \
+    GUI/Analysis/tagdialog.cpp \
+    imageexporter.cpp \
+    Project/Analysis/tag.cpp \
+    Video/videocontroller.cpp \
+    Video/videoplayer.cpp \
+    Project/recentproject.cpp \
+    Project/Analysis/basicanalysis.cpp \
+    Project/Analysis/analysisinterval.cpp \
+    Filehandler/writeable.cpp \
+    Project/Analysis/analysisproxy.cpp \
+    Project/Analysis/detectionbox.cpp \
+    GUI/TreeItems/videoitem.cpp \
+    GUI/TreeItems/treeitem.cpp \
+    GUI/recentprojectdialog.cpp \
+    GUI/projectwidget.cpp \
+    GUI/projectdialog.cpp \
+    GUI/TreeItems/folderitem.cpp \
+    GUI/TreeItems/tagitem.cpp \
+    GUI/TreeItems/analysisitem.cpp \
+    GUI/fpsdialog.cpp \
+    GUI/frameexporterdialog.cpp \
+    GUI/framewidget.cpp \
+    GUI/videowidget.cpp \
+    Analysis/analysissettings.cpp \
+    GUI/Analysis/analysisdialog.cpp \
+    GUI/Analysis/videolistitem.cpp \
+    GUI/Analysis/queuewidget.cpp
 
 #
 # TEST
 #
-SOURCES += Test/test_video_player.cpp\
-    Test/filehandlertest.cpp\
-    Test/test_mainwindow.cpp \
-    Test/test_report_generator.cpp \
-    Test/overlayintegrationtest.cpp
-HEADERS += Test/test_video_player.h \
-    Test/filehandlertest.h \
-    Test/test_mainwindow.h \
+SOURCES +=\
+    Test/test_report_generator.cpp
+
+HEADERS += reportgenerator.h\
     Test/test_report_generator.h \
-    Test/overlayintegrationtest.h \
+    GUI/Toolbars/maintoolbar.h \
+    GUI/Toolbars/drawingtoolbar.h \
+    utility.h \
+    GUI/drawscrollarea.h \
+    Video/zoomer.h \
+    GUI/Analysis/analysisslider.h \
+    Project/Test/videoprojecttest.h \
+    GUI/Bookmark/bookmarkcategory.h \
+    imagegenerator.h \
+    GUI/Bookmark/bookmarklist.h \
+    GUI/statusbar.h \
+    GUI/Analysis/analysiswidget.h \
+    GUI/manipulatordialog.h \
+    Video/frameprocessor.h \
+    Project/projecttreestate.h \
+    GUI/Analysis/tagdialog.h \
+    imageexporter.h \
+    Project/Analysis/tag.h \
+    Video/videocontroller.h \
+    Video/videoplayer.h \
+    Project/recentproject.h \
+    Project/Analysis/basicanalysis.h \
+    Project/Analysis/analysisinterval.h \
+    Filehandler/writeable.h \
+    Project/Analysis/analysisproxy.h \
+    Project/Analysis/detectionbox.h \
+    GUI/TreeItems/tagitem.h \
+    GUI/TreeItems/videoitem.h \
+    GUI/TreeItems/analysisitem.h \
+    GUI/TreeItems/treeitem.h \
+    GUI/projectdialog.h \
+    GUI/projectwidget.h \
+    GUI/recentprojectdialog.h \
+    GUI/fpsdialog.h \
+    GUI/frameexporterdialog.h \
+    GUI/framewidget.h \
+    GUI/videowidget.h \
+    Analysis/analysissettings.h \
+    Analysis/analysismethod.h \
+    GUI/Analysis/analysisdialog.h \
+    GUI/Analysis/videolistitem.h \
+    GUI/Analysis/queuewidget.h
 
 #
 # LIBRARY
@@ -43,30 +122,16 @@ HEADERS += Library/customdialog.h
 # GUI
 #
 SOURCES += GUI/mainwindow.cpp \
-    GUI/icononbuttonhandler.cpp \
-    GUI/qtreeitems.cpp \
-    GUI/bookmarkview.cpp \
-    GUI/bookmarkitem.cpp \
-    GUI/reportgenerator.cpp \
-    GUI/makeproject.cpp \
-    GUI/fpsdialog.cpp \
-    GUI/analysiswindow.cpp \
+    GUI/Bookmark/bookmarkitem.cpp \
+    GUI/Bookmark/bookmarkwidget.cpp
 
 
 HEADERS  += GUI/mainwindow.h \
-    GUI/icononbuttonhandler.h \
     GUI/action.h \
-    GUI/qtreeitems.h \
-    GUI/reportgenerator.h \
-    GUI/bookmarkview.h \
-    GUI/makeproject.h \
-    GUI/bookmarkitem.h \
-    GUI/fpsdialog.h \
-    GUI/analysiswindow.h \
+    GUI/Bookmark/bookmarkitem.h \
+    GUI/Bookmark/bookmarkwidget.h
 
-FORMS    += GUI/mainwindow.ui \
-    GUI/makeproject.ui \
-    GUI/analysiswindow.ui
+FORMS    +=
 
 RESOURCES += resources.qrc
 #
@@ -74,7 +139,7 @@ RESOURCES += resources.qrc
 # VIDEOPLAYER
 # OPENCV
 #
-SOURCES += Video/video_player.cpp \
+SOURCES += \
     Video/overlay.cpp \
     Video/analysisoverlay.cpp \
     Video/shapes/arrow.cpp \
@@ -85,8 +150,9 @@ SOURCES += Video/video_player.cpp \
     Video/shapes/shape.cpp \
     Video/shapes/text.cpp \
     Video/shapes/zoomrectangle.cpp \
-    Video/shapes/analysarea.cpp
-HEADERS += Video/video_player.h \
+    Video/shapes/analysarea.cpp \
+    Video/framemanipulator.cpp
+HEADERS += \
     Video/overlay.h \
     Video/analysisoverlay.h \
     Video/shapes/arrow.h \
@@ -97,7 +163,8 @@ HEADERS += Video/video_player.h \
     Video/shapes/shape.h \
     Video/shapes/text.h \
     Video/shapes/zoomrectangle.h \
-    Video/shapes/analysarea.h
+    Video/shapes/analysarea.h \
+    Video/framemanipulator.h
 
 win32 {
     INCLUDEPATH += C:\opencv\release\install\include
@@ -122,12 +189,12 @@ unix {
 #
 # START: FILEHANDLER
 #
-SOURCES += Filehandler/filehandler.cpp \
+SOURCES += \
     Filehandler/saveable.cpp \
 
 
 
-HEADERS  += Filehandler/filehandler.h \
+HEADERS  += \
     Filehandler/saveable.h \
 
 
@@ -139,23 +206,23 @@ HEADERS  += Filehandler/filehandler.h \
 #
 # Project
 #
-SOURCES += Project/report.cpp \
+SOURCES += Project/Test/projecttestsuite.cpp \
+    Project/report.cpp \
     Project/project.cpp \
     Project/video.cpp \
     Project/videoproject.cpp \
     Project/bookmark.cpp \
     Project/Analysis/analysis.cpp \
-    Project/Analysis/ooi.cpp \
     Project/Analysis/poi.cpp
 
 
-HEADERS += Project/project.h \
+HEADERS +=Project/Test/projecttestsuite.h \
+    Project/project.h \
     Project/video.h \
     Project/videoproject.h \
     Project/bookmark.h  \
     Project/report.h \
     Project/Analysis/analysis.h \
-    Project/Analysis/ooi.h \
     Project/Analysis/poi.h
 
 
@@ -164,10 +231,9 @@ HEADERS += Project/project.h \
 #
 # ANALYSIS
 #
-SOURCES += Analysis/AnalysisMethod.cpp\
-    Analysis/MotionDetection.cpp \
-    Analysis/AnalysisController.cpp
+SOURCES += Analysis/analysismethod.cpp\
+    Analysis/motiondetection.cpp \
+    Analysis/analysiscontroller.cpp
 
-HEADERS +=Analysis/AnalysisMethod.h\
-    Analysis/MotionDetection.h \
-    Analysis/AnalysisController.h
+HEADERS += Analysis/motiondetection.h \
+    Analysis/analysiscontroller.h

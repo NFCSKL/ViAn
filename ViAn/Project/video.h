@@ -6,13 +6,29 @@
 #include <QJsonObject>
 #include <QString>
 #include "Filehandler/saveable.h"
+struct VideoState{
+    int frame = 0;
+    int contrast = 0;
+    int brightness = 0;
+    int rotation = 0;
+    VideoState(){}
+    VideoState(VideoState&rh){
+        frame = rh.frame;
+        contrast = rh.contrast;
+        brightness = rh.brightness;
+        rotation = rh.rotation;
+    }
+};
 typedef int ID;
-class Video : Saveable{
-
+class Video : Writeable{
+    std::string m_name;
+public:
+    VideoState state;
 public:
     Video();
     Video(std::string file_path);
     std::string file_path;
+    std::string get_name();
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
     friend bool operator==(Video v1, Video v2);

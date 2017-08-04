@@ -6,30 +6,26 @@
 #include <QObject>
 #include <vector>
 #include <map>
+#include <set>
 #include "Filehandler/saveable.h"
 #include "opencv2/core/core.hpp"
 #include "poi.h"
-#include "ooi.h"
+#include "detectionbox.h"
+#include "basicanalysis.h"
 
-enum ANALYSIS_TYPE {MOTION_DETECTION = 0, FACIAL_DETECTION = 1};
-
-const std::vector<std::string> ANALYSIS_NAMES = {"Motion detection", "Facial detection"};
-const std::map<std::string, ANALYSIS_TYPE> ANALYSIS_NAMES_TYPE_MAP = {std::make_pair("Motion detection",MOTION_DETECTION),
-                                                                     std::make_pair("Facial detection",FACIAL_DETECTION)};
-class Analysis : Saveable {
+class Analysis : public BasicAnalysis {
+    friend class AnalysisMeta;
 public:
     ANALYSIS_TYPE type;
-    Analysis();
-    ~Analysis();
-    Analysis(const Analysis &obj);
-    QString name;
-    void set_name(QString name);
-    void add_POI(POI POI);
-    void read(const QJsonObject& json);
-    void write(QJsonObject& json);
+public:
+    virtual void read(const QJsonObject& json) override;
+    virtual void write(QJsonObject& json) override;
+    virtual SAVE_TYPE get_save_type() const override;
+    virtual ANALYSIS_TYPE get_type() const override;
     std::vector<cv::Rect> get_detections_on_frame(int frame_num);
-    std::vector<POI> POIs;
+    void set_name(const std::string &name);
+    std::string get_name() const;
+
 };
-Q_DECLARE_METATYPE(Analysis)
 
 #endif // ANALYSIS_H
