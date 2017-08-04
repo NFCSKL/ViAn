@@ -301,22 +301,18 @@ void MainWindow::init_analysis_menu() {
 void MainWindow::init_interval_menu() {
     QMenu* interval_menu = menuBar()->addMenu(tr("&Interval"));
 
-    QAction* export_act = new QAction(tr("&Export interval"), this);
     QAction* tag_interval_act = new QAction(tr("&Tag interval"), this);
     QAction* rm_tag_interval_act = new QAction(tr("&Remove tag on interval"), this);
     QAction* rm_interval_act = new QAction(tr("&Delete interval"), this);
 
-    export_act->setShortcut(tr("Shift+E"));
     tag_interval_act->setShortcut(tr("Shift+T"));
     rm_tag_interval_act->setShortcut(tr("Shift+R"));
     rm_interval_act->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Delete));
 
-    interval_menu->addAction(export_act);
     interval_menu->addAction(tag_interval_act);
     interval_menu->addAction(rm_tag_interval_act);
     interval_menu->addAction(rm_interval_act);
 
-    connect(export_act, &QAction::triggered, this, &MainWindow::export_images);
     connect(tag_interval_act, &QAction::triggered, video_wgt, &VideoWidget::tag_interval);
     connect(rm_tag_interval_act, &QAction::triggered, video_wgt, &VideoWidget::remove_tag_interval);
     connect(rm_interval_act, &QAction::triggered, video_wgt, &VideoWidget::delete_interval);
@@ -343,8 +339,8 @@ void MainWindow::init_tools_menu() {
     QAction* pen_act = new QAction(tr("&Pen"), this);
     QAction* text_act = new QAction(tr("&Text"), this);
 
-    QAction* export_frame_act = new QAction(tr("&Export frame"), this);
-    export_frame_act->setShortcut(Qt::Key_E);
+    QAction* export_act = new QAction(tr("&Export interval"), this);
+    export_act->setShortcut(tr("Shift+E"));
 
     color_act->setIcon(QIcon("../ViAn/Icons/color.png"));
     undo_act->setIcon(QIcon("../ViAn/Icons/undo.png"));
@@ -362,7 +358,7 @@ void MainWindow::init_tools_menu() {
 
     // Export submenu
     QMenu* export_menu = tool_menu->addMenu(tr("&Export"));
-    export_menu->addAction(export_frame_act);
+    export_menu->addAction(export_act);
 
     tool_menu->addSeparator();
 
@@ -400,7 +396,7 @@ void MainWindow::init_tools_menu() {
     text_act->setStatusTip(tr("Text tool"));
 
     //Connect
-    connect(export_frame_act, &QAction::triggered, this, &MainWindow::export_current_frame);
+    connect(export_act, &QAction::triggered, this, &MainWindow::export_images);
     connect(fit_screen_act, &QAction::triggered, video_wgt, &VideoWidget::on_fit_screen);
     connect(reset_zoom_act, &QAction::triggered, video_wgt, &VideoWidget::on_original_size);
 }
@@ -438,19 +434,6 @@ void MainWindow::cont_bri() {
     ManipulatorDialog* man_dialog = new ManipulatorDialog(this);
     connect(man_dialog, SIGNAL(values(int,double)), video_wgt, SLOT(update_brightness_contrast(int,double)));
     man_dialog->exec();
-}
-
-void MainWindow::export_current_frame() {
-    //int frame_num = video_wgt->frame_line_edit->text();
-    //std::pair<int, int> interval = std::make_pair(frame_num, frame_num);
-    VideoProject* vid_proj = video_wgt->get_current_video_project();
-    if (vid_proj == nullptr){
-        set_status_bar("A video needs to be selected");
-        return;
-    }
-
-    ImageExporter* im_exp = new ImageExporter();
-    //im_exp->set_file_path(vid_proj->get_index_path());
 }
 
 void MainWindow::export_images(){

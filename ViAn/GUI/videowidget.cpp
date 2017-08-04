@@ -374,8 +374,8 @@ void VideoWidget::connect_btns() {
     connect(analysis_btn, &QPushButton::clicked, this, &VideoWidget::analysis_btn_clicked);
     connect(analysis_play_btn, &QPushButton::toggled, this, &VideoWidget::analysis_play_btn_toggled);
     connect(next_poi_btn, &QPushButton::clicked, this, &VideoWidget::next_poi_btn_clicked);
-    connect(prev_poi_btn, &QPushButton::clicked, this, &VideoWidget::prev_poi_btn_clicked);
-    connect(prev_poi_btn, &DoubleClickButton::double_clicked, this, &VideoWidget::prev_poi_doubleclicked);
+    connect(prev_poi_btn, &DoubleClickButton::clicked, this, &VideoWidget::prev_poi_btn_clicked);
+    connect(prev_poi_btn, &DoubleClickButton::double_clicked, this, &VideoWidget::prev_poi_btn_clicked);
 
     // Tag
     connect(tag_btn, &QPushButton::clicked, this, &VideoWidget::tag_frame);
@@ -647,23 +647,6 @@ void VideoWidget::prev_poi_btn_clicked() {
         frame_index.store(new_frame);
         on_new_frame();
         emit set_status_bar("Jumped to previous POI");
-    }
-}
-
-void VideoWidget::prev_poi_doubleclicked() {
-    int current_frame_index = frame_index.load();
-    int prev_poi = playback_slider->get_prev_poi_start(current_frame_index);
-    int second_prev_poi = playback_slider->get_prev_poi_start(prev_poi);
-    if (prev_poi == current_frame_index) {
-        emit set_status_bar("Already at first POI");
-    } else if (second_prev_poi == current_frame_index) {
-        frame_index.store(prev_poi);
-        on_new_frame();
-        emit set_status_bar("Jumped to previous POI1");
-    } else {
-        frame_index.store(second_prev_poi);
-        on_new_frame();
-        emit set_status_bar("Jumped to previous POI2");
     }
 }
 

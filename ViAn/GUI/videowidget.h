@@ -109,7 +109,6 @@ public slots:
     void zoom_out_clicked(void);
     void next_poi_btn_clicked(void);
     void prev_poi_btn_clicked(void);
-    void prev_poi_doubleclicked(void);
     void analysis_play_btn_toggled(bool value);
     void set_slider_max(int value);
     void on_new_frame();
