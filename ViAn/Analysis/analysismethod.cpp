@@ -4,7 +4,6 @@
 #include "Analysis/analysismethod.h"
 AnalysisMethod::AnalysisMethod(const std::string &video_path, const std::string& save_path)
 {
-    cv::namedWindow("name");
     m_source_file = video_path;
     std::size_t index = video_path.find_last_of('/') + 1;
     std::string vid_name = video_path.substr(index);
@@ -156,8 +155,6 @@ void AnalysisMethod::run() {
             else{
                 analysis_frame = original_frame;
             }
-            cv::rectangle(original_frame,bounding_box, cv::Scalar(0,255,0));
-            cv::imshow("name", original_frame);
             if(!m_scaling_done){
 
                 calculate_scaling_factor();

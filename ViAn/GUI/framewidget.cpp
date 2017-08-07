@@ -263,7 +263,6 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
 
         settings->setBounding_box(scaled);
         emit quick_analysis(settings);
-        qDebug () << "TODO:analysis rect needs scaling";
         tool = NONE;
         mark_rect = false;
         break;
