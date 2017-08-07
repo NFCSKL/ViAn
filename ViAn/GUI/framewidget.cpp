@@ -117,13 +117,13 @@ void FrameWidget::set_overlay_color(QColor color) {
     }
 }
 
-cv::Mat FrameWidget::get_mat() const {
+cv::Mat FrameWidget::get_modified_frame() const {
     return _tmp_frame.clone();
 }
 
-void FrameWidget::export_original_frame(std::string path)
+cv::Mat FrameWidget::get_org_frame() const
 {
-   cv::imwrite(path + ".tiff", current_frame);
+    return current_frame.clone();
 }
 
 void FrameWidget::on_new_image(cv::Mat frame, int frame_index) {

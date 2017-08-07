@@ -99,10 +99,10 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, const int frame_nbr
     int index = file_name.find_last_of('/') + 1;
     file_name = file_name.substr(index);
     file_name += "_" + std::to_string(frame_nbr);
-
+    qDebug() << file_name.c_str();
     ImageGenerator im_gen(frame, m_path);
     std::string thumbnail_path = im_gen.create_thumbnail(file_name);
-    std::string bm_file = im_gen.create_tiff(file_name);
+    std::string bm_file = im_gen.create_bookmark(file_name);
     Bookmark* bookmark = new Bookmark(vid_proj, bm_file, text.toStdString() , frame_nbr);
     vid_proj->add_bookmark(bookmark);
 
@@ -111,7 +111,15 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, const int frame_nbr
     bm_list->addItem(bm_item);
 }
 
-
+void BookmarkWidget::export_original_frame(VideoProject* vid_proj,const int frame_nbr, cv::Mat frame)
+{
+    std::string file_name = vid_proj->get_video()->file_path;
+    int index = file_name.find_last_of('/') + 1;
+    file_name = file_name.substr(index);
+    file_name += "_" + std::to_string(frame_nbr);
+    ImageGenerator im_gen(frame, m_path);
+    im_gen.create_tiff(file_name);
+}
 void BookmarkWidget::load_bookmarks(VideoProject *vid_proj) {
     for (auto bm_map : vid_proj->get_bookmarks()) {
         Bookmark* bm = bm_map.second;

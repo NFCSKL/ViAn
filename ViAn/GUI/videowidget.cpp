@@ -510,8 +510,11 @@ void VideoWidget::set_scale_factor(double scale_factor) {
 }
 
 void VideoWidget::on_bookmark_clicked() {
-    cv::Mat bookmark_frame = frame_wgt->get_mat();
-    emit new_bookmark(m_vid_proj, frame_index.load(), bookmark_frame);
+    cv::Mat bookmark_frame = frame_wgt->get_modified_frame();
+    cv::Mat org_frame = frame_wgt->get_org_frame();
+    int frame = frame_index.load();
+    emit new_bookmark(m_vid_proj, frame , bookmark_frame);
+    emit export_original_frame(m_vid_proj, frame, org_frame);
 }
 
 /**
@@ -1009,7 +1012,8 @@ void VideoWidget::set_current_frame_size(QSize size) {
 
 void VideoWidget::on_export_frame()
 {
-    emit export_original_frame();
+    int frame = frame_index.load();
+    emit export_original_frame(m_vid_proj,frame, frame_wgt->get_org_frame());
 }
 
 /**

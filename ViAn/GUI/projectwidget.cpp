@@ -37,10 +37,6 @@ ProjectWidget::ProjectWidget(QWidget *parent) : QTreeWidget(parent) {
     connect(this, &ProjectWidget::currentItemChanged, this, &ProjectWidget::check_selection_level);
 }
 
-void ProjectWidget::export_original_frame()
-{
-    emit export_org_frame(m_proj->getDir() + "Stills");
-}
 
 /**
  * @brief ProjectWidget::new_project

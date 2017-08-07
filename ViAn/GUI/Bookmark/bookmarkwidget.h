@@ -35,6 +35,7 @@ signals:
     void play_bookmark_video(VideoProject* vid_proj, int frame_idx);
 public slots:
     void create_bookmark(VideoProject *vid_proj, const int frame_nbr, cv::Mat);
+    void export_original_frame(VideoProject *vid_proj, const int frame_nbr, cv::Mat frame);
     void load_bookmarks(VideoProject *vid_proj);
     void set_path(std::string path);
     void clear_bookmarks();

@@ -106,8 +106,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent){
     connect(analysis_wgt, SIGNAL(show_progress(int)), status_bar, SLOT(update_analysis_bar(int)));
 
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt->frame_wgt, &FrameWidget::clear_analysis);
-    connect(video_wgt,   &VideoWidget::export_original_frame, project_wgt, &ProjectWidget::export_original_frame);
-    connect(project_wgt, &ProjectWidget::export_org_frame, video_wgt->frame_wgt, &FrameWidget::export_original_frame);
+    connect(video_wgt,   &VideoWidget::export_original_frame, bookmark_wgt, &BookmarkWidget::export_original_frame);
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt->playback_slider, &AnalysisSlider::clear_slider);
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::load_marked_video);
     connect(project_wgt, &ProjectWidget::marked_video, video_wgt, &VideoWidget::clear_tag);

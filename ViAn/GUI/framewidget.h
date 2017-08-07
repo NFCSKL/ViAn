@@ -14,6 +14,7 @@
 #include "Project/Analysis/analysisproxy.h"
 #include "Project/videoproject.h"
 #include "Analysis/analysissettings.h"
+#include "imagegenerator.h"
 
 //enum click_tool {NONE, ZOOM, MOVE,ANALYSIS_BOX};
 
@@ -49,7 +50,8 @@ class FrameWidget : public QWidget
 public:
     explicit FrameWidget(QWidget *parent = nullptr);
 
-    cv::Mat get_mat() const;
+    cv::Mat get_modified_frame() const;
+    cv::Mat get_org_frame() const;
     void set_overlay(Overlay *overlay);
     Overlay* get_overlay();
 
@@ -71,7 +73,6 @@ signals:
     void mouse_released(QPoint);
     void mouse_moved(QPoint);
 public slots:
-    void export_original_frame(std::string path);
     void on_new_image(cv::Mat image, int frame_index);
     void toggle_zoom(bool value);
     void set_analysis_tool();
