@@ -12,7 +12,8 @@ MotionDetection::MotionDetection(std::string source_file, std::string save_file)
 }
 
 MotionDetection::~MotionDetection() {
-
+    background_subtractor.release();
+    dilation_kernel.release();
 }
 
 void MotionDetection::init_settings()
