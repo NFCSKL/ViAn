@@ -57,3 +57,9 @@ void QueueWidget::update_progress(int i)
     progressbar->setValue(i);
 }
 
+void QueueWidget::toggle_show()
+{
+    if(this->isVisible()) hide();
+    else show();
+}
+

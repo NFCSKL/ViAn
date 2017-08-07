@@ -40,6 +40,7 @@ public:
     ~MainWindow();
 
     StatusBar* status_bar;
+    QAction* show_analysis_queue;
     QAction* detect_intv_act;
     QAction* bound_box_act;
     QAction* interval_act;

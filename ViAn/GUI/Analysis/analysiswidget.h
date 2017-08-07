@@ -13,10 +13,11 @@
 class AnalysisWidget : public QWidget
 {
     Q_OBJECT
-    QueueWidget* queue_wgt;
+
     std::map<AnalysisMethod*, bool*> abort_map;
 public:
     explicit AnalysisWidget(QWidget *parent = nullptr);
+    QueueWidget* queue_wgt;
     std::string dots = "";
     std::clock_t start;
     int duration = 0;

@@ -20,6 +20,8 @@ public:
     void enqueue(AnalysisMethod *method);
     void remove();
     void update_progress(int i);
+public slots:
+    void toggle_show();
 signals:
     void abort_analysis();
 };

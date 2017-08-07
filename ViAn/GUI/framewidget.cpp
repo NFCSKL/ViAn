@@ -123,7 +123,16 @@ cv::Mat FrameWidget::get_modified_frame() const {
 
 cv::Mat FrameWidget::get_org_frame() const
 {
-    return current_frame.clone();
+    cv::Mat tmp = current_frame.clone();
+    switch (tmp.type()) {
+        case CV_8UC1:
+            cvtColor(current_frame, tmp, CV_GRAY2RGB);
+            break;
+        case CV_8UC3:
+            cvtColor(current_frame, tmp, CV_BGR2RGB);
+            break;
+    }
+    return tmp;
 }
 
 void FrameWidget::on_new_image(cv::Mat frame, int frame_index) {

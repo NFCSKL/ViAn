@@ -89,6 +89,8 @@ void AnalysisWidget::analysis_done(AnalysisProxy analysis) {
         current_analysis_item = get<1>(analysis_queue.front());
         move_queue();
         perform_analysis(analysis_queue.front());
+    }else{
+        queue_wgt->hide();
     }
 }
 
