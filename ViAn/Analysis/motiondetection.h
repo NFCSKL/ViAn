@@ -2,7 +2,6 @@
 #define MOTIONDETECTION_H
 #include "Project/Analysis/detectionbox.h"
 #include "analysismethod.h"
-#include "analysiscontroller.h"
 #include <string>
 
 /**

@@ -17,7 +17,6 @@
 #include "reportgenerator.h"
 #include "action.h"
 
-#include "Analysis/AnalysisController.h"
 #include "GUI/recentprojectdialog.h"
 #include "Project/Analysis/analysisproxy.h"
 

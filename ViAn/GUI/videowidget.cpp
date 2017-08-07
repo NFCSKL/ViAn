@@ -11,7 +11,6 @@
 
 #include "GUI/frameexporterdialog.h"
 #include "Video/video_player.h"
-#include "Analysis/analysiscontroller.h"
 #include "imageexporter.h"
 
 #include <opencv2/videoio.hpp>
@@ -167,7 +166,7 @@ void VideoWidget::init_frame_processor() {
  * @brief VideoWidget::set_icons
  * Set icons on all buttons
  */
-void VideoWidget::set_btn_icons() {
+void VideoWidget::set_btn_icons() {    
     play_btn = new QPushButton(QIcon("../ViAn/Icons/play.png"), "", this);
     stop_btn = new QPushButton(QIcon("../ViAn/Icons/stop.png"), "", this);
     next_frame_btn = new QPushButton(QIcon("../ViAn/Icons/next_frame.png"), "", this);
