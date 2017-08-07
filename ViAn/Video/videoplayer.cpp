@@ -46,8 +46,6 @@ void VideoPlayer::load_video(){
 
     m_new_video->store(false);
     m_new_frame_video->store(true);
-
-    synced_load_read();
     //m_v_sync->con_var.notify_all();
 }
 
@@ -93,7 +91,7 @@ void VideoPlayer::check_events() {
         if (m_player_con->wait_until(lk, now + delay - elapsed, [&](){return m_new_video->load() || current_frame != m_frame->load();})) {
             // Notified from the VideoWidget
             if (m_new_video->load()) {
-                load_video();
+                wait_load_read();
             } else if (current_frame != m_frame->load()) {
                 set_frame();
             }
@@ -154,10 +152,17 @@ bool VideoPlayer::synced_read(){
 }
 
 
-bool VideoPlayer::synced_load_read(){
+bool VideoPlayer::wait_load_read(){
+
+    // Wait for processing thread to finish processing new frame
+    {
+        std::unique_lock<std::mutex> lk(m_v_sync->lock);
+        m_v_sync->con_var.wait(lk, [&]{return !m_new_frame->load();});
+    }
     // Read new frame and notify processing thread
    {
         std::lock_guard<std::mutex> lk(m_v_sync->lock);
+        load_video();
         if (!m_capture.read(m_v_sync->frame)) {
             m_is_playing->store(false);
             playback_stopped();
@@ -167,11 +172,5 @@ bool VideoPlayer::synced_load_read(){
         m_new_frame->store(true);
     }
     m_v_sync->con_var.notify_one();
-
-    // Wait for processing thread to finish processing new frame
-    {
-        std::unique_lock<std::mutex> lk(m_v_sync->lock);
-        m_v_sync->con_var.wait(lk, [&]{return !m_new_frame->load();});
-    }
     return true;
 }
