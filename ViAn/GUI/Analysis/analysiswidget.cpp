@@ -1,5 +1,4 @@
 #include "analysiswidget.h"
-#include "Analysis/AnalysisController.h"
 #include "GUI/TreeItems/analysisitem.h"
 #include "GUI/videowidget.h"
 #include <QDebug>
@@ -7,10 +6,8 @@
 #include <tuple>
 AnalysisWidget::AnalysisWidget(QWidget *parent) {
     queue_wgt = new QueueWidget();
-    queue_wgt->hide();
-    an_col = new AnalysisController(this);    
-    connect(an_col, SIGNAL(progress_signal(int)), this, SLOT(send_progress(int)));
-    connect(an_col, SIGNAL(analysis_done(AnalysisProxy)), this, SLOT(analysis_done(AnalysisProxy)));
+    queue_wgt->hide();  
+    connect(queue_wgt,SIGNAL(abort_analysis()), this, SLOT(abort_analysis()));
 }
 
 
@@ -33,7 +30,7 @@ void AnalysisWidget::start_analysis(QTreeWidgetItem* item, AnalysisMethod *metho
         queue_wgt->next();
         analysis_queue.push_back(analys);
         perform_analysis(analys);
-        current_analysis = item;
+        current_analysis_item = item;
     }
 }
 
@@ -49,13 +46,18 @@ void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> a
 //    start = std::clock();
 //    an_col->start();
     AnalysisMethod* method = get<0>(analys);
-    QThread* analysis_thread = new QThread();
+    bool* abort_bool = new bool(false);
+    method->aborted = abort_bool;
+    abort_map.insert(std::make_pair(method,abort_bool));
 
+    current_method = method;
+    QThread* analysis_thread = new QThread();
     method->moveToThread(analysis_thread);
     connect(analysis_thread, &QThread::started, method, &AnalysisMethod::run);
     connect(method, &AnalysisMethod::finito, analysis_thread, &QThread::quit);
     connect(analysis_thread, &QThread::finished, analysis_thread, &QThread::deleteLater);
 
+    connect(method, &AnalysisMethod::analysis_aborted, this, &AnalysisWidget::on_analysis_aborted);
     connect(method, &AnalysisMethod::send_progress, this,&AnalysisWidget::send_progress);
     connect(method, &AnalysisMethod::finito, method, &AnalysisMethod::deleteLater);
     connect(method, SIGNAL(send_progress(int)),this, SLOT(send_progress(int)));
@@ -70,20 +72,41 @@ void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> a
  * Slot function to be called when an analysis is completed
  * Removes the current analysis from the queue and start the next one if there is one
  */
-void AnalysisWidget::analysis_done(AnalysisProxy analysis) {
+void AnalysisWidget::analysis_done(AnalysisProxy analysis) { 
     analysis_queue.pop_front();
     emit remove_analysis_bar();
-    emit name_in_tree(current_analysis, "Analysis");
-    AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(current_analysis);
+    emit name_in_tree(current_analysis_item, "Analysis");
+    AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(current_analysis_item);
     AnalysisProxy* am = new AnalysisProxy(analysis);
     ana_item->set_analysis(am);
-    VideoItem* vid = dynamic_cast<VideoItem*>(current_analysis->parent());
+    VideoItem* vid = dynamic_cast<VideoItem*>(current_analysis_item->parent());
     vid->get_video_project()->add_analysis(am);
-    current_analysis = nullptr;
-    duration = 0;   
+    current_analysis_item = nullptr;
+    duration = 0;
+
     queue_wgt->next();
     if (!analysis_queue.empty()) {
-        current_analysis = get<1>(analysis_queue.front());
+        current_analysis_item = get<1>(analysis_queue.front());
+        move_queue();
+        perform_analysis(analysis_queue.front());
+    }
+}
+
+void AnalysisWidget::abort_analysis()
+{
+    bool* abort = abort_map.at(current_method);
+    *abort = true;
+}
+
+void AnalysisWidget::on_analysis_aborted()
+{
+    analysis_queue.pop_front();
+    emit remove_analysis_bar();
+    emit name_in_tree(current_analysis_item, "Aborted");
+    delete current_analysis_item;
+    queue_wgt->next();
+    if (!analysis_queue.empty()) {
+        current_analysis_item = get<1>(analysis_queue.front());
         move_queue();
         perform_analysis(analysis_queue.front());
     }
@@ -117,6 +140,6 @@ void AnalysisWidget::send_progress(int progress) {
     }
     queue_wgt->update_progress(progress);
     std::string name = "Loading " + to_string(progress) + "%" + dots;
-    emit name_in_tree(current_analysis, QString::fromStdString(name));
+    emit name_in_tree(current_analysis_item, QString::fromStdString(name));
     emit show_progress(progress);
 }
