@@ -21,7 +21,6 @@ void AnalysisWidget::start_analysis(QTreeWidgetItem* item, AnalysisMethod *metho
     tuple<AnalysisMethod*,QTreeWidgetItem*> analys (method,item);
     queue_wgt->enqueue(method);
     if (!analysis_queue.empty()) {
-        qDebug () << "non empty queue";
         analysis_queue.push_back(analys);        
         std::string name = "Queued #"+to_string(analysis_queue.size()-1);
         emit name_in_tree(item, QString::fromStdString(name));
@@ -40,21 +39,12 @@ void AnalysisWidget::start_analysis(QTreeWidgetItem* item, AnalysisMethod *metho
  * Takes in a tuple consisting of <savepath, videopath, video to be analysed>
  */
 void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> analys) {
-
-    //an_col->new_analysis(get<1>(analys),get<0>(analys));
-//    start = std::clock();
-//    an_col->start();
     AnalysisMethod* method = get<0>(analys);
     bool* abort_bool = new bool(false);
     method->aborted = abort_bool;
     abort_map.insert(std::make_pair(method,abort_bool));    
     current_method = method;
     qDebug()<< (int) current_method;
-//    QThread* analysis_thread = new QThread();
-//    method->moveToThread(analysis_thread);
-//    connect(analysis_thread, &QThread::started, method, &AnalysisMethod::run);
-//    connect(method, &AnalysisMethod::finito, analysis_thread, &QThread::quit);
-//    connect(analysis_thread, &QThread::finished, analysis_thread, &QThread::deleteLater);
 
     connect(method, &AnalysisMethod::analysis_aborted, this, &AnalysisWidget::on_analysis_aborted);
     connect(method, &AnalysisMethod::send_progress, this,&AnalysisWidget::send_progress);       
@@ -63,7 +53,6 @@ void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> a
     QThreadPool::globalInstance()->start(method);
     emit add_analysis_bar();
     queue_wgt->show();
-//    analysis_thread->start();
 }
 
 /**
@@ -73,7 +62,6 @@ void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> a
  * Removes the current analysis from the queue and start the next one if there is one
  */
 void AnalysisWidget::analysis_done(AnalysisProxy analysis) { 
-    qDebug() << "analysis_done";
     emit name_in_tree(current_analysis_item, "Analysis");
     emit show_progress(0);
     analysis_queue.pop_front();
@@ -94,7 +82,7 @@ void AnalysisWidget::analysis_done(AnalysisProxy analysis) {
     }else{
         queue_wgt->hide();
     }
-
+    emit remove_analysis_bar();
 }
 
 void AnalysisWidget::abort_analysis()
@@ -105,24 +93,18 @@ void AnalysisWidget::abort_analysis()
 
 void AnalysisWidget::on_analysis_aborted()
 {    
-    qDebug() << "";
-    qDebug() << "pop front";
     analysis_queue.pop_front();
     delete current_analysis_item; // Delete item from tree
     auto it = abort_map.find(current_method);   
     abort_map.erase(it);
 
     queue_wgt->next();
-    qDebug() << "next end";
     if (!analysis_queue.empty()) {        
-        qDebug() << "non empty queue";
         current_analysis_item = get<1>(analysis_queue.front());
-        qDebug() << "move_queue";
         move_queue();
         perform_analysis(analysis_queue.front());
         return;
     }
-    qDebug() << "remove_analysis_bar";
     // Queue Empty
     queue_wgt->hide();
     emit remove_analysis_bar();
