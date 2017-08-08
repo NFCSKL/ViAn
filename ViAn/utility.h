@@ -10,7 +10,9 @@ namespace Utility{
      int number_of_digits(int n);
      std::string zfill(std::string number, int length);
      std::string name_from_path(const std::string full_path);
-     cv::Rect scale_rect(cv::Rect rect, double scale_factor);
+
+     cv::Rect scale_rect(cv::Rect rect, double scale_factor, cv::Point anchor);
+     QRect scale_rect(QRect rect, double scale_factor, QPoint anchor);
 
      QPoint from_cvpoint(cv::Point point);
      cv::Point from_qpoint(QPoint point);

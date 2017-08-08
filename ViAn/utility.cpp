@@ -45,8 +45,7 @@ std::string Utility::name_from_path(const std::string full_path)
     return res;
 }
 
-
-cv::Rect Utility::scale_rect(cv::Point anchor, cv::Rect rect, double scale_factor)
+cv::Rect Utility::scale_rect(cv::Rect rect, double scale_factor, cv::Point anchor)
 {
     cv::Point start(anchor.x + rect.tl().x/scale_factor, anchor.y = rect.tl().y/scale_factor);
     double height_diff = rect.br().y - rect.tl().y;
@@ -56,6 +55,9 @@ cv::Rect Utility::scale_rect(cv::Point anchor, cv::Rect rect, double scale_facto
     return res;
 }
 
+QRect Utility::scale_rect(QRect rect, double scale_factor, QPoint anchor){
+    return from_cvrect(scale_rect(from_qrect(rect), scale_factor, from_qpoint(anchor)));
+}
 
 QPoint Utility::from_cvpoint(cv::Point point)
 {

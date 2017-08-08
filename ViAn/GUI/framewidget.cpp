@@ -270,6 +270,7 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
 
         double wid_ratio = double(wid) / _qimage.width();
         double height_mod = std::copysign(_qimage.height() * wid_ratio, hei);
+
         cv::Point end = cv::Point(rect_end.x(), rect_start.y() + height_mod);
         cv::Point start (rect_start.x(), rect_start.y());
         cv::Rect scaled = cv::Rect(cv::Point(anchor.x() + start.x / m_scale_factor, anchor.y() + start.y / m_scale_factor),
@@ -378,10 +379,6 @@ void FrameWidget::end_zoom() {
     double wid_ratio = double(wid) / _qimage.width();
     double height_mod = std::copysign(_qimage.height() * wid_ratio, hei);
     QPoint end = QPoint(rect_end.x(), rect_start.y() + height_mod);
-
-
-
-
 
     emit zoom_points(rect_start, end);
 }

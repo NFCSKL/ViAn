@@ -18,10 +18,10 @@ MotionDetection::~MotionDetection() {
 
 void MotionDetection::init_settings()
 {
-    add_setting("OPEN_DEGREE", 16, "Noise filtering, higher=> less noise");
-    add_setting("SMALLEST_OBJECT_SIZE", 500, "Smallest detected object");
+    add_setting("OPEN_DEGREE", 4, "Noise filtering, higher=> less noise");
+    add_setting("SMALLEST_OBJECT_SIZE", 100, "Smallest detected object");
     add_setting("BACKGROUND_HISTORY", 500, "Number of frames in background model");
-    add_setting("MOG2_THRESHOLD", 50, "MOG2");
+    add_setting("MOG2_THRESHOLD", 10, "MOG2");
     add_setting("IGNORE_SHADOWS", 0, "Ignore reflections");
 }
 
@@ -68,7 +68,7 @@ std::vector<DetectionBox> MotionDetection::analyse_frame(){
                 cv::Rect rect_to_original (rect.tl()+slice_rect.tl(), slice_rect.tl() + rect.br());
                 rect = rect_to_original;
             }
-            if(scaling_needed) rect = Utility::scale_rect(rect, scaling_ratio);
+            if(scaling_needed) rect = Utility::scale_rect(rect, scaling_ratio, cv::Point(0,0));
             OOIs.push_back(DetectionBox(rect));
         }
     }    

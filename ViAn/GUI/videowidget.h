@@ -67,7 +67,7 @@ private:
     int m_frame_rate = 0;
     int m_frame_length = 0;
 
-    std::pair<int, int> m_interval = std::make_pair(0, 0);
+    std::pair<int, int> m_interval = std::make_pair(-1, -1);
 
     FrameProcessor* f_processor;
 public:
