@@ -113,7 +113,7 @@ void AnalysisMethod::set_include_exclude_area(std::vector<cv::Point> points, boo
  * @return true if the current frame should be analysed.
  */
 bool AnalysisMethod::sample_current_frame() {
-    return current_frame_index % sample_freq == 0;
+    current_frame_index % sample_freq == 0;
 }
 
 /**
@@ -143,7 +143,7 @@ void AnalysisMethod::run() {
     }
 
     while(!(*aborted) && capture.read(original_frame) &&
-          !(use_interval && (current_frame_index <= end_frame))) {
+          !(use_interval && (current_frame_index >= end_frame))) {
         // do frame analysis
         if (sample_current_frame() || current_frame_index == end_frame) {
             // Slice frame if bounding box should be used
@@ -171,11 +171,6 @@ void AnalysisMethod::run() {
                 detecting = false;
             } else if (!detections.empty()) {
                 detecting = true;
-                if (scaling_needed) {
-                    for (DetectionBox detection : detections) {
-                        detection.scale_coordinates(1.0/scaling_ratio);
-                    }
-                }
                 m_POI->add_detections(current_frame_index, detections);
             }
         } else if (!detections.empty()) {

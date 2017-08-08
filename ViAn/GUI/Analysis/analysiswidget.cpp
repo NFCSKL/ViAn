@@ -9,6 +9,7 @@ AnalysisWidget::AnalysisWidget(QWidget *parent) {
     connect(queue_wgt, SIGNAL(abort_analysis()), this, SLOT(abort_analysis()));
 }
 
+
 /**
  * @brief AnalysisWidget::start_analysis
  * @param save_path     : path to the save map

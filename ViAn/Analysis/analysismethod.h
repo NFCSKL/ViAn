@@ -12,6 +12,7 @@
 #include "Project/Analysis/analysisproxy.h"
 #include "Filehandler/saveable.h"
 #include <atomic>
+#include "utility.h"
 using Settings = std::map<std::string,int>;
 using SettingsDescr = std::map<std::string,std::string>;
 class AnalysisMethod : public QObject ,public QRunnable{

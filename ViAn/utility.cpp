@@ -45,3 +45,34 @@ std::string Utility::name_from_path(const std::string full_path)
     return res;
 }
 
+
+cv::Rect Utility::scale_rect(cv::Point anchor, cv::Rect rect, double scale_factor)
+{
+    cv::Point start(anchor.x + rect.tl().x/scale_factor, anchor.y = rect.tl().y/scale_factor);
+    double height_diff = rect.br().y - rect.tl().y;
+    double width_diff = rect.br().x - rect.tl().x;
+    cv::Point end (anchor.x + rect.tl().x + width_diff/scale_factor, anchor.y + rect.tl().y + height_diff/scale_factor);
+    cv::Rect res = cv::Rect(start, end);
+    return res;
+}
+
+
+QPoint Utility::from_cvpoint(cv::Point point)
+{
+    return QPoint(point.x,point.y);
+}
+
+cv::Point Utility::from_qpoint(QPoint point)
+{
+    return cv::Point(point.x(),point.y());
+}
+
+cv::Rect Utility::from_qrect(QRect rect)
+{
+    return cv::Rect(from_qpoint(rect.topLeft()), from_qpoint(rect.bottomRight()));
+}
+
+QRect Utility::from_cvrect(cv::Rect rect)
+{
+    return QRect(from_cvpoint(rect.tl()), from_cvpoint(rect.br()));
+}

@@ -12,6 +12,8 @@ MotionDetection::MotionDetection(std::string source_file, std::string save_file)
 }
 
 MotionDetection::~MotionDetection() {  
+    background_subtractor.release();
+    dilation_kernel.release();
 }
 
 void MotionDetection::init_settings()
@@ -28,7 +30,7 @@ void MotionDetection::init_settings()
  * @brief MotionDetection::setup_analysis
  * Initial setup of the analysis
  */
-void MotionDetection::setup_analysis(){
+void MotionDetection::setup_analysis(){   
     background_subtractor = cv::createBackgroundSubtractorMOG2(get_setting("BACKGROUND_HISTORY"),
                                                                get_setting("MOG2_THRESHOLD"),
                                                                get_setting("IGNORE_SHADOWS"));
@@ -59,14 +61,14 @@ std::vector<DetectionBox> MotionDetection::analyse_frame(){
     // Creates OOIs from the detected countours.
     cv::findContours(result, contours, cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
     for (std::vector<cv::Point> contour : contours) {
-        if (cv::contourArea(contour) > get_setting("SMALLEST_OBJECT_SIZE")) {
+        if (cv::contourArea(contour) > get_setting("SMALLEST_OBJECT_SIZE")) {            
             cv::Rect rect = cv::boundingRect(contour);
             if(use_bounding_box){
                 cv::Rect slice_rect = bounding_box;
                 cv::Rect rect_to_original (rect.tl()+slice_rect.tl(), slice_rect.tl() + rect.br());
                 rect = rect_to_original;
-
             }
+            if(scaling_needed) rect = Utility::scale_rect(rect, scaling_ratio);
             OOIs.push_back(DetectionBox(rect));
         }
     }    

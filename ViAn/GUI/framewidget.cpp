@@ -274,7 +274,6 @@ void FrameWidget::mouseReleaseEvent(QMouseEvent *event) {
         cv::Point start (rect_start.x(), rect_start.y());
         cv::Rect scaled = cv::Rect(cv::Point(anchor.x() + start.x / m_scale_factor, anchor.y() + start.y / m_scale_factor),
                       cv::Point(anchor.x() + end.x / m_scale_factor, anchor.y() + end.y / m_scale_factor));
-
         settings->setBounding_box(scaled);
         emit quick_analysis(settings);
         tool = NONE;
