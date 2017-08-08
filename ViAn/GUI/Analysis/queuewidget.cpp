@@ -3,6 +3,7 @@
 
 QueueWidget::QueueWidget(QWidget *parent) : QWidget(parent) {
     m_queue = new QListWidget();
+    setWindowTitle(QString::fromStdString("Vian - AnalysisQueue"));
 //    m_queue->setAcceptDrops(true);
 //    m_queue->setDragEnabled(true);
 
