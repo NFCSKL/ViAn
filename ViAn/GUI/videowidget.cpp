@@ -652,14 +652,14 @@ void VideoWidget::new_tag(QString name) {
  * @brief VideoWidget::tag_interval
  */
 void VideoWidget::tag_interval() {
-    if (m_tag != nullptr) {
-        if (m_interval.first != -1 && m_interval.second != -1 && m_interval.first <= m_interval.second) {
-            m_tag->add_interval(new AnalysisInterval(m_interval.first, m_interval.second));
-            playback_slider->set_basic_analysis(m_tag);
-            delete_interval();
-        }
-    } else {
-        emit set_status_bar("No tag selected");
+    if(m_tag == nullptr){
+        emit set_status_bar("Please select a tag");
+        return;
+    }
+    if (m_interval.first != -1 && m_interval.second != -1 && m_interval.first <= m_interval.second) {
+        m_tag->add_interval(new AnalysisInterval(m_interval.first, m_interval.second));
+        playback_slider->set_basic_analysis(m_tag);
+        delete_interval();
     }
 }
 
