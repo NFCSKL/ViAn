@@ -75,9 +75,11 @@ void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> a
  */
 void AnalysisWidget::analysis_done(AnalysisProxy analysis) { 
     qDebug() << "analysis_done";
-    analysis_queue.pop_front();
-    emit remove_analysis_bar();
     emit name_in_tree(current_analysis_item, "Analysis");
+    emit show_progress(0);
+    analysis_queue.pop_front();
+
+
     AnalysisItem* ana_item = dynamic_cast<AnalysisItem*>(current_analysis_item);
     AnalysisProxy* am = new AnalysisProxy(analysis);
     ana_item->set_analysis(am);
@@ -85,7 +87,6 @@ void AnalysisWidget::analysis_done(AnalysisProxy analysis) {
     vid->get_video_project()->add_analysis(am);
     current_analysis_item = nullptr;
     duration = 0;
-
     queue_wgt->next();
     if (!analysis_queue.empty()) {
         current_analysis_item = get<1>(analysis_queue.front());
@@ -116,11 +117,13 @@ void AnalysisWidget::on_analysis_aborted()
     if (!analysis_queue.empty()) {        
         qDebug() << "non empty queue";
         current_analysis_item = get<1>(analysis_queue.front());
+        qDebug() << "move_queue";
         move_queue();
         perform_analysis(analysis_queue.front());
-    }else{
-        qDebug() << "empty queue";
+        return;
     }
+    qDebug() << "remove_analysis_bar";
+    // Queue Empty
     emit remove_analysis_bar();
 }
 
