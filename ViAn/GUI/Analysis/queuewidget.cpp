@@ -33,14 +33,18 @@ void QueueWidget::next()
         item = m_queue->takeItem(0);
         m_line->setText(item->text());
     }else{
+        qDebug() << "hide abort_btn";
         abort_btn->hide();
+        qDebug() << "hide progressbar";
         progressbar->hide();
+        qDebug() << "hide progressbar end";
     }
-
 }
 
 void QueueWidget::enqueue(AnalysisMethod *method)
 {
+    abort_btn->show();
+    progressbar->show();
     AnalysisListItem* item = new AnalysisListItem(method);
     std::string path = method->save_path();
     std::size_t index = path.find_last_of('/') + 1;
@@ -53,7 +57,7 @@ void QueueWidget::enqueue(AnalysisMethod *method)
 }
 
 void QueueWidget::update_progress(int i)
-{
+{    
     progressbar->setValue(i);
 }
 
