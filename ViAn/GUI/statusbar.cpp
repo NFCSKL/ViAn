@@ -22,15 +22,20 @@ void StatusBar::add_analysis_bar() {
     ana_prog->setMaximumHeight(PROG_BAR_HEIGHT);
     ana_prog->setMaximumWidth(PROG_BAR_WIDTH);
     //ana_prog->setMaximum(100);
-
     addPermanentWidget(ana_prog);
 }
 
 void StatusBar::update_analysis_bar(int progress) {
+    if(ana_prog == nullptr) return;
     ana_prog->setValue(progress);
 }
 
 void StatusBar::remove_analysis_bar() {
+    if(ana_prog == nullptr) return;
+
+    qDebug() << "remove widget";
     removeWidget(ana_prog);
+    qDebug() << "delete widget";
     delete ana_prog;
+    ana_prog = nullptr;
 }

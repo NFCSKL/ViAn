@@ -195,8 +195,10 @@ void AnalysisMethod::run() {
         original_frame.release();
     }
     if(*aborted){
+        capture.release();
         emit analysis_aborted();
         emit finito();
+        return;
     }else{
         // Makes sure that a POI that stretches to the end of the
         // video gets an end frame.

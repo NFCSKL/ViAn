@@ -6,7 +6,7 @@
 #include <tuple>
 AnalysisWidget::AnalysisWidget(QWidget *parent) {
     queue_wgt = new QueueWidget();
-    connect(queue_wgt, SIGNAL(abort_analysis()), this, SLOT(abort_analysis()));
+    connect(queue_wgt,SIGNAL(abort_analysis()), this, SLOT(abort_analysis()));
 }
 
 
@@ -74,7 +74,6 @@ void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> a
  * Removes the current analysis from the queue and start the next one if there is one
  */
 void AnalysisWidget::analysis_done(AnalysisProxy analysis) { 
-    qDebug() << "analysis_done";
     analysis_queue.pop_front();
     emit remove_analysis_bar();
     emit name_in_tree(current_analysis_item, "Analysis");
@@ -104,16 +103,15 @@ void AnalysisWidget::abort_analysis()
 
 void AnalysisWidget::on_analysis_aborted()
 {    
-    qDebug() << "";
     qDebug() << "pop front";
     analysis_queue.pop_front();
+    emit remove_analysis_bar();
     delete current_analysis_item; // Delete item from tree
-    auto it = abort_map.find(current_method);
-    abort_map.erase(it);
     qDebug() << "next";
-    queue_wgt->next();
+
     qDebug() << "next end";
-    if (!analysis_queue.empty()) {        
+    if (!analysis_queue.empty()) {
+        queue_wgt->next();
         qDebug() << "non empty queue";
         current_analysis_item = get<1>(analysis_queue.front());
         move_queue();
@@ -121,7 +119,6 @@ void AnalysisWidget::on_analysis_aborted()
     }else{
         qDebug() << "empty queue";
     }
-    emit remove_analysis_bar();
 }
 
 /**

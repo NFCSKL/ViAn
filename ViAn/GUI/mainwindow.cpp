@@ -278,7 +278,7 @@ void MainWindow::init_view_menu() {
     bound_box_act->setChecked(true);
     interval_act->setChecked(true);
     drawing_act->setChecked(true);
-    show_analysis_queue->setChecked(false);
+    show_analysis_queue->setChecked(true);
 
     view_menu->addAction(toggle_project_wgt);
     view_menu->addAction(toggle_bookmark_wgt);
