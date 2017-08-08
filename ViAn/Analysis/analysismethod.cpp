@@ -113,7 +113,7 @@ void AnalysisMethod::set_include_exclude_area(std::vector<cv::Point> points, boo
  * @return true if the current frame should be analysed.
  */
 bool AnalysisMethod::sample_current_frame() {
-    current_frame_index % sample_freq == 0;
+    return current_frame_index % sample_freq == 0;
 }
 
 /**
