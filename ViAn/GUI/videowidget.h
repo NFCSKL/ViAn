@@ -58,7 +58,7 @@ private:
     std::atomic_bool new_frame{false};          // True when a new frame has been loaded by the video player
     std::atomic_bool new_video{false};          // True when a new video is loaded
     std::atomic_bool new_frame_video{false};    // True when a new video has been loaded by video player but not by frameprocesser
-    
+
     std::condition_variable player_con;         // Used to notify the video player when to load a new video or when to play the current one
     std::mutex player_lock;
 
@@ -187,7 +187,7 @@ private:
     DoubleClickButton* prev_poi_btn;
     QPushButton* analysis_btn;
     QPushButton* analysis_play_btn;
-    QPushButton* bookmark_btn;    
+    QPushButton* bookmark_btn;
     QPushButton* tag_btn;
     QPushButton* new_tag_btn;
     QPushButton* zoom_in_btn;
@@ -205,7 +205,7 @@ private:
     QHBoxLayout* zoom_btns;       // Zoom buttons
     QHBoxLayout* interval_btns;   // Interval buttons
     QGridLayout* speed_slider_layout;
-    
+
     std::vector<QPushButton*> btns;
 
     QString convert_time(int time);

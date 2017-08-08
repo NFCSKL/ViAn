@@ -281,7 +281,6 @@ void VideoWidget::set_btn_tab_order() {
  * Set shortcuts to the buttons
  */
 void VideoWidget::set_btn_shortcuts() {
-    play_btn->setShortcut(Qt::Key_Space);
     stop_btn->setShortcut(Qt::Key_X);
     next_frame_btn->setShortcut(Qt::Key_Right);
     prev_frame_btn->setShortcut(Qt::Key_Left);
