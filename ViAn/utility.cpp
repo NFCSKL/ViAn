@@ -42,3 +42,10 @@ std::string Utility::zfill(std::string number, int length){
     else
         return number;
 }
+
+std::string Utility::name_from_path(const std::string full_path)
+{
+    std::string res = full_path.substr(full_path.find_last_of("/")+1, full_path.size());
+    return res;
+}
+

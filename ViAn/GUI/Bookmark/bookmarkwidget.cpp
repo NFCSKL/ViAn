@@ -36,7 +36,7 @@ BookmarkWidget::BookmarkWidget(QWidget *parent) : QWidget(parent){
 }
 
 void BookmarkWidget::add_new_folder() {
-    BookmarkCategory* f2 = new BookmarkCategory("name", bm_list, CONTAINER);
+    BookmarkCategory* f2 = new BookmarkCategory(std::string("Category " +  std::to_string(category_cnt++)), bm_list, CONTAINER);
     bm_list->addItem(f2);
     connect(f2, SIGNAL(set_bookmark_video(VideoProject*,int)), this, SIGNAL(play_bookmark_video(VideoProject*,int)));
 
@@ -54,7 +54,7 @@ void BookmarkWidget::generate_report()
             std::vector<BookmarkItem*> _temp_ref = _tmp_cat->get_references();
             std::vector<BookmarkItem*> _temp_disp = _tmp_cat->get_disputed();
 
-            RefDisp ref_disp = std::make_pair(_temp_ref, _temp_disp);
+            RefDisp ref_disp = std::make_pair(_temp_disp, _temp_ref);
             rp_cont.push_back(std::make_pair(cat_name, ref_disp));
         }
     }
