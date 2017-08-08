@@ -33,11 +33,8 @@ void QueueWidget::next()
         item = m_queue->takeItem(0);
         m_line->setText(item->text());
     }else{
-        qDebug() << "hide abort_btn";
         abort_btn->hide();
-        qDebug() << "hide progressbar";
         progressbar->hide();
-        qDebug() << "hide progressbar end";
     }
 }
 

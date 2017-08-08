@@ -44,7 +44,6 @@ void AnalysisWidget::perform_analysis(tuple<AnalysisMethod*, QTreeWidgetItem*> a
     method->aborted = abort_bool;
     abort_map.insert(std::make_pair(method,abort_bool));    
     current_method = method;
-    qDebug()<< (int) current_method;
 
     connect(method, &AnalysisMethod::analysis_aborted, this, &AnalysisWidget::on_analysis_aborted);
     connect(method, &AnalysisMethod::send_progress, this,&AnalysisWidget::send_progress);       

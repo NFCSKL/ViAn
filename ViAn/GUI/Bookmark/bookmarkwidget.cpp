@@ -99,7 +99,6 @@ void BookmarkWidget::create_bookmark(VideoProject* vid_proj, const int frame_nbr
     int index = file_name.find_last_of('/') + 1;
     file_name = file_name.substr(index);
     file_name += "_" + std::to_string(frame_nbr);
-    qDebug() << file_name.c_str();
     ImageGenerator im_gen(frame, m_path);
     std::string thumbnail_path = im_gen.create_thumbnail(file_name);
     std::string bm_file = im_gen.create_bookmark(file_name);
