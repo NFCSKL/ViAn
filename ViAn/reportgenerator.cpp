@@ -49,7 +49,7 @@ QString ReportGenerator::get_bookmark_descr(BookmarkItem *bm)
     QString bm_description = QString::fromStdString(bm->get_bookmark()->get_description());
     QString description = QString("Beskrivning: %1").arg(bm_description);
 
-    return img_file + QString("\v") + QString("\v") + frame_nr + QString("\v") + description;
+    return img_file + QString("\v") + frame_nr + QString("\v") + description;
 }
 
 
