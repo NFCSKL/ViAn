@@ -1,8 +1,4 @@
 #include "utility.h"
-
-Utility::Utility(){
-}
-
 /**
  * @brief Utility::size_ratio
  * calculates and returns the height and width ratios between the two QSize objects
