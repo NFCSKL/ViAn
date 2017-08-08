@@ -11,9 +11,7 @@ MotionDetection::MotionDetection(std::string source_file, std::string save_file)
     init_settings();    
 }
 
-MotionDetection::~MotionDetection() {
-    background_subtractor.release();
-    dilation_kernel.release();
+MotionDetection::~MotionDetection() {  
 }
 
 void MotionDetection::init_settings()
@@ -30,7 +28,7 @@ void MotionDetection::init_settings()
  * @brief MotionDetection::setup_analysis
  * Initial setup of the analysis
  */
-void MotionDetection::setup_analysis(){    
+void MotionDetection::setup_analysis(){
     background_subtractor = cv::createBackgroundSubtractorMOG2(get_setting("BACKGROUND_HISTORY"),
                                                                get_setting("MOG2_THRESHOLD"),
                                                                get_setting("IGNORE_SHADOWS"));
@@ -50,8 +48,8 @@ std::vector<DetectionBox> MotionDetection::analyse_frame(){
     std::vector<DetectionBox> OOIs;
     std::vector<std::vector<cv::Point> > contours;
     // Updates background model
-    background_subtractor->apply(analysis_frame, foreground_mask,-1);
-    cv::threshold(foreground_mask, foreground_mask, DETECTION_THRESHOLD, GRAYSCALE_WHITE, cv::THRESH_BINARY);
+    background_subtractor->apply(analysis_frame, temp,-1);
+    cv::threshold(temp, foreground_mask, DETECTION_THRESHOLD, GRAYSCALE_WHITE, cv::THRESH_BINARY);
     cv::morphologyEx(foreground_mask, result, cv::MORPH_OPEN, dilation_kernel);
 
     //This code excludes the area of the frame that has been given by exclude_frame.
@@ -71,8 +69,6 @@ std::vector<DetectionBox> MotionDetection::analyse_frame(){
             }
             OOIs.push_back(DetectionBox(rect));
         }
-    }
-
-    analysis_frame.release();
+    }    
     return OOIs;
 }
