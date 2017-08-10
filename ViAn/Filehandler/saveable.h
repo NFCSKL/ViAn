@@ -19,11 +19,7 @@
 class Saveable : public Writeable
 {
 private:
-<<<<<<< HEAD
     std::string m_full_path = ""; // Used to save complete saved path, i.e /Dir/Path/file.ending
-=======
-    std::string m_full_path = "UNSET PATH"; // Used to save complete saved path, i.e /Dir/Path/file.ending
->>>>>>> 27a0be1c827a271dbb011d3d089a470771a4ea0b
 public:
 
     enum SAVE_FORMAT {JSON, BINARY};    // Formats supported by save_project
